@@ -1,6 +1,5 @@
 import API from "./api";
 
-// GET PORTFOLIO BY TAILOR ID
 export const getMyPortfolios =
   async (tailorId) => {
 

@@ -1,19 +1,19 @@
 import { useEffect, useState }
 from "react";
 
+import { useNavigate }
+from "react-router-dom";
+
 import { getMyTailor }
 from "../services/tailorService";
 
-import { getMyPortfolios }
-from "../services/portfolioService";
-
 const Dashboard = () => {
+
+  const navigate =
+    useNavigate();
 
   const [tailor, setTailor] =
     useState(null);
-
-  const [portfolios, setPortfolios] =
-    useState([]);
 
   useEffect(() => {
 
@@ -29,15 +29,6 @@ const Dashboard = () => {
         await getMyTailor();
 
       setTailor(tailorData);
-
-      const portfolioData =
-        await getMyPortfolios(
-          tailorData.id
-        );
-
-      setPortfolios(
-        portfolioData
-      );
 
     } catch (error) {
 
@@ -71,7 +62,6 @@ const Dashboard = () => {
             borderRadius: "10px",
             boxShadow:
               "0px 2px 10px rgba(0,0,0,0.1)",
-            marginBottom: "30px",
           }}>
 
             <h2 style={{
@@ -140,63 +130,33 @@ const Dashboard = () => {
               {tailor.rating}
             </p>
 
+            <button
+              onClick={() =>
+                navigate(
+                  "/manage-portfolio"
+                )
+              }
+
+              style={{
+                marginTop: "20px",
+                padding:
+                  "10px 20px",
+                backgroundColor:
+                  "#4CAF50",
+                color: "white",
+                border: "none",
+                borderRadius: "8px",
+                cursor: "pointer",
+                fontWeight: "bold",
+              }}
+            >
+              Manage Portfolio
+            </button>
+
           </div>
 
         )
       }
-
-      <h2 style={{
-        marginBottom: "20px",
-      }}>
-        Portfolio
-      </h2>
-
-      <div style={{
-        display: "flex",
-        gap: "20px",
-        flexWrap: "wrap",
-      }}>
-
-        {
-          portfolios.map((item) => (
-
-            <div
-              key={item.id}
-
-              style={{
-                width: "300px",
-                backgroundColor: "white",
-                padding: "15px",
-                borderRadius: "10px",
-                boxShadow:
-                  "0px 2px 10px rgba(0,0,0,0.1)",
-              }}
-            >
-
-              <img
-                src={item.image_url}
-                alt="portfolio"
-
-                style={{
-                  width: "100%",
-                  height: "200px",
-                  objectFit: "cover",
-                  borderRadius: "10px",
-                }}
-              />
-
-              <p style={{
-                marginTop: "10px",
-              }}>
-                {item.description}
-              </p>
-
-            </div>
-
-          ))
-        }
-
-      </div>
 
     </div>
 

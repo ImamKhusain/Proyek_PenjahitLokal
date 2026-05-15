@@ -4,13 +4,19 @@ import {
   Route,
 } from "react-router-dom";
 
-import Login from "../pages/Login";
+import Login
+from "../pages/Login";
 
-import Dashboard from "../pages/Dashboard";
+import Dashboard
+from "../pages/Dashboard";
+
+import ManagePortfolio
+from "../pages/ManagePortfolio";
 
 const AppRoutes = () => {
 
   return (
+
     <BrowserRouter>
 
       <Routes>
@@ -25,10 +31,19 @@ const AppRoutes = () => {
           element={<Dashboard />}
         />
 
+        <Route
+          path="/manage-portfolio"
+          element={
+            <ManagePortfolio />
+          }
+        />
+
       </Routes>
 
     </BrowserRouter>
+
   );
+
 };
 
 export default AppRoutes;

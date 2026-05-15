@@ -1,102 +1,54 @@
-const Portfolio = require("../schema/Portfolio");
-const Tailor = require("../schema/Tailor");
+const { DataTypes } =
+  require("sequelize");
 
-// GET ALL PORTFOLIOS
-const findAll = async () => {
+const sequelize =
+  require("../config/database");
 
-  return await Portfolio.findAll({
-    include: [
-      {
-        model: Tailor,
-        attributes: [
-          "id",
-          "specialization",
-        ],
+const Tailor =
+  require("./Tailor");
+
+const Portfolio =
+  sequelize.define(
+    "Portfolio",
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
       },
-    ],
-  });
 
-};
+      tailor_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
 
-// CREATE PORTFOLIO
-const create = async (portfolioData) => {
+      image_url: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
 
-  return await Portfolio.create(
-    portfolioData
+      description: {
+        type: DataTypes.TEXT,
+      },
+
+      created_at: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
+      },
+    },
+    {
+      tableName: "portfolios",
+      timestamps: false,
+    }
   );
 
-};
+// RELATION
+Portfolio.belongsTo(Tailor, {
+  foreignKey: "tailor_id",
+});
 
-// GET PORTFOLIO BY ID
-const findById = async (id) => {
+Tailor.hasMany(Portfolio, {
+  foreignKey: "tailor_id",
+});
 
-  return await Portfolio.findByPk(id, {
-    include: [
-      {
-        model: Tailor,
-        attributes: [
-          "id",
-          "specialization",
-        ],
-      },
-    ],
-  });
-
-};
-
-// GET PORTFOLIO BY TAILOR ID
-const findByTailorId =
-  async (tailorId) => {
-
-    return await Portfolio.findAll({
-      where: {
-        tailor_id: tailorId,
-      },
-
-      include: [
-        {
-          model: Tailor,
-          attributes: [
-            "id",
-            "specialization",
-          ],
-        },
-      ],
-    });
-
-};
-
-// UPDATE PORTFOLIO
-const updateById =
-  async (id, portfolioData) => {
-
-    return await Portfolio.update(
-      portfolioData,
-      {
-        where: {
-          id,
-        },
-      }
-    );
-
-};
-
-// DELETE PORTFOLIO
-const deleteById = async (id) => {
-
-  return await Portfolio.destroy({
-    where: {
-      id,
-    },
-  });
-
-};
-
-module.exports = {
-  findAll,
-  create,
-  findById,
-  findByTailorId,
-  updateById,
-  deleteById,
-};
+module.exports = Portfolio;
