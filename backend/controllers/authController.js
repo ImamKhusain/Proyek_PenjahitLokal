@@ -2,13 +2,12 @@ const userModel = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-// REGISTER
-const register = async (req, res) => {
+// REGISTER CUSTOMER
+const registerCustomer = async (req, res) => {
   try {
 
-    const { name, email, password, role } = req.body;
+    const { name, email, password } = req.body;
 
-    // cek email
     const existingUser = await userModel.findByEmail(email);
 
     if (existingUser) {
@@ -17,26 +16,62 @@ const register = async (req, res) => {
       });
     }
 
-    // hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // create user
     const newUser = await userModel.create({
       name,
       email,
       password: hashedPassword,
-      role,
+      role: "customer",
     });
 
     res.status(201).json({
-      message: "Register success",
+      message: "Customer registered successfully",
       data: newUser,
     });
 
   } catch (error) {
 
     res.status(500).json({
-      message: "Error registering user",
+      message: "Error register customer",
+      error: error.message,
+    });
+
+  }
+};
+
+// REGISTER ADMIN / PENJAHIT
+const registerAdmin = async (req, res) => {
+  try {
+
+    const { name, email, password } = req.body;
+
+    const existingUser = await userModel.findByEmail(email);
+
+    if (existingUser) {
+      return res.status(400).json({
+        message: "Email already registered",
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = await userModel.create({
+      name,
+      email,
+      password: hashedPassword,
+      role: "admin",
+    });
+
+    res.status(201).json({
+      message: "Admin registered successfully",
+      data: newUser,
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      message: "Error register admin",
       error: error.message,
     });
 
@@ -49,7 +84,6 @@ const login = async (req, res) => {
 
     const { email, password } = req.body;
 
-    // cek user
     const user = await userModel.findByEmail(email);
 
     if (!user) {
@@ -58,7 +92,6 @@ const login = async (req, res) => {
       });
     }
 
-    // cek password
     const isMatch = await bcrypt.compare(
       password,
       user.password
@@ -70,7 +103,6 @@ const login = async (req, res) => {
       });
     }
 
-    // generate token
     const token = jwt.sign(
       {
         id: user.id,
@@ -99,6 +131,7 @@ const login = async (req, res) => {
 };
 
 module.exports = {
-  register,
+  registerCustomer,
+  registerAdmin,
   login,
 };
