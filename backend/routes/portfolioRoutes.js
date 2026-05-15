@@ -4,20 +4,36 @@ const router = express.Router();
 
 const {
   getAllPortfolios,
+  getPortfolioByTailorId,
   createPortfolio,
   getPortfolioById,
   updatePortfolio,
   deletePortfolio,
 } = require("../controllers/portfolioController");
 
-const authMiddleware = require("../middleware/authMiddleware");
-const adminMiddleware = require("../middleware/adminMiddleware");
+const authMiddleware =
+  require("../middleware/authMiddleware");
+
+const adminMiddleware =
+  require("../middleware/adminMiddleware");
 
 // GET ALL PORTFOLIOS
-router.get("/", getAllPortfolios);
+router.get(
+  "/",
+  getAllPortfolios
+);
+
+// GET PORTFOLIO BY TAILOR ID
+router.get(
+  "/tailor/:tailorId",
+  getPortfolioByTailorId
+);
 
 // GET PORTFOLIO BY ID
-router.get("/:id", getPortfolioById);
+router.get(
+  "/:id",
+  getPortfolioById
+);
 
 // CREATE PORTFOLIO
 router.post(

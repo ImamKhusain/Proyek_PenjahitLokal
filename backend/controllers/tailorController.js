@@ -21,12 +21,43 @@ const getAllTailors = async (req, res) => {
   }
 };
 
+// GET MY TAILOR
+const getMyTailor = async (req, res) => {
+  try {
+
+    const tailor =
+      await tailorModel.findByUserId(
+        req.user.id
+      );
+
+    if (!tailor) {
+
+      return res.status(404).json({
+        message: "Tailor not found",
+      });
+
+    }
+
+    res.status(200).json({
+      message: "My tailor retrieved successfully",
+      data: tailor,
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      message: "Error retrieving my tailor",
+      error: error.message,
+    });
+
+  }
+};
+
 // CREATE TAILOR
 const createTailor = async (req, res) => {
   try {
 
     const {
-      user_id,
       specialization,
       description,
       address,
@@ -34,11 +65,15 @@ const createTailor = async (req, res) => {
     } = req.body;
 
     const newTailor = await tailorModel.create({
-      user_id,
+
+      // otomatis ambil user login
+      user_id: req.user.id,
+
       specialization,
       description,
       address,
       phone,
+
     });
 
     res.status(201).json({
@@ -62,12 +97,15 @@ const getTailorById = async (req, res) => {
 
     const { id } = req.params;
 
-    const tailor = await tailorModel.findById(id);
+    const tailor =
+      await tailorModel.findById(id);
 
     if (!tailor) {
+
       return res.status(404).json({
         message: "Tailor not found",
       });
+
     }
 
     res.status(200).json({
@@ -98,12 +136,15 @@ const updateTailor = async (req, res) => {
       phone,
     } = req.body;
 
-    const tailor = await tailorModel.findById(id);
+    const tailor =
+      await tailorModel.findById(id);
 
     if (!tailor) {
+
       return res.status(404).json({
         message: "Tailor not found",
       });
+
     }
 
     await tailorModel.updateById(id, {
@@ -133,12 +174,15 @@ const deleteTailor = async (req, res) => {
 
     const { id } = req.params;
 
-    const tailor = await tailorModel.findById(id);
+    const tailor =
+      await tailorModel.findById(id);
 
     if (!tailor) {
+
       return res.status(404).json({
         message: "Tailor not found",
       });
+
     }
 
     await tailorModel.deleteById(id);
@@ -159,6 +203,7 @@ const deleteTailor = async (req, res) => {
 
 module.exports = {
   getAllTailors,
+  getMyTailor,
   createTailor,
   getTailorById,
   updateTailor,

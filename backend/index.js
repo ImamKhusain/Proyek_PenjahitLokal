@@ -12,6 +12,7 @@ require("./schema/Portfolio");
 require("./schema/Payment");
 require("./schema/Rating");
 
+
 // IMPORT ROUTES
 const authRoutes = require("./routes/authRoutes");
 const tailorRoutes = require("./routes/tailorRoutes");
@@ -19,7 +20,7 @@ const bookingRoutes = require("./routes/bookingRoutes");
 const portfolioRoutes = require("./routes/portfolioRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const ratingRoutes = require("./routes/ratingRoutes");
-
+const userRoutes = require("./routes/userRoutes");
 const app = express();
 
 // MIDDLEWARE
@@ -33,6 +34,7 @@ app.use("/api/bookings", bookingRoutes);
 app.use("/api/portfolios", portfolioRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/ratings", ratingRoutes);
+app.use("/api/users", userRoutes);
 
 // ROOT
 app.get("/", (req, res) => {
