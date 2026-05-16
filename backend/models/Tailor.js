@@ -47,28 +47,25 @@ const findById = async (id) => {
 };
 
 // GET TAILOR BY USER ID
-const findByUserId =
-  async (userId) => {
-
-    return await Tailor.findOne({
-      where: {
-        user_id: userId,
+// GET TAILOR BY USER ID
+const findByUserId = async (userId) => {
+  // UBAH findOne MENJADI findAll DI SINI 👇
+  return await Tailor.findAll({
+    where: {
+      user_id: userId,
+    },
+    include: [
+      {
+        model: User,
+        attributes: [
+          "id",
+          "name",
+          "email",
+        ],
       },
-
-      include: [
-        {
-          model: User,
-          attributes: [
-            "id",
-            "name",
-            "email",
-          ],
-        },
-      ],
-    });
-
+    ],
+  });
 };
-
 // UPDATE TAILOR
 const updateById =
   async (id, tailorData) => {

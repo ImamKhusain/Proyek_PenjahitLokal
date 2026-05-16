@@ -23,21 +23,27 @@ const AuthProvider = ({
     const role =
       localStorage.getItem("role");
 
+    // AMBIL NAMA JUGA SAAT REFRESH
+    const name =
+      localStorage.getItem("name");
+
     if (token && role) {
 
       setUser({
         token,
         role,
+        name, // Masukkan nama ke dalam state global
       });
 
     }
 
   }, []);
 
-  // LOGIN
+  // LOGIN (Tambahkan parameter name di sini)
   const login = (
     token,
-    role
+    role,
+    name
   ) => {
 
     localStorage.setItem(
@@ -50,9 +56,16 @@ const AuthProvider = ({
       role
     );
 
+    // SIMPAN NAMA KE STORAGE
+    localStorage.setItem(
+      "name",
+      name || ""
+    );
+
     setUser({
       token,
       role,
+      name, // Masukkan nama ke dalam state global user
     });
 
   };
@@ -66,6 +79,11 @@ const AuthProvider = ({
 
     localStorage.removeItem(
       "role"
+    );
+
+    // HAPUS NAMA SAAT LOGOUT
+    localStorage.removeItem(
+      "name"
     );
 
     setUser(null);

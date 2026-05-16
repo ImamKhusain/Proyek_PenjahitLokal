@@ -18,28 +18,31 @@ const getAllTailors = async (req, res) => {
 };
 
 // GET MY TAILOR
+// GET MY TAILOR
 const getMyTailor = async (req, res) => {
   try {
-    const tailor = await tailorModel.findByUserId(req.user.id);
+    // Hasilnya sekarang berupa Array (daftar penjahit)
+    const tailors = await tailorModel.findByUserId(req.user.id);
 
-    if (!tailor) {
+    // Karena findAll mengembalikan [], kita cek panjang array-nya
+    if (!tailors || tailors.length === 0) {
       return res.status(404).json({
-        message: "Tailor not found",
+        message: "Belum ada profil penjahit",
+        data: [], // Kembalikan array kosong agar frontend aman
       });
     }
 
     res.status(200).json({
-      message: "My tailor retrieved successfully",
-      data: tailor,
+      message: "My tailors retrieved successfully",
+      data: tailors, // Mengirimkan semua daftar penjahit
     });
   } catch (error) {
     res.status(500).json({
-      message: "Error retrieving my tailor",
+      message: "Error retrieving my tailors",
       error: error.message,
     });
   }
 };
-
 // CREATE TAILOR
 const createTailor = async (req, res) => {
   try {

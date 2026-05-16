@@ -114,10 +114,14 @@ const login = async (req, res) => {
       }
     );
 
+    // ==========================================================
+    // PERBAIKAN: Menambahkan kolom name dari database ke response
+    // ==========================================================
     res.status(200).json({
       message: "Login success",
       token,
       role: user.role,
+      name: user.name, // Data name sekarang ikut dikirim ke frontend!
     });
 
   } catch (error) {

@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const path = require("path"); // 1. TAMBAHAN: Mengimpor modul path bawaan Node.js
 require("dotenv").config();
 
 const sequelize = require("./config/database");
@@ -12,7 +13,6 @@ require("./schema/Portfolio");
 require("./schema/Payment");
 require("./schema/Rating");
 
-
 // IMPORT ROUTES
 const authRoutes = require("./routes/authRoutes");
 const tailorRoutes = require("./routes/tailorRoutes");
@@ -21,11 +21,15 @@ const portfolioRoutes = require("./routes/portfolioRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const ratingRoutes = require("./routes/ratingRoutes");
 const userRoutes = require("./routes/userRoutes");
+
 const app = express();
 
 // MIDDLEWARE
 app.use(cors());
 app.use(express.json());
+
+// 2. TAMBAHAN MIDDLEWARE: Membuka akses folder 'uploads' agar bisa diakses oleh Frontend
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // ROUTES
 app.use("/api/auth", authRoutes);
@@ -46,7 +50,6 @@ sequelize
   .authenticate()
   .then(() => {
     console.log("Database connected");
-
     return sequelize.sync();
   })
   .then(() => {

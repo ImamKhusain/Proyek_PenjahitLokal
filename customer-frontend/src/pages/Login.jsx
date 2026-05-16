@@ -49,10 +49,11 @@ const Login = () => {
         const response =
           await login(formData);
 
-        // SIMPAN KE AUTH CONTEXT
+        // Mengirimkan token, role, dan name dari response API backend
         loginContext(
           response.token,
-          response.role
+          response.role,
+          response.name
         );
 
         // CEK CUSTOMER
@@ -156,4 +157,5 @@ const Login = () => {
 
 };
 
+// BARIS INI WAJIB ADA AGAR APPROUTES TIDAK ERROR MERAH
 export default Login;
