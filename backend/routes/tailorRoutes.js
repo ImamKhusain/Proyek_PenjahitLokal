@@ -1,5 +1,4 @@
 const express = require("express");
-
 const router = express.Router();
 
 const {
@@ -11,11 +10,11 @@ const {
   deleteTailor,
 } = require("../controllers/tailorController");
 
-const authMiddleware =
-  require("../middleware/authMiddleware");
+const authMiddleware = require("../middleware/authMiddleware");
+const adminMiddleware = require("../middleware/adminMiddleware");
 
-const adminMiddleware =
-  require("../middleware/adminMiddleware");
+// TAMBAHAN: Import multer middleware yang sudah kamu buat
+const upload = require("../middleware/uploadMiddleware");
 
 // GET ALL TAILORS
 router.get("/", getAllTailors);
@@ -36,6 +35,7 @@ router.post(
   "/",
   authMiddleware,
   adminMiddleware,
+  upload.single("photo"), // TAMBAHAN: Tangkap file gambar dengan field 'photo'
   createTailor
 );
 
@@ -44,6 +44,7 @@ router.put(
   "/:id",
   authMiddleware,
   adminMiddleware,
+  upload.single("photo"), // TAMBAHAN: Tangkap file gambar dengan field 'photo'
   updateTailor
 );
 

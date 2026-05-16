@@ -16,7 +16,14 @@ const Tailor = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false, // Wajib diisi
+    },
+    photo: {
+      type: DataTypes.STRING,
+      allowNull: true, // Boleh kosong jika belum upload
+    },
     specialization: {
       type: DataTypes.STRING,
       allowNull: false,
