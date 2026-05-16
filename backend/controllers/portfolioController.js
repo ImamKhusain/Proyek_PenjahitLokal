@@ -69,6 +69,7 @@ const createPortfolio = async (req, res) => {
 
     const {
       tailor_id,
+      name,
       description,
       price,
       size,
@@ -87,6 +88,7 @@ const createPortfolio = async (req, res) => {
       await portfolioModel.create({
 
         tailor_id,
+        name,
         image_url: imageUrl,
         description,
         price: parseInt(price) || 0,
@@ -165,6 +167,7 @@ const updatePortfolio =
         req.params;
 
       const {
+        name,
         image_url,
         description,
         price,
@@ -186,6 +189,7 @@ const updatePortfolio =
       await portfolioModel.updateById(
         id,
         {
+          name,
           image_url,
           description,
           price: price ? parseInt(price) : undefined,
