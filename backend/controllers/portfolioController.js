@@ -69,16 +69,28 @@ const createPortfolio = async (req, res) => {
 
     const {
       tailor_id,
-      image_url,
       description,
+      price,
+      size,
     } = req.body;
+
+    if (!req.file) {
+      return res.status(400).json({
+        message: "Error creating portfolio",
+        error: "Harap unggah file foto portofolio.",
+      });
+    }
+
+    const imageUrl = `http://localhost:8080/uploads/catalog/${req.file.filename}`;
 
     const newPortfolio =
       await portfolioModel.create({
 
         tailor_id,
-        image_url,
+        image_url: imageUrl,
         description,
+        price: parseInt(price) || 0,
+        size,
 
       });
 
@@ -155,6 +167,8 @@ const updatePortfolio =
       const {
         image_url,
         description,
+        price,
+        size,
       } = req.body;
 
       const portfolio =
@@ -174,6 +188,8 @@ const updatePortfolio =
         {
           image_url,
           description,
+          price: price ? parseInt(price) : undefined,
+          size,
         }
       );
 

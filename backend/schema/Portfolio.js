@@ -31,6 +31,16 @@ const Portfolio =
         type: DataTypes.TEXT,
       },
 
+      price: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+
+      size: {
+        type: DataTypes.STRING(50),
+        allowNull: true,
+      },
+
       created_at: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,

@@ -17,6 +17,8 @@ const authMiddleware =
 const adminMiddleware =
   require("../middleware/adminMiddleware");
 
+const upload = require("../middleware/uploadMiddleware");
+
 // GET ALL PORTFOLIOS
 router.get(
   "/",
@@ -40,6 +42,7 @@ router.post(
   "/",
   authMiddleware,
   adminMiddleware,
+  upload.catalog.single("image"),
   createPortfolio
 );
 
