@@ -1,5 +1,15 @@
-import { useEffect, useState }
-from "react";
+import {
+  useEffect,
+  useState,
+  useContext,
+} from "react";
+
+import { useNavigate }
+from "react-router-dom";
+
+import {
+  AuthContext
+} from "../context/AuthContext";
 
 import { getMyTailor }
 from "../services/tailorService";
@@ -9,27 +19,42 @@ from "../services/portfolioService";
 
 const ManagePortfolio = () => {
 
+  const navigate =
+    useNavigate();
+
+  const { user } =
+    useContext(AuthContext);
+
   const [portfolios, setPortfolios] =
     useState([]);
 
   useEffect(() => {
 
+    // CEK LOGIN
+    if (!user) {
+
+      navigate("/");
+
+      return;
+
+    }
+
     fetchPortfolio();
 
-  }, []);
+  }, [user]);
 
   const fetchPortfolio =
     async () => {
 
       try {
 
-        // ambil tailor login
+        // AMBIL TAILOR LOGIN
         const tailor =
           await getMyTailor();
 
         console.log(tailor);
 
-        // ambil portfolio sesuai tailor
+        // AMBIL PORTFOLIO
         const data =
           await getMyPortfolios(
             tailor.id
@@ -51,12 +76,14 @@ const ManagePortfolio = () => {
 
     <div style={{
       padding: "30px",
-      backgroundColor: "#f5f5f5",
+      backgroundColor:
+        "#f5f5f5",
       minHeight: "100vh",
     }}>
 
       <h1 style={{
-        marginBottom: "30px",
+        marginBottom:
+          "30px",
       }}>
         Manage Portfolio
       </h1>
@@ -68,37 +95,48 @@ const ManagePortfolio = () => {
       }}>
 
         {
-          portfolios.map((item) => (
+          portfolios.map(
+            (item) => (
 
             <div
               key={item.id}
 
               style={{
                 width: "300px",
-                backgroundColor: "white",
+                backgroundColor:
+                  "white",
                 padding: "15px",
-                borderRadius: "10px",
+                borderRadius:
+                  "10px",
                 boxShadow:
                   "0px 2px 10px rgba(0,0,0,0.1)",
               }}
             >
 
               <img
-                src={item.image_url}
+                src={
+                  item.image_url
+                }
+
                 alt="portfolio"
 
                 style={{
                   width: "100%",
                   height: "200px",
-                  objectFit: "cover",
-                  borderRadius: "10px",
+                  objectFit:
+                    "cover",
+                  borderRadius:
+                    "10px",
                 }}
               />
 
               <p style={{
-                marginTop: "10px",
+                marginTop:
+                  "10px",
               }}>
-                {item.description}
+                {
+                  item.description
+                }
               </p>
 
             </div>

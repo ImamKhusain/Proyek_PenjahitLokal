@@ -1,8 +1,15 @@
-import { useEffect, useState }
-from "react";
+import {
+  useEffect,
+  useState,
+  useContext,
+} from "react";
 
 import { useNavigate }
 from "react-router-dom";
+
+import {
+  AuthContext
+} from "../context/AuthContext";
 
 import { getMyTailor }
 from "../services/tailorService";
@@ -12,29 +19,46 @@ const Dashboard = () => {
   const navigate =
     useNavigate();
 
+  const {
+    user,
+    logout
+  } = useContext(AuthContext);
+
   const [tailor, setTailor] =
     useState(null);
 
   useEffect(() => {
 
-    fetchData();
+    // CEK LOGIN
+    if (!user) {
 
-  }, []);
+      navigate("/");
 
-  const fetchData = async () => {
-
-    try {
-
-      const tailorData =
-        await getMyTailor();
-
-      setTailor(tailorData);
-
-    } catch (error) {
-
-      console.log(error);
+      return;
 
     }
+
+    fetchData();
+
+  }, [user]);
+
+  const fetchData =
+    async () => {
+
+      try {
+
+        const tailorData =
+          await getMyTailor();
+
+        setTailor(
+          tailorData
+        );
+
+      } catch (error) {
+
+        console.log(error);
+
+      }
 
   };
 
@@ -42,7 +66,8 @@ const Dashboard = () => {
 
     <div style={{
       padding: "30px",
-      backgroundColor: "#f5f5f5",
+      backgroundColor:
+        "#f5f5f5",
       minHeight: "100vh",
     }}>
 
@@ -57,17 +82,22 @@ const Dashboard = () => {
 
           <div style={{
             width: "400px",
-            backgroundColor: "white",
+            backgroundColor:
+              "white",
             padding: "20px",
-            borderRadius: "10px",
+            borderRadius:
+              "10px",
             boxShadow:
               "0px 2px 10px rgba(0,0,0,0.1)",
           }}>
 
             <h2 style={{
-              marginBottom: "20px",
+              marginBottom:
+                "20px",
             }}>
-              {tailor.User.name}
+              {
+                tailor.User.name
+              }
             </h2>
 
             <p>
@@ -77,7 +107,9 @@ const Dashboard = () => {
 
               {" "}
 
-              {tailor.User.email}
+              {
+                tailor.User.email
+              }
             </p>
 
             <p>
@@ -87,7 +119,9 @@ const Dashboard = () => {
 
               {" "}
 
-              {tailor.specialization}
+              {
+                tailor.specialization
+              }
             </p>
 
             <p>
@@ -97,7 +131,9 @@ const Dashboard = () => {
 
               {" "}
 
-              {tailor.description}
+              {
+                tailor.description
+              }
             </p>
 
             <p>
@@ -107,7 +143,9 @@ const Dashboard = () => {
 
               {" "}
 
-              {tailor.address}
+              {
+                tailor.address
+              }
             </p>
 
             <p>
@@ -117,7 +155,9 @@ const Dashboard = () => {
 
               {" "}
 
-              {tailor.phone}
+              {
+                tailor.phone
+              }
             </p>
 
             <p>
@@ -127,7 +167,9 @@ const Dashboard = () => {
 
               {" "}
 
-              {tailor.rating}
+              {
+                tailor.rating
+              }
             </p>
 
             <button
@@ -138,19 +180,52 @@ const Dashboard = () => {
               }
 
               style={{
-                marginTop: "20px",
+                marginTop:
+                  "20px",
                 padding:
                   "10px 20px",
                 backgroundColor:
                   "#4CAF50",
                 color: "white",
                 border: "none",
-                borderRadius: "8px",
+                borderRadius:
+                  "8px",
                 cursor: "pointer",
-                fontWeight: "bold",
+                fontWeight:
+                  "bold",
+                marginRight:
+                  "10px",
               }}
             >
               Manage Portfolio
+            </button>
+
+            <button
+              onClick={() => {
+
+                logout();
+
+                navigate("/");
+
+              }}
+
+              style={{
+                marginTop:
+                  "20px",
+                padding:
+                  "10px 20px",
+                backgroundColor:
+                  "red",
+                color: "white",
+                border: "none",
+                borderRadius:
+                  "8px",
+                cursor: "pointer",
+                fontWeight:
+                  "bold",
+              }}
+            >
+              Logout
             </button>
 
           </div>

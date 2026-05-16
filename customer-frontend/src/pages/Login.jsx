@@ -1,71 +1,94 @@
-import { useState } from "react";
+import {
+  useState,
+  useContext,
+} from "react";
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate }
+from "react-router-dom";
 
-import { login } from "../services/authService";
+import {
+  AuthContext
+} from "../context/AuthContext";
+
+import { login }
+from "../services/authService";
 
 import "../App.css";
 
 const Login = () => {
 
-  const navigate = useNavigate();
+  const navigate =
+    useNavigate();
 
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const { login: loginContext } =
+    useContext(AuthContext);
+
+  const [formData, setFormData] =
+    useState({
+      email: "",
+      password: "",
+    });
 
   const handleChange = (e) => {
 
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [e.target.name]:
+        e.target.value,
     });
 
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit =
+    async (e) => {
 
-    e.preventDefault();
+      e.preventDefault();
 
-    try {
+      try {
 
-      const response = await login(formData);
+        const response =
+          await login(formData);
 
-      localStorage.setItem(
-        "token",
-        response.token
-      );
+        // SIMPAN KE AUTH CONTEXT
+        loginContext(
+          response.token,
+          response.role
+        );
 
-      localStorage.setItem(
-        "role",
-        response.role
-      );
+        // CEK CUSTOMER
+        if (
+          response.role ===
+          "customer"
+        ) {
 
-      if (response.role === "customer") {
+          alert(
+            "Login berhasil"
+          );
 
-        alert("Login berhasil");
+          navigate("/home");
 
-        navigate("/home");
+        } else {
 
-      } else {
+          alert(
+            "Bukan akun customer"
+          );
 
-        alert("Bukan akun customer");
+        }
+
+      } catch (error) {
+
+        alert(
+          error.response?.data
+            ?.message ||
+          "Login gagal"
+        );
 
       }
-
-    } catch (error) {
-
-      alert(
-        error.response?.data?.message ||
-        "Login gagal"
-      );
-
-    }
 
   };
 
   return (
+
     <div className="login-container">
 
       <div className="login-card">
@@ -76,16 +99,24 @@ const Login = () => {
 
         </h2>
 
-        <form onSubmit={handleSubmit}>
+        <form
+          onSubmit={
+            handleSubmit
+          }
+        >
 
           <div className="input-group">
 
-            <label>Email</label>
+            <label>
+              Email
+            </label>
 
             <input
               type="email"
               name="email"
-              onChange={handleChange}
+              onChange={
+                handleChange
+              }
               required
             />
 
@@ -93,12 +124,16 @@ const Login = () => {
 
           <div className="input-group">
 
-            <label>Password</label>
+            <label>
+              Password
+            </label>
 
             <input
               type="password"
               name="password"
-              onChange={handleChange}
+              onChange={
+                handleChange
+              }
               required
             />
 
@@ -116,7 +151,9 @@ const Login = () => {
       </div>
 
     </div>
+
   );
+
 };
 
 export default Login;
