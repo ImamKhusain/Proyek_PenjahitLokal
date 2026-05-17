@@ -2,239 +2,465 @@ import { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { getMyTailor } from "../services/tailorService";
+import { FiBell } from "react-icons/fi";
+import Navbar from "../components/Navbar";
 
-// URL Statis Backend Port 8080
-const BASE_URL_BACKEND = "http://localhost:8080/uploads/";
+const BASE_URL_BACKEND =
+  "http://localhost:8080/uploads/";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { user, logout } = useContext(AuthContext);
-  const [tailors, setTailors] = useState([]);
 
-  // State tambahan untuk mengontrol Modal Detail
-  const [selectedTailor, setSelectedTailor] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { user, logout } =
+    useContext(AuthContext);
 
+  const [tailors, setTailors] =
+    useState([]);
+
+  const [isSidebarOpen, setIsSidebarOpen] =
+    useState(true);
+
+  const [selectedCategory, setSelectedCategory] =
+    useState("");
+
+  // FETCH DATA
   useEffect(() => {
     if (!user) {
       navigate("/");
       return;
     }
+
     fetchData();
   }, [user]);
 
   const fetchData = async () => {
     try {
-      const responseData = await getMyTailor();
-      const actualTailorData = responseData.data ? responseData.data : responseData;
-      
+      const responseData =
+        await getMyTailor();
+
+      const actualTailorData =
+        responseData.data
+          ? responseData.data
+          : responseData;
+
       if (Array.isArray(actualTailorData)) {
         setTailors(actualTailorData);
-      } else if (actualTailorData) {
-        setTailors([actualTailorData]);
       }
     } catch (error) {
-      console.log("Error mengambil data tailor:", error);
+      console.log(error);
     }
   };
 
-  // Fungsi membuka detail penjahit
-  const handleOpenDetail = (tailor) => {
-    setSelectedTailor(tailor);
-    setIsModalOpen(true);
-  };
+  // CATEGORY
+  const categories = [
+    ...new Set(
+      tailors
+        .map(
+          (tailor) =>
+            tailor.specialization
+        )
+        .filter(Boolean)
+    ),
+  ];
 
-  // Fungsi menutup detail penjahit
-  const handleCloseDetail = () => {
-    setSelectedTailor(null);
-    setIsModalOpen(false);
-  };
+  // FILTER
+  const filteredTailors =
+    selectedCategory
+      ? tailors.filter(
+          (tailor) =>
+            tailor.specialization
+              ?.toLowerCase()
+              .trim() ===
+            selectedCategory
+              .toLowerCase()
+              .trim()
+        )
+      : tailors;
 
   return (
-    <div style={{ padding: "30px", backgroundColor: "#f5f5f5", minHeight: "100vh", fontFamily: "sans-serif" }}>
-      
-      {/* HEADER */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "30px" }}>
-        <h1 style={{ margin: 0, color: "#333" }}>Dashboard Tailor</h1>
-        <button
-          onClick={() => navigate("/manage-tailor")}
-          style={{
-            padding: "10px 20px",
-            backgroundColor: "#007BFF",
-            color: "white",
-            border: "none",
-            borderRadius: "8px",
-            cursor: "pointer",
-            fontWeight: "bold",
-          }}
-        >
-          + Tambah Penjahit
-        </button>
-      </div>
+    <div
+      style={{
+        display: "flex",
 
-      {/* CONTAINER LIST CARD */}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "25px" }}>
-        {tailors.length > 0 ? (
-          tailors.map((tailorItem, index) => {
-            const hasPhoto = tailorItem.photo && tailorItem.photo !== "NULL" && tailorItem.photo !== "";
-            
-            // PERBAIKAN UTAMA: Menggunakan encodeURIComponent untuk mengubah spasi nama file menjadi %20 agar terbaca CSS browser
-            const safePhotoName = hasPhoto ? encodeURIComponent(tailorItem.photo) : "";
-            
-            // Penggabungan gradasi hitam transparan dan gambar latar belakang yang valid
-            const cardBackground = hasPhoto 
-              ? `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.6)), url("${BASE_URL_BACKEND}${safePhotoName}")`
-              : "#ffffff";
+        minHeight: "100vh",
 
-            return (
-              <div
-                key={tailorItem.id || index}
-                style={{
-                  width: "320px",
-                  height: "220px",
-                  borderRadius: "12px",
-                  boxShadow: "0px 4px 15px rgba(0,0,0,0.1)",
-                  padding: "20px",
-                  background: cardBackground,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  backgroundColor: "#ffffff", // Menjaga warna dasar tetap putih bersih jika loading/gagal
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                  color: hasPhoto ? "white" : "#333",
-                  border: hasPhoto ? "none" : "1px solid #e0e0e0"
-                }}
-              >
-                {/* HANYA MENAMPILKAN NAMA DI CARD UTAMA */}
-                <h2 style={{ 
-                  margin: 0, 
-                  fontSize: "22px", 
-                  fontWeight: "bold", 
-                  color: hasPhoto ? "white" : "#222",
-                  textShadow: hasPhoto ? "1px 1px 4px rgba(0,0,0,0.8)" : "none" 
-                }}>
-                  {tailorItem.name || "Nama Belum Diatur"}
-                </h2>
+        background: "#f3f4f6",
 
-                {/* TOMBOL AKSI DI BAWAH CARD */}
-                <div style={{ display: "flex", gap: "10px" }}>
-                  <button
-                    onClick={() => handleOpenDetail(tailorItem)}
-                    style={{
-                      flex: 1,
-                      padding: "8px 12px",
-                      backgroundColor: hasPhoto ? "rgba(255, 255, 255, 0.9)" : "#f0f0f0",
-                      color: "#333",
-                      border: "1px solid #ccc",
-                      borderRadius: "6px",
-                      cursor: "pointer",
-                      fontWeight: "bold",
-                      fontSize: "13px",
-                      boxShadow: "0 2px 5px rgba(0,0,0,0.1)"
-                    }}
-                  >
-                    Lihat Detail
-                  </button>
-                  <button
-                    onClick={() => navigate(`/manage-portfolio/${tailorItem.id}`)}
-                    style={{
-                      flex: 1,
-                      padding: "8px 12px",
-                      backgroundColor: "#4CAF50",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "6px",
-                      cursor: "pointer",
-                      fontWeight: "bold",
-                      fontSize: "13px",
-                      boxShadow: "0 2px 5px rgba(0,0,0,0.1)"
-                    }}
-                  >
-                    Portfolio
-                  </button>
-                </div>
-              </div>
-            );
-          })
-        ) : (
-          <p>Belum ada profil penjahit. Silakan klik + Tambah Penjahit.</p>
-        )}
-      </div>
+        fontFamily:
+          "Arial, sans-serif",
+      }}
+    >
+      {/* SIDEBAR */}
+      <Navbar
+        isSidebarOpen={
+          isSidebarOpen
+        }
+        setIsSidebarOpen={
+          setIsSidebarOpen
+        }
+        logout={logout}
+        navigate={navigate}
+      />
 
-      {/* BUTTON LOGOUT AKUN */}
-      <button
-        onClick={() => {
-          logout();
-          navigate("/");
-        }}
+      {/* MAIN */}
+      <div
         style={{
-          marginTop: "50px",
-          padding: "10px 20px",
-          backgroundColor: "#DC3545",
-          color: "white",
-          border: "none",
-          borderRadius: "8px",
-          cursor: "pointer",
-          fontWeight: "bold",
+          flex: 1,
+
+          display: "flex",
+
+          flexDirection: "column",
         }}
       >
-        Logout Akun
-      </button>
+        {/* TOPBAR */}
+        <div
+          style={{
+            height: "60px",
 
-      {/* POP-UP MODAL UNTUK DETAIL LAINNYA */}
-      {isModalOpen && selectedTailor && (
-        <div style={{
-          position: "fixed",
-          top: 0, left: 0, right: 0, bottom: 0,
-          backgroundColor: "rgba(0,0,0,0.5)",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          zIndex: 1000
-        }}>
-          <div style={{
-            backgroundColor: "white",
-            padding: "30px",
-            borderRadius: "12px",
-            width: "450px",
-            boxShadow: "0 5px 25px rgba(0,0,0,0.3)",
-            position: "relative"
-          }}>
-            <h2 style={{ marginTop: 0, marginBottom: "20px", borderBottom: "2px solid #eee", paddingBottom: "10px", color: "#333" }}>
-              Detail Penjahit
-            </h2>
-            
-            <div style={{ display: "flex", flexDirection: "column", gap: "12px", color: "#555" }}>
-              <p style={{ margin: 0 }}><strong>Nama:</strong> {selectedTailor.name}</p>
-              <p style={{ margin: 0 }}><strong>Email Kontak:</strong> {user?.email || "Email tidak tersedia"}</p>
-              <p style={{ margin: 0 }}><strong>Spesialisasi:</strong> {selectedTailor.specialization || "-"}</p>
-              <p style={{ margin: 0 }}><strong>Deskripsi:</strong> {selectedTailor.description || "-"}</p>
-              <p style={{ margin: 0 }}><strong>Alamat:</strong> {selectedTailor.address || "-"}</p>
-              <p style={{ margin: 0 }}><strong>No HP:</strong> {selectedTailor.phone || "-"}</p>
-              <p style={{ margin: 0 }}><strong>Rating Sistem:</strong> ⭐ {selectedTailor.rating || "0.0"}</p>
-            </div>
+            background: "#ffffff",
 
-            <button
-              onClick={handleCloseDetail}
+            borderBottom:
+              "1px solid #e5e7eb",
+
+            display: "flex",
+
+            alignItems: "center",
+
+            justifyContent:
+              "space-between",
+
+            padding: "0 24px",
+          }}
+        >
+          {/* LEFT */}
+          <div
+            onClick={() =>
+              setIsSidebarOpen(
+                !isSidebarOpen
+              )
+            }
+            style={{
+              cursor: "pointer",
+
+              fontSize: "20px",
+
+              color: "#6b7280",
+            }}
+          >
+            ☰
+          </div>
+
+          {/* RIGHT */}
+          <div
+            style={{
+              display: "flex",
+
+              alignItems: "center",
+
+              gap: "14px",
+            }}
+          >
+            <FiBell
+              size={18}
+              color="#111827"
+            />
+
+            <div
               style={{
-                marginTop: "25px",
-                width: "100%",
-                padding: "10px",
-                backgroundColor: "#6c757d",
-                color: "white",
-                border: "none",
-                borderRadius: "6px",
-                cursor: "pointer",
-                fontWeight: "bold"
+                fontWeight: "700",
+
+                fontSize: "13px",
               }}
             >
-              Tutup Detail
-            </button>
+              ARKI
+            </div>
           </div>
         </div>
-      )}
 
+        {/* CONTENT */}
+        <div
+          style={{
+            padding: "24px",
+
+            flex: 1,
+          }}
+        >
+          {/* HEADER */}
+          <div
+            style={{
+              display: "flex",
+
+              justifyContent:
+                "space-between",
+
+              alignItems: "center",
+
+              marginBottom: "20px",
+            }}
+          >
+            <h2
+              style={{
+                margin: 0,
+
+                fontSize: "18px",
+
+                fontWeight: "700",
+
+                color: "#111827",
+              }}
+            >
+              Daftar Penjahit
+            </h2>
+
+            <button
+              onClick={() =>
+                navigate(
+                  "/manage-tailor"
+                )
+              }
+              style={{
+                border: "none",
+
+                background:
+                  "#2563eb",
+
+                color: "white",
+
+                padding:
+                  "10px 16px",
+
+                borderRadius: "8px",
+
+                cursor: "pointer",
+
+                fontWeight: "700",
+
+                fontSize: "12px",
+
+                boxShadow:
+                  "0 4px 10px rgba(37,99,235,0.2)",
+              }}
+            >
+              + Tambah Penjahit
+            </button>
+          </div>
+
+          {/* BODY */}
+          <div
+            style={{
+              display: "flex",
+
+              gap: "18px",
+
+              alignItems:
+                "flex-start",
+            }}
+          >
+            {/* CATEGORY */}
+            <div
+              style={{
+                width: "230px",
+
+                minHeight: "500px",
+
+                background:
+                  "#ffffff",
+
+                borderRadius:
+                  "10px",
+
+                padding: "18px",
+
+                boxShadow:
+                  "0 4px 12px rgba(0,0,0,0.03)",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+
+                  flexDirection:
+                    "column",
+
+                  gap: "28px",
+                }}
+              >
+                {categories.map(
+                  (
+                    category,
+                    index
+                  ) => (
+                    <div
+                      key={index}
+                      onClick={() =>
+                        setSelectedCategory(
+                          category
+                        )
+                      }
+                      style={{
+                        cursor:
+                          "pointer",
+
+                        fontWeight:
+                          "700",
+
+                        fontSize:
+                          "14px",
+
+                        transition:
+                          "0.2s ease",
+
+                        color:
+                          selectedCategory ===
+                          category
+                            ? "#2563eb"
+                            : "#111827",
+                      }}
+                    >
+                      {category}
+                    </div>
+                  )
+                )}
+              </div>
+            </div>
+
+            {/* CARD LIST */}
+            <div
+              style={{
+                flex: 1,
+
+                display: "grid",
+
+                gridTemplateColumns:
+                  "repeat(2, 1fr)",
+
+                gap: "16px",
+
+                alignContent:
+                  "start",
+              }}
+            >
+              {filteredTailors.map(
+                (
+                  tailor,
+                  index
+                ) => {
+                  const imageUrl =
+                    tailor.photo
+                      ? `${BASE_URL_BACKEND}${tailor.photo}`
+                      : "https://via.placeholder.com/50";
+
+                  return (
+                    <div
+                      key={index}
+                      style={{
+                        background:
+                          "#ffffff",
+
+                        borderRadius:
+                          "10px",
+
+                        padding:
+                          "14px",
+
+                        display:
+                          "flex",
+
+                        justifyContent:
+                          "space-between",
+
+                        alignItems:
+                          "center",
+
+                        boxShadow:
+                          "0 4px 12px rgba(0,0,0,0.03)",
+                      }}
+                    >
+                      {/* LEFT */}
+                      <div
+                        style={{
+                          display:
+                            "flex",
+
+                          alignItems:
+                            "center",
+
+                          gap: "14px",
+                        }}
+                      >
+                        <img
+                          src={imageUrl}
+                          alt="tailor"
+                          style={{
+                            width:
+                              "56px",
+
+                            height:
+                              "56px",
+
+                            borderRadius:
+                              "8px",
+
+                            objectFit:
+                              "cover",
+                          }}
+                        />
+
+                        <div>
+                          <div
+                            style={{
+                              fontWeight:
+                                "700",
+
+                              fontSize:
+                                "14px",
+
+                              marginBottom:
+                                "4px",
+
+                              color:
+                                "#111827",
+                            }}
+                          >
+                            {
+                              tailor.name
+                            }
+                          </div>
+                          <div
+                            onClick={() =>
+                              navigate(`/tailor-detail`)
+                            }
+                            style={{
+                              fontSize: "12px",
+                              color: "#111827",
+                              cursor: "pointer",
+                              fontWeight: "600",
+                            }}
+                          >
+                            Lihat Detail
+                          </div>
+                        </div>
+                      </div>
+                      {/* RIGHT */}
+                      <div
+                        style={{
+                          fontSize:
+                            "18px",
+
+                          color:
+                            "#9ca3af",
+                        }}
+                      >
+                        ›
+                      </div>
+                    </div>
+                  );
+                }
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

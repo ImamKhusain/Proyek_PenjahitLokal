@@ -1,23 +1,23 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-// Sesuaikan import API/Service kamu di sini
-import api from "../services/api"; 
+import api from "../services/api";
 
-const TailorForm = () => {
+const TailorForm = ({ photo }) => {
   const navigate = useNavigate();
+
   const [loading, setLoading] = useState(false);
 
-  // Pisahkan state untuk teks dan file
   const [formData, setFormData] = useState({
     name: "",
+    email: "",
     specialization: "",
-    description: "",
+    category: "",
     address: "",
     phone: "",
+    description: "",
   });
-  const [photo, setPhoto] = useState(null);
 
-  // Handle perubahan input teks
+  // HANDLE INPUT
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -25,108 +25,388 @@ const TailorForm = () => {
     });
   };
 
-  // Handle perubahan input file
-  const handleFileChange = (e) => {
-    setPhoto(e.target.files[0]);
-  };
-
+  // SUBMIT
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     setLoading(true);
 
     try {
-      // Wajib pakai FormData jika ada upload file
       const submitData = new FormData();
-      submitData.append("name", formData.name);
-      submitData.append("specialization", formData.specialization);
-      submitData.append("description", formData.description);
-      submitData.append("address", formData.address);
-      submitData.append("phone", formData.phone);
-      
+
+      submitData.append(
+        "name",
+        formData.name
+      );
+
+      submitData.append(
+        "email",
+        formData.email
+      );
+
+      submitData.append(
+        "specialization",
+        formData.specialization
+      );
+
+      submitData.append(
+        "category",
+        formData.category
+      );
+
+      submitData.append(
+        "address",
+        formData.address
+      );
+
+      submitData.append(
+        "phone",
+        formData.phone
+      );
+
+      submitData.append(
+        "description",
+        formData.description
+      );
+
+      // IMAGE
       if (photo) {
-        submitData.append("photo", photo); // Key "photo" ini harus sama dengan upload.single("photo") di backend
+        submitData.append(
+          "photo",
+          photo
+        );
       }
 
-      // Kirim ke backend (Sesuaikan endpoint API kamu)
-      // Pastikan ada header token jika route-nya diproteksi authMiddleware
-      const token = localStorage.getItem("token"); // Ambil token dari storage
-      await api.post("/tailors", submitData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const token =
+        localStorage.getItem("token");
 
-      alert("Data penjahit berhasil ditambahkan!");
+      await api.post(
+        "/tailors",
+        submitData,
+        {
+          headers: {
+            "Content-Type":
+              "multipart/form-data",
+
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      alert(
+        "Data penjahit berhasil ditambahkan!"
+      );
+
       navigate("/dashboard");
     } catch (error) {
-      console.error("Gagal menyimpan data:", error);
-      alert("Gagal menyimpan data penjahit.");
+      console.error(
+        "ERROR:",
+        error.response?.data ||
+          error.message
+      );
+
+      alert(
+        "Gagal menyimpan data penjahit."
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  const inputStyle = {
-    width: "100%",
-    padding: "10px",
-    marginBottom: "15px",
-    borderRadius: "5px",
-    border: "1px solid #ccc",
-    boxSizing: "border-box",
-  };
-
   return (
-    <form onSubmit={handleSubmit} style={{ width: "100%" }}>
-      <div>
-        <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>Nama Penjahit</label>
-        <input type="text" name="name" value={formData.name} onChange={handleChange} style={inputStyle} required />
+    <form
+      onSubmit={handleSubmit}
+      style={{
+        background: "#ffffff",
+
+        padding: "24px",
+
+        borderRadius: "12px",
+
+        width: "100%",
+      }}
+    >
+      {/* NAMA */}
+      <div
+        style={{
+          marginBottom: "18px",
+        }}
+      >
+        <label style={labelStyle}>
+          Nama Penjahit
+        </label>
+
+        <input
+          type="text"
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          style={inputStyle}
+          required
+        />
       </div>
 
-      <div>
-        <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>Foto Profil</label>
-        <input type="file" name="photo" accept="image/*" onChange={handleFileChange} style={inputStyle} />
+      {/* EMAIL */}
+      <div
+        style={{
+          marginBottom: "18px",
+        }}
+      >
+        <label style={labelStyle}>
+          Email Kontak
+        </label>
+
+        <input
+          type="email"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          style={inputStyle}
+          required
+        />
       </div>
 
-      <div>
-        <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>Spesialisasi (Misal: Kebaya, Jas)</label>
-        <input type="text" name="specialization" value={formData.specialization} onChange={handleChange} style={inputStyle} required />
+      {/* SPESIALISASI */}
+      <div
+        style={{
+          marginBottom: "18px",
+        }}
+      >
+        <label style={labelStyle}>
+          Spesialisasi Jahitan
+        </label>
+
+        <select
+          name="specialization"
+          value={
+            formData.specialization
+          }
+          onChange={handleChange}
+          style={selectStyle}
+          required
+        >
+          <option value="">
+            Silahkan Pilih
+            Spesialisasi
+          </option>
+
+          <option value="Jahit Jas">
+            Jahit Jas
+          </option>
+
+          <option value="Jahit Seragam">
+            Jahit Seragam
+          </option>
+
+          <option value="Jahit Kemeja Batik">
+            Jahit Kemeja Batik
+          </option>
+
+          <option value="Jahit Blazer, Beskap, Surjan">
+            Jahit Blazer, Beskap,
+            Surjan
+          </option>
+
+          <option value="Jahit Celana">
+            Jahit Celana
+          </option>
+
+          <option value="Jahit Dress & Rok">
+            Jahit Dress & Rok
+          </option>
+        </select>
       </div>
 
-      <div>
-        <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>Deskripsi Singkat</label>
-        <textarea name="description" value={formData.description} onChange={handleChange} style={{ ...inputStyle, minHeight: "80px" }} required />
+      {/* ALAMAT */}
+      <div
+        style={{
+          marginBottom: "18px",
+        }}
+      >
+        <label style={labelStyle}>
+          Alamat
+        </label>
+
+        <input
+          type="text"
+          name="address"
+          value={formData.address}
+          onChange={handleChange}
+          style={inputStyle}
+          required
+        />
       </div>
 
-      <div>
-        <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>Alamat Lengkap</label>
-        <textarea name="address" value={formData.address} onChange={handleChange} style={{ ...inputStyle, minHeight: "80px" }} required />
+      {/* NO HP */}
+      <div
+        style={{
+          marginBottom: "18px",
+        }}
+      >
+        <label style={labelStyle}>
+          No. HP
+        </label>
+
+        <input
+          type="text"
+          name="phone"
+          value={formData.phone}
+          onChange={handleChange}
+          style={inputStyle}
+          required
+        />
       </div>
 
-      <div>
-        <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>Nomor HP</label>
-        <input type="text" name="phone" value={formData.phone} onChange={handleChange} style={inputStyle} required />
+      {/* DESCRIPTION */}
+      <div
+        style={{
+          marginBottom: "18px",
+        }}
+      >
+        <label style={labelStyle}>
+          Description
+        </label>
+
+        <textarea
+          name="description"
+          value={formData.description}
+          onChange={handleChange}
+          style={{
+            ...inputStyle,
+
+            minHeight: "120px",
+
+            resize: "none",
+
+            paddingTop: "12px",
+          }}
+          required
+        />
       </div>
 
+      {/* BUTTON */}
       <button
         type="submit"
         disabled={loading}
         style={{
-          width: "100%",
-          padding: "12px",
-          backgroundColor: loading ? "#ccc" : "#007BFF",
+          background: loading
+            ? "#93c5fd"
+            : "#2563eb",
+
           color: "white",
+
           border: "none",
-          borderRadius: "8px",
-          cursor: loading ? "not-allowed" : "pointer",
-          fontWeight: "bold",
+
+          borderRadius: "10px",
+
+          padding: "12px 18px",
+
+          fontWeight: "700",
+
+          fontSize: "14px",
+
+          cursor: loading
+            ? "not-allowed"
+            : "pointer",
+
           marginTop: "10px",
+
+          transition: "0.2s ease",
+
+          boxShadow:
+            "0 4px 12px rgba(37,99,235,0.2)",
         }}
       >
-        {loading ? "Menyimpan..." : "Simpan Data Penjahit"}
+        {loading
+          ? "Menyimpan..."
+          : "Save changes"}
       </button>
     </form>
   );
+};
+
+// LABEL STYLE
+const labelStyle = {
+  display: "block",
+
+  marginBottom: "8px",
+
+  fontSize: "13px",
+
+  fontWeight: "600",
+
+  color: "#111827",
+};
+
+// INPUT STYLE
+const inputStyle = {
+  width: "100%",
+
+  height: "46px",
+
+  borderRadius: "10px",
+
+  border: "1px solid #d1d5db",
+
+  padding: "0 14px",
+
+  fontSize: "14px",
+
+  outline: "none",
+
+  boxSizing: "border-box",
+
+  background: "#ffffff",
+
+  transition: "0.2s ease",
+
+  boxShadow:
+    "0 1px 2px rgba(0,0,0,0.04)",
+};
+
+// SELECT STYLE
+const selectStyle = {
+  width: "100%",
+
+  height: "46px",
+
+  borderRadius: "10px",
+
+  border: "1px solid #d1d5db",
+
+  padding: "0 42px 0 14px",
+
+  fontSize: "14px",
+
+  outline: "none",
+
+  boxSizing: "border-box",
+
+  backgroundColor: "#ffffff",
+
+  color: "#111827",
+
+  cursor: "pointer",
+
+  appearance: "none",
+
+  WebkitAppearance: "none",
+
+  MozAppearance: "none",
+
+  transition: "0.2s ease",
+
+  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M5 7.5L10 12.5L15 7.5' stroke='%236B7280' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`,
+
+  backgroundRepeat: "no-repeat",
+
+  backgroundPosition:
+    "right 14px center",
+
+  backgroundSize: "18px",
+
+  boxShadow:
+    "0 1px 2px rgba(0,0,0,0.04)",
 };
 
 export default TailorForm;
