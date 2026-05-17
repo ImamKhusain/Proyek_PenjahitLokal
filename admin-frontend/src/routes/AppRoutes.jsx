@@ -1,42 +1,55 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+} from "react-router-dom";
 
 import Login from "../pages/Login";
 import Dashboard from "../pages/Dashboard";
 import ManagePortfolio from "../pages/ManagePortfolio";
 import ManageTailor from "../pages/ManageTailor";
-import PortofolioForm from "../components/PortofolioForm"; // TAMBAHKAN IMPORT INI
+import TailorDetail from "../pages/TailorDetail";
+import PortofolioForm from "../components/PortofolioForm";
 
 const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route 
-          path="/" 
-          element={<Login />} 
+        {/* LOGIN */}
+        <Route
+          path="/"
+          element={<Login />}
         />
 
-        <Route 
-          path="/dashboard" 
-          element={<Dashboard />} 
+        {/* DASHBOARD */}
+        <Route
+          path="/dashboard"
+          element={<Dashboard />}
         />
 
-        {/* PERBAIKAN: Ditambahkan /:id agar mengenali parameter ID Tailor */}
+        {/* DETAIL PENJAHIT */}
+        <Route
+          path="/tailor-detail/:id"
+          element={<TailorDetail />}
+        />
+
+        {/* MANAGE PORTFOLIO */}
         <Route
           path="/manage-portfolio/:id"
           element={<ManagePortfolio />}
         />
 
-        {/* TAMBAHKAN ROUTE BARU UNTUK FORM INPUT SESUAI DATABASE */}
+        {/* ADD PORTFOLIO */}
         <Route
           path="/manage-portfolio/:id/add"
           element={<PortofolioForm />}
         />
 
+        {/* TAMBAH PENJAHIT */}
         <Route
           path="/manage-tailor"
           element={<ManageTailor />}
         />
-        
       </Routes>
     </BrowserRouter>
   );

@@ -181,7 +181,6 @@ const Dashboard = () => {
         <div
           style={{
             padding: "24px",
-
             flex: 1,
           }}
         >
@@ -189,28 +188,22 @@ const Dashboard = () => {
           <div
             style={{
               display: "flex",
-
               justifyContent:
                 "space-between",
-
               alignItems: "center",
-
               marginBottom: "20px",
             }}
           >
-            <h2
+            <h1
               style={{
                 margin: 0,
-
-                fontSize: "18px",
-
+                fontSize: "30px",
                 fontWeight: "700",
-
                 color: "#111827",
               }}
             >
               Daftar Penjahit
-            </h2>
+            </h1>
 
             <button
               onClick={() =>
@@ -427,15 +420,12 @@ const Dashboard = () => {
                             }
                           </div>
                           <div
+                            className="detail-link"
                             onClick={() =>
-                              navigate(`/tailor-detail`)
+                              navigate(
+                                `/tailor-detail/${tailor.id}`
+                              )
                             }
-                            style={{
-                              fontSize: "12px",
-                              color: "#111827",
-                              cursor: "pointer",
-                              fontWeight: "600",
-                            }}
                           >
                             Lihat Detail
                           </div>
