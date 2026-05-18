@@ -19,6 +19,7 @@ const Navbar = ({
     >
       {/* TOP */}
       <div>
+
         {/* TITLE */}
         {isSidebarOpen && (
           <h2 className="sidebar-title">
@@ -44,6 +45,9 @@ const Navbar = ({
           {/* PESANAN */}
           <button
             className="menu-btn"
+            onClick={() =>
+              navigate("/bookings")
+            }
           >
             {isSidebarOpen
               ? "Daftar Pesanan"
@@ -82,7 +86,8 @@ const Navbar = ({
           navigate("/");
         }}
       >
-        {isSidebarOpen && "Logout"}
+        {isSidebarOpen &&
+          "Logout"}
 
         <FiLogOut size={15} />
       </button>

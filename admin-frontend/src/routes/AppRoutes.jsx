@@ -14,12 +14,18 @@ import {
 
 import Login from "../pages/Login";
 import Dashboard from "../pages/Dashboard";
+
 import ManagePortfolio from "../pages/ManagePortfolio";
 import ManageTailor from "../pages/ManageTailor";
+
 import TailorDetail from "../pages/TailorDetail";
+
 import PortfolioPage from "../pages/PortfolioPage";
 import PortfolioDetail from "../pages/PortfolioDetail";
+
 import PortofolioForm from "../components/PortofolioForm";
+
+import BookingPage from "../pages/BookingPage";
 
 const AppRoutes = () => {
 
@@ -44,6 +50,18 @@ const AppRoutes = () => {
           element={
             user ? (
               <Dashboard />
+            ) : (
+              <Login />
+            )
+          }
+        />
+
+        {/* BOOKING PAGE */}
+        <Route
+          path="/bookings"
+          element={
+            user ? (
+              <BookingPage />
             ) : (
               <Login />
             )
