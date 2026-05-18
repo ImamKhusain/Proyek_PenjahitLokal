@@ -4,6 +4,14 @@ import {
   Route,
 } from "react-router-dom";
 
+import {
+  useContext,
+} from "react";
+
+import {
+  AuthContext,
+} from "../context/AuthContext";
+
 import Login from "../pages/Login";
 import Dashboard from "../pages/Dashboard";
 import ManagePortfolio from "../pages/ManagePortfolio";
@@ -14,8 +22,14 @@ import PortfolioDetail from "../pages/PortfolioDetail";
 import PortofolioForm from "../components/PortofolioForm";
 
 const AppRoutes = () => {
+
+  const { user } =
+    useContext(AuthContext);
+
   return (
+
     <BrowserRouter>
+
       <Routes>
 
         {/* LOGIN */}
@@ -27,46 +41,93 @@ const AppRoutes = () => {
         {/* DASHBOARD */}
         <Route
           path="/dashboard"
-          element={<Dashboard />}
+          element={
+            user ? (
+              <Dashboard />
+            ) : (
+              <Login />
+            )
+          }
         />
 
         {/* PORTFOLIO PAGE */}
         <Route
           path="/portfolio"
-          element={<PortfolioPage />}
+          element={
+            user ? (
+              <PortfolioPage />
+            ) : (
+              <Login />
+            )
+          }
         />
 
         {/* DETAIL PENJAHIT */}
         <Route
           path="/tailor-detail/:id"
-          element={<TailorDetail />}
+          element={
+            user ? (
+              <TailorDetail />
+            ) : (
+              <Login />
+            )
+          }
         />
 
         {/* MANAGE PORTFOLIO */}
         <Route
           path="/manage-portfolio/:id"
-          element={<ManagePortfolio />}
+          element={
+            user &&
+            user.role === "admin" ? (
+              <ManagePortfolio />
+            ) : (
+              <Login />
+            )
+          }
         />
 
         {/* DETAIL PORTFOLIO */}
         <Route
           path="/portfolio-detail/:id"
-          element={<PortfolioDetail />}
+          element={
+            user &&
+            user.role === "admin" ? (
+              <PortfolioDetail />
+            ) : (
+              <Login />
+            )
+          }
         />
 
         {/* ADD PORTFOLIO */}
         <Route
           path="/manage-portfolio/:id/add"
-          element={<PortofolioForm />}
+          element={
+            user &&
+            user.role === "admin" ? (
+              <PortofolioForm />
+            ) : (
+              <Login />
+            )
+          }
         />
 
         {/* TAMBAH PENJAHIT */}
         <Route
           path="/manage-tailor"
-          element={<ManageTailor />}
+          element={
+            user &&
+            user.role === "admin" ? (
+              <ManageTailor />
+            ) : (
+              <Login />
+            )
+          }
         />
 
       </Routes>
+
     </BrowserRouter>
   );
 };

@@ -2,65 +2,87 @@ import {
   BrowserRouter,
   Routes,
   Route,
-  Outlet
+  Outlet,
 } from "react-router-dom";
+
+import {
+  useContext,
+} from "react";
+
+import {
+  AuthContext,
+} from "../context/AuthContext";
 
 import Login from "../pages/Login";
 import Home from "../pages/Home";
-import TailorDetail from "../pages/TailorDetail"; 
+import TailorDetail from "../pages/TailorDetail";
 import PortfolioCard from "../components/PortfolioCard";
-import Navbar from "../components/Navbar"; 
+import Navbar from "../components/Navbar";
 import About from "../pages/About";
-import Layanan from "../pages/Layanan"; // 💡 1. IMPOR HALAMAN LAYANAN YANG BARU
+import Layanan from "../pages/Layanan";
 
 const LayoutDenganNavbar = () => {
   return (
     <>
-      <Navbar /> 
-      <Outlet /> 
+      <Navbar />
+      <Outlet />
     </>
   );
 };
 
 const AppRoutes = () => {
+
+  const { user } =
+    useContext(AuthContext);
+
   return (
+
     <BrowserRouter>
+
       <Routes>
 
-        {/* ❌ HALAMAN TANPA NAVBAR */}
+        {/* LOGIN */}
         <Route
           path="/"
           element={<Login />}
         />
 
-        {/* ✨ HALAMAN DENGAN NAVBAR (Semua halaman di bawah ini otomatis punya Navbar) */}
-        <Route element={<LayoutDenganNavbar />}>
-          
-          {/* Halaman Home */}
+        {/* HALAMAN YANG BUTUH LOGIN */}
+        <Route
+          element={
+            user ? (
+              <LayoutDenganNavbar />
+            ) : (
+              <Login />
+            )
+          }
+        >
+
+          {/* HOME */}
           <Route
             path="/home"
             element={<Home />}
           />
 
-          {/* Halaman About */}
+          {/* ABOUT */}
           <Route
             path="/about"
             element={<About />}
           />
 
-          {/* 💡 2. TAMBAHKAN ROUTE LAYANAN DI SINI */}
+          {/* LAYANAN */}
           <Route
             path="/layanan"
             element={<Layanan />}
           />
 
-          {/* Halaman Detail Penjahit */}
+          {/* DETAIL PENJAHIT */}
           <Route
             path="/detail/:id"
             element={<TailorDetail />}
           />
 
-          {/* Halaman Katalog Portfolio */}
+          {/* PORTFOLIO */}
           <Route
             path="/portfolio-katalog/:id"
             element={<PortfolioCard />}
@@ -69,6 +91,7 @@ const AppRoutes = () => {
         </Route>
 
       </Routes>
+
     </BrowserRouter>
   );
 };
