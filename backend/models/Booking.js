@@ -1,68 +1,122 @@
-const Booking = require("../schema/Booking");
-const User = require("../schema/User");
-const Tailor = require("../schema/Tailor");
+const { DataTypes } =
+  require("sequelize");
 
-// GET ALL BOOKINGS
-const findAll = async () => {
-  return await Booking.findAll({
-    include: [
-      {
-        model: User,
-        as: "customer",
-        attributes: ["id", "name", "email"],
-      },
-      {
-        model: Tailor,
-        attributes: ["id", "specialization"],
-      },
-    ],
-  });
-};
+const sequelize =
+  require("../config/database");
 
-// CREATE BOOKING
-const create = async (bookingData) => {
-  return await Booking.create(bookingData);
-};
+// IMPORT DARI FOLDER SCHEMA
+const User =
+  require("../schema/User");
 
-// GET BOOKING BY ID
-const findById = async (id) => {
-  return await Booking.findByPk(id, {
-    include: [
-      {
-        model: User,
-        as: "customer",
-        attributes: ["id", "name", "email"],
-      },
-      {
-        model: Tailor,
-        attributes: ["id", "specialization"],
-      },
-    ],
-  });
-};
+const Tailor =
+  require("../schema/Tailor");
 
-// UPDATE BOOKING
-const updateById = async (id, bookingData) => {
-  return await Booking.update(bookingData, {
-    where: {
-      id,
+const Booking =
+  sequelize.define(
+    "Booking",
+    {
+      id: {
+        type:
+          DataTypes.INTEGER,
+
+        autoIncrement: true,
+
+        primaryKey: true,
+      },
+
+      customer_id: {
+        type:
+          DataTypes.INTEGER,
+
+        allowNull: false,
+      },
+
+      tailor_id: {
+        type:
+          DataTypes.INTEGER,
+
+        allowNull: false,
+      },
+
+      booking_date: {
+        type:
+          DataTypes.DATE,
+
+        allowNull: false,
+      },
+
+      status: {
+        type:
+          DataTypes.ENUM(
+            "pending",
+            "accepted",
+            "completed",
+            "cancelled"
+          ),
+
+        defaultValue:
+          "pending",
+      },
+
+      body_size_note: {
+        type:
+          DataTypes.TEXT,
+      },
+
+      created_at: {
+        type:
+          DataTypes.DATE,
+
+        defaultValue:
+          DataTypes.NOW,
+      },
     },
-  });
-};
 
-// DELETE BOOKING
-const deleteById = async (id) => {
-  return await Booking.destroy({
-    where: {
-      id,
-    },
-  });
-};
+    {
+      tableName:
+        "bookings",
 
-module.exports = {
-  findAll,
-  create,
-  findById,
-  updateById,
-  deleteById,
-};
+      timestamps: false,
+    }
+  );
+
+// =====================
+// RELATION CUSTOMER
+// =====================
+
+Booking.belongsTo(User, {
+  foreignKey:
+    "customer_id",
+
+  as: "customer",
+});
+
+User.hasMany(Booking, {
+  foreignKey:
+    "customer_id",
+
+  as:
+    "customerBookings",
+});
+
+// =====================
+// RELATION TAILOR
+// =====================
+
+Booking.belongsTo(Tailor, {
+  foreignKey:
+    "tailor_id",
+
+  as: "tailor",
+});
+
+Tailor.hasMany(Booking, {
+  foreignKey:
+    "tailor_id",
+
+  as:
+    "tailorBookings",
+});
+
+module.exports =
+  Booking;

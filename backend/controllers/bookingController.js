@@ -1,162 +1,298 @@
-const bookingModel = require("../models/Booking");
+const bookingModel =
+  require("../models/Booking");
+
+const User =
+  require("../schema/User");
+
+const Tailor =
+  require("../schema/Tailor");
 
 // GET ALL BOOKINGS
-const getAllBookings = async (req, res) => {
-  try {
+const getAllBookings =
+  async (req, res) => {
 
-    const bookings = await bookingModel.findAll();
+    try {
 
-    res.status(200).json({
-      message: "Bookings retrieved successfully",
-      data: bookings,
-    });
+      const bookings =
+        await bookingModel.findAll({
 
-  } catch (error) {
+          include: [
 
-    res.status(500).json({
-      message: "Error retrieving bookings",
-      error: error.message,
-    });
+            {
+              model: User,
+              as: "customer",
 
-  }
-};
+              attributes: [
+                "id",
+                "name",
+              ],
+            },
+
+            {
+              model: Tailor,
+               as: "tailor",
+
+              attributes: [
+                "id",
+                "name",
+              ],
+            },
+
+          ],
+
+          order: [
+            ["id", "DESC"],
+          ],
+
+        });
+
+      res.status(200).json({
+
+        message:
+          "Bookings retrieved successfully",
+
+        data: bookings,
+
+      });
+
+    } catch (error) {
+
+      res.status(500).json({
+
+        message:
+          "Error retrieving bookings",
+
+        error: error.message,
+
+      });
+
+    }
+  };
 
 // CREATE BOOKING
-const createBooking = async (req, res) => {
-  try {
+const createBooking =
+  async (req, res) => {
 
-    const {
-      customer_id,
-      tailor_id,
-      booking_date,
-      body_size_note,
-    } = req.body;
+    try {
 
-    const newBooking = await bookingModel.create({
-      customer_id,
-      tailor_id,
-      booking_date,
-      body_size_note,
-    });
+      const {
+        customer_id,
+        tailor_id,
+        booking_date,
+        body_size_note,
+      } = req.body;
 
-    res.status(201).json({
-      message: "Booking created successfully",
-      data: newBooking,
-    });
+      const newBooking =
+        await bookingModel.create({
 
-  } catch (error) {
+          customer_id,
+          tailor_id,
+          booking_date,
+          body_size_note,
 
-    res.status(400).json({
-      message: "Error creating booking",
-      error: error.message,
-    });
+        });
 
-  }
-};
+      res.status(201).json({
+
+        message:
+          "Booking created successfully",
+
+        data: newBooking,
+
+      });
+
+    } catch (error) {
+
+      res.status(400).json({
+
+        message:
+          "Error creating booking",
+
+        error: error.message,
+
+      });
+
+    }
+  };
 
 // GET BOOKING BY ID
-const getBookingById = async (req, res) => {
-  try {
+const getBookingById =
+  async (req, res) => {
 
-    const { id } = req.params;
+    try {
 
-    const booking = await bookingModel.findById(id);
+      const { id } =
+        req.params;
 
-    if (!booking) {
-      return res.status(404).json({
-        message: "Booking not found",
+      const booking =
+        await bookingModel.findByPk(id, {
+
+          include: [
+
+            {
+              model: User,
+              as: "customer",
+
+              attributes: [
+                "id",
+                "name",
+              ],
+            },
+
+            {
+              model: Tailor,
+               as: "tailor",
+              attributes: [
+                "id",
+                "name",
+              ],
+            },
+
+          ],
+
+        });
+
+      if (!booking) {
+
+        return res.status(404).json({
+
+          message:
+            "Booking not found",
+
+        });
+      }
+
+      res.status(200).json({
+
+        message:
+          "Booking retrieved successfully",
+
+        data: booking,
+
       });
+
+    } catch (error) {
+
+      res.status(500).json({
+
+        message:
+          "Error retrieving booking",
+
+        error: error.message,
+
+      });
+
     }
-
-    res.status(200).json({
-      message: "Booking retrieved successfully",
-      data: booking,
-    });
-
-  } catch (error) {
-
-    res.status(500).json({
-      message: "Error retrieving booking",
-      error: error.message,
-    });
-
-  }
-};
+  };
 
 // UPDATE BOOKING
-const updateBooking = async (req, res) => {
-  try {
+const updateBooking =
+  async (req, res) => {
 
-    const { id } = req.params;
+    try {
 
-    const {
-      booking_date,
-      status,
-      body_size_note,
-    } = req.body;
+      const { id } =
+        req.params;
 
-    const booking = await bookingModel.findById(id);
+      const {
+        booking_date,
+        status,
+        body_size_note,
+      } = req.body;
 
-    if (!booking) {
-      return res.status(404).json({
-        message: "Booking not found",
+      const booking =
+        await bookingModel.findByPk(id);
+
+      if (!booking) {
+
+        return res.status(404).json({
+
+          message:
+            "Booking not found",
+
+        });
+      }
+
+      await booking.update({
+
+        booking_date,
+        status,
+        body_size_note,
+
       });
+
+      res.status(200).json({
+
+        message:
+          "Booking updated successfully",
+
+      });
+
+    } catch (error) {
+
+      res.status(500).json({
+
+        message:
+          "Error updating booking",
+
+        error: error.message,
+
+      });
+
     }
-
-    await bookingModel.updateById(id, {
-      booking_date,
-      status,
-      body_size_note,
-    });
-
-    res.status(200).json({
-      message: "Booking updated successfully",
-    });
-
-  } catch (error) {
-
-    res.status(500).json({
-      message: "Error updating booking",
-      error: error.message,
-    });
-
-  }
-};
+  };
 
 // DELETE BOOKING
-const deleteBooking = async (req, res) => {
-  try {
+const deleteBooking =
+  async (req, res) => {
 
-    const { id } = req.params;
+    try {
 
-    const booking = await bookingModel.findById(id);
+      const { id } =
+        req.params;
 
-    if (!booking) {
-      return res.status(404).json({
-        message: "Booking not found",
+      const booking =
+        await bookingModel.findByPk(id);
+
+      if (!booking) {
+
+        return res.status(404).json({
+
+          message:
+            "Booking not found",
+
+        });
+      }
+
+      await booking.destroy();
+
+      res.status(200).json({
+
+        message:
+          "Booking deleted successfully",
+
       });
+
+    } catch (error) {
+
+      res.status(500).json({
+
+        message:
+          "Error deleting booking",
+
+        error: error.message,
+
+      });
+
     }
-
-    await bookingModel.deleteById(id);
-
-    res.status(200).json({
-      message: "Booking deleted successfully",
-    });
-
-  } catch (error) {
-
-    res.status(500).json({
-      message: "Error deleting booking",
-      error: error.message,
-    });
-
-  }
-};
+  };
 
 module.exports = {
+
   getAllBookings,
   createBooking,
   getBookingById,
   updateBooking,
   deleteBooking,
+
 };
