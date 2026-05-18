@@ -21,6 +21,7 @@ const portfolioRoutes = require("./routes/portfolioRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const ratingRoutes = require("./routes/ratingRoutes");
 const userRoutes = require("./routes/userRoutes");
+const chatRoutes = require("./routes/chatRoutes");
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.use("/api/portfolios", portfolioRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/ratings", ratingRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/chats", chatRoutes);
 
 // ROOT
 app.get("/", (req, res) => {

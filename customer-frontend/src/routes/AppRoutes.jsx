@@ -20,6 +20,7 @@ import PortfolioCard from "../components/PortfolioCard";
 import Navbar from "../components/Navbar";
 import About from "../pages/About";
 import Layanan from "../pages/Layanan";
+import ChatPage from "../pages/ChatPage";
 
 const LayoutDenganNavbar = () => {
   return (
@@ -86,6 +87,11 @@ const AppRoutes = () => {
           <Route
             path="/portfolio-katalog/:id"
             element={<PortfolioCard />}
+          />
+
+          <Route
+            path="/chat/:roomId"
+            element={<ChatPage />}
           />
 
         </Route>

@@ -66,15 +66,18 @@ const Navbar = ({
               : "PF"}
           </button>
 
-          {/* CHAT */}
-          <button
-            className="menu-btn"
-          >
-            {isSidebarOpen
-              ? "Chat"
-              : "CH"}
-          </button>
+ {/* CHAT */}
+<button
+  className="menu-btn"
 
+  onClick={() =>
+    navigate("/admin-chat")
+  }
+>
+  {isSidebarOpen
+    ? "Chat"
+    : "CH"}
+</button>
         </div>
       </div>
 

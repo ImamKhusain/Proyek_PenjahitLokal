@@ -14,7 +14,8 @@ import {
 
 import Login from "../pages/Login";
 import Dashboard from "../pages/Dashboard";
-
+import AdminChat from "../pages/AdminChat";
+import AdminChatRoom from "../pages/AdminChatRoom";
 import ManagePortfolio from "../pages/ManagePortfolio";
 import ManageTailor from "../pages/ManageTailor";
 
@@ -91,7 +92,15 @@ const AppRoutes = () => {
             )
           }
         />
+        <Route
+  path="/admin-chat"
+  element={<AdminChat />}
+/>
 
+<Route
+  path="/admin-chat/:roomId"
+  element={<AdminChatRoom />}
+/>
         {/* MANAGE PORTFOLIO */}
         <Route
           path="/manage-portfolio/:id"

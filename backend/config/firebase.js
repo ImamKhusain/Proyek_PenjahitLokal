@@ -1,4 +1,4 @@
-const { initializeApp } = require("firebase/app");
+const { initializeApp, getApps } = require("firebase/app");
 
 const firebaseConfig = {
   apiKey: "AIzaSy...",
@@ -9,6 +9,9 @@ const firebaseConfig = {
   appId: "1:764024000152:web:6e13533470776ffb050aed",
 };
 
-const app = initializeApp(firebaseConfig);
+const app =
+  getApps().length === 0
+    ? initializeApp(firebaseConfig)
+    : getApps()[0];
 
 module.exports = app;
