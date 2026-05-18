@@ -10,8 +10,14 @@ const {
   deletePayment,
 } = require("../controllers/paymentController");
 
-const authMiddleware = require("../middleware/authMiddleware");
-const adminMiddleware = require("../middleware/adminMiddleware");
+const authMiddleware =
+  require("../middleware/authMiddleware");
+
+const adminMiddleware =
+  require("../middleware/adminMiddleware");
+
+const upload =
+  require("../middleware/uploadMiddleware");
 
 // GET ALL PAYMENTS
 router.get(
@@ -32,6 +38,7 @@ router.get(
 router.post(
   "/",
   authMiddleware,
+  upload.single("payment_proof"),
   createPayment
 );
 
@@ -39,6 +46,7 @@ router.post(
 router.put(
   "/:id",
   authMiddleware,
+  upload.single("payment_proof"),
   updatePayment
 );
 
