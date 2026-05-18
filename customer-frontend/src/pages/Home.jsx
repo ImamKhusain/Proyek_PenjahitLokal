@@ -1,200 +1,98 @@
-import {
-  useEffect,
-  useState,
-  useContext,
-} from "react";
-
-import { useNavigate }
-from "react-router-dom";
-
-import {
-  AuthContext
-} from "../context/AuthContext";
-
-import Navbar
-from "../components/Navbar";
-
-import TailorCard
-from "../components/TailorCard";
-
-import { getAllTailors }
-from "../services/tailorService";
+import { useEffect, useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
+import TailorCard from "../components/TailorCard";
+import { getAllTailors } from "../services/tailorService";
 
 import "../App.css";
+import "./Home.css"; 
 
 const Home = () => {
-
-  const navigate =
-    useNavigate();
-
-  const {
-    user,
-    logout
-  } = useContext(AuthContext);
-
-  const [tailors, setTailors] =
-    useState([]);
-
-  // State baru untuk menampung teks pencarian
+  const navigate = useNavigate();
+  
+  // 💡 1. AMBIL PROPERTI 'loading' DARI CONTEXT
+  const { user, loading } = useContext(AuthContext);
+  const [tailors, setTailors] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
+    // 💡 2. JIKA CONTEXT MASIH LOADING, JANGAN LAKUKAN APAPAUN DULU
+    if (loading) return; 
 
-    // CEK LOGIN
+    // CEK LOGIN JIKA LOADING SUDAH SELESAI
     if (!user) {
-
       navigate("/");
-
       return;
-
     }
-
     fetchTailors();
+  }, [user, loading]); // 💡 3. TAMBAHKAN loading KE DALAM DEPENDENCY ARRAY
 
-  }, [user]);
-
-  const fetchTailors =
-    async () => {
-
-      try {
-
-        const data =
-          await getAllTailors();
-
-        setTailors(data);
-
-      } catch (error) {
-
-        console.log(error);
-
-      }
-
+  const fetchTailors = async () => {
+    try {
+      const data = await getAllTailors();
+      setTailors(data);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  // Fungsi menyaring data penjahit berdasarkan input di search bar
+  // 💡 4. TAMPILKAN LOADING SCREEN RINGAN JIKA PROSES CEK STORAGE BELUM SELESAI
+  if (loading) {
+    return (
+      <div style={{ textAlign: "center", paddingTop: "150px", fontFamily: "sans-serif" }}>
+        <h3>Memuat Aplikasi...</h3>
+      </div>
+    );
+  }
+
   const filteredTailors = tailors.filter((tailor) =>
     (tailor.name || "").toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // ====================================================================
-  // PERBAIKAN DI SINI: Langsung mengambil data 'name' dari AuthContext.
-  // Jika data name belum sempat termuat, kita berikan fallback "USER".
-  // ====================================================================
   const displayUserName = user?.name || "USER";
 
   return (
-
-    <div>
-
-      <Navbar />
-
+    <div className="home-page-container">
       <div className="home-container">
-
-        {/* BAGIAN ATAS: DIGANTI TOTAL SESUAI GAMBAR REFERENSI */}
-        <div style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "20px",
-          fontFamily: "sans-serif"
-        }}>
-
-          {/* SISI KIRI: SAPAAN USER */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-            <h1 style={{
-              margin: 0,
-              fontSize: "20px",
-              fontWeight: "bold",
-              color: "#000000"
-            }}>
-              Hi, {displayUserName.toUpperCase()}
-            </h1>
-            <p style={{
-              margin: 0,
-              fontSize: "14px",
-              color: "#aaaaaa"
-            }}>
-              Selamat Datang di Aplikasi Kami
-            </p>
+        
+        {/* BAGIAN ATAS: SAPAAN & SEARCH BAR */}
+        <div className="home-header-layout">
+          <div className="user-welcome-section">
+            <h1>Hi, {displayUserName.toUpperCase()}</h1>
+            <p>Selamat Datang di Aplikasi Kami</p>
           </div>
 
-          {/* SISI KANAN: LONCENG & SEARCH BAR */}
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            
-            {/* Tombol Lonceng Notifikasi */}
-            <button style={{
-              width: "40px",
-              height: "40px",
-              backgroundColor: "#ffffff",
-              border: "1px solid #cccccc",
-              borderRadius: "8px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-              fontSize: "16px"
-            }}>
-              🔔
-            </button>
-
-            {/* Input Pencarian */}
-            <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+          <div className="header-actions-section">
+            <button className="notification-bell-btn">🔔</button>
+            <div className="search-input-wrapper">
               <input
                 type="text"
                 placeholder="Search"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                style={{
-                  width: "220px",
-                  height: "40px",
-                  padding: "0 35px 0 12px",
-                  fontSize: "14px",
-                  backgroundColor: "#ffffff",
-                  border: "1px solid #cccccc",
-                  borderRadius: "8px",
-                  outline: "none"
-                }}
+                className="search-input-field"
               />
-              <span style={{
-                position: "absolute",
-                right: "12px",
-                fontSize: "14px",
-                color: "#aaaaaa",
-                pointerEvents: "none"
-              }}>
-                🔍
-              </span>
+              <span className="search-icon-inside">🔍</span>
             </div>
-
           </div>
-
         </div>
 
         {/* GRID KARTU PENJAHIT */}
         <div className="tailor-list">
-
-          {/* Pengecekan length > 0 sebelum map */}
           {filteredTailors.length > 0 ? (
             filteredTailors.map((tailor) => (
-              <TailorCard
-                key={tailor.id}
-                tailor={tailor}
-              />
+              <TailorCard key={tailor.id} tailor={tailor} />
             ))
           ) : (
-            <p style={{ color: "#888", fontSize: "14px", width: "100%" }}>
+            <p className="tailor-not-found-msg">
               Penjahit tidak ditemukan.
             </p>
           )}
-
         </div>
 
       </div>
-
     </div>
-
   );
-
 };
 
 export default Home;

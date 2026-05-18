@@ -1,111 +1,57 @@
-import {
-  createContext,
-  useState,
-  useEffect,
-} from "react";
+import { createContext, useState, useEffect } from "react";
 
-export const AuthContext =
-  createContext();
+export const AuthContext = createContext();
 
-const AuthProvider = ({
-  children,
-}) => {
-
-  const [user, setUser] =
-    useState(null);
+const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  // 💡 1. TAMBAHKAN STATE LOADING (Default: true)
+  const [loading, setLoading] = useState(true);
 
   // CHECK LOGIN SAAT REFRESH
   useEffect(() => {
-
-    const token =
-      localStorage.getItem("token");
-
-    const role =
-      localStorage.getItem("role");
-
-    // AMBIL NAMA JUGA SAAT REFRESH
-    const name =
-      localStorage.getItem("name");
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+    const name = localStorage.getItem("name");
 
     if (token && role) {
-
       setUser({
         token,
         role,
-        name, // Masukkan nama ke dalam state global
+        name,
       });
-
     }
-
+    
+    // 💡 2. SELESAI CEK STORAGE, SET LOADING JADI FALSE
+    setLoading(false); 
   }, []);
 
-  // LOGIN (Tambahkan parameter name di sini)
-  const login = (
-    token,
-    role,
-    name
-  ) => {
-
-    localStorage.setItem(
-      "token",
-      token
-    );
-
-    localStorage.setItem(
-      "role",
-      role
-    );
-
-    // SIMPAN NAMA KE STORAGE
-    localStorage.setItem(
-      "name",
-      name || ""
-    );
+  // LOGIN
+  const login = (token, role, name) => {
+    localStorage.setItem("token", token);
+    localStorage.setItem("role", role);
+    localStorage.setItem("name", name || "");
 
     setUser({
       token,
       role,
-      name, // Masukkan nama ke dalam state global user
+      name,
     });
-
   };
 
   // LOGOUT
   const logout = () => {
-
-    localStorage.removeItem(
-      "token"
-    );
-
-    localStorage.removeItem(
-      "role"
-    );
-
-    // HAPUS NAMA SAAT LOGOUT
-    localStorage.removeItem(
-      "name"
-    );
-
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    localStorage.removeItem("name");
     setUser(null);
-
   };
 
   return (
-
-    <AuthContext.Provider
-      value={{
-        user,
-        login,
-        logout,
-      }}
-    >
-
+    // 💡 3. KIRIMKAN STATE LOADING KE DALAM VALUE PROVIDER
+    <AuthContext.Provider value={{ user, loading, login, logout }}>
       {children}
-
     </AuthContext.Provider>
-
   );
-
 };
 
 export default AuthProvider;
