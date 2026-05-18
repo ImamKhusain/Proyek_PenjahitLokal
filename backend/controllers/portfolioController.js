@@ -168,7 +168,6 @@ const updatePortfolio =
 
       const {
         name,
-        image_url,
         description,
         price,
         size,
@@ -186,13 +185,28 @@ const updatePortfolio =
 
       }
 
+      let image_url =
+        portfolio.image_url;
+
+      // kalau upload gambar baru
+      if (req.file) {
+
+        image_url =
+          `http://localhost:8080/uploads/catalog/${req.file.filename}`;
+
+      }
+
       await portfolioModel.updateById(
         id,
         {
           name,
           image_url,
           description,
-          price: price ? parseInt(price) : undefined,
+          price:
+            price
+              ? parseInt(price)
+              : 0,
+
           size,
         }
       );
@@ -203,6 +217,8 @@ const updatePortfolio =
       });
 
     } catch (error) {
+
+      console.log(error);
 
       res.status(500).json({
         message:

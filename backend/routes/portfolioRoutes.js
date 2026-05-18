@@ -51,6 +51,7 @@ router.put(
   "/:id",
   authMiddleware,
   adminMiddleware,
+  upload.catalog.single("image"),
   updatePortfolio
 );
 
