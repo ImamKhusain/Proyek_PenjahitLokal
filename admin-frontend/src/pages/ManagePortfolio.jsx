@@ -142,6 +142,35 @@ const ManagePortfolio = () => {
                   {item.price ? `Rp ${item.price.toLocaleString("id-ID")}` : "Rp 0"}
                 </span>
               </div>
+              {/* BUTTON ACTION */}
+<div
+  style={{
+    display: "flex",
+    gap: "10px",
+    marginTop: "15px",
+  }}
+>
+  {/* EDIT */}
+<button
+  onClick={() =>
+    navigate(
+      `/portfolio-detail/${item.id}`
+    )
+  }
+  style={{
+    flex: 1,
+    padding: "10px",
+    backgroundColor: "#2563eb",
+    color: "white",
+    border: "none",
+    borderRadius: "6px",
+    cursor: "pointer",
+    fontWeight: "bold",
+  }}
+>
+  Edit
+</button>
+</div>
             </div>
           ))
         ) : (

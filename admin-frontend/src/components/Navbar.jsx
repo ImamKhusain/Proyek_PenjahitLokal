@@ -1,14 +1,11 @@
 import "./Navbar.css";
 
 import {
-  FiBell,
   FiLogOut,
-  FiMenu,
 } from "react-icons/fi";
 
 const Navbar = ({
   isSidebarOpen,
-  setIsSidebarOpen,
   logout,
   navigate,
 }) => {
@@ -31,29 +28,49 @@ const Navbar = ({
 
         {/* MENU */}
         <div className="sidebar-menu">
-          <button className="menu-btn">
+
+          {/* DASHBOARD */}
+          <button
+            className="menu-btn"
+            onClick={() =>
+              navigate("/dashboard")
+            }
+          >
             {isSidebarOpen
               ? "Daftar Penjahit"
               : "DP"}
           </button>
 
-          <button className="menu-btn">
+          {/* PESANAN */}
+          <button
+            className="menu-btn"
+          >
             {isSidebarOpen
               ? "Daftar Pesanan"
               : "PS"}
           </button>
 
-          <button className="menu-btn">
+          {/* PORTFOLIO */}
+          <button
+            className="menu-btn"
+            onClick={() =>
+              navigate("/portfolio")
+            }
+          >
             {isSidebarOpen
               ? "Portofolio Penjahit"
               : "PF"}
           </button>
 
-          <button className="menu-btn">
+          {/* CHAT */}
+          <button
+            className="menu-btn"
+          >
             {isSidebarOpen
               ? "Chat"
               : "CH"}
           </button>
+
         </div>
       </div>
 

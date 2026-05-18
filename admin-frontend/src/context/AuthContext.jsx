@@ -1,7 +1,6 @@
 import {
   createContext,
   useState,
-  useEffect,
 } from "react";
 
 export const AuthContext =
@@ -12,27 +11,30 @@ const AuthProvider = ({
 }) => {
 
   const [user, setUser] =
-    useState(null);
+    useState(() => {
 
-  // CHECK LOGIN SAAT REFRESH
-  useEffect(() => {
+      const token =
+        localStorage.getItem(
+          "token"
+        );
 
-    const token =
-      localStorage.getItem("token");
+      const role =
+        localStorage.getItem(
+          "role"
+        );
 
-    const role =
-      localStorage.getItem("role");
+      if (token && role) {
 
-    if (token && role) {
+        return {
+          token,
+          role,
+        };
 
-      setUser({
-        token,
-        role,
-      });
+      }
 
-    }
+      return null;
 
-  }, []);
+    });
 
   // LOGIN
   const login = (
