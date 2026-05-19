@@ -14,7 +14,11 @@ import {
   onSnapshot,
   addDoc,
   serverTimestamp,
+  doc,
+  getDoc,
 } from "firebase/firestore";
+
+import axios from "axios";
 
 import db from "../services/firebaseService";
 
@@ -29,7 +33,86 @@ const AdminChatRoom = () => {
   const [message, setMessage] =
     useState("");
 
+  // CUSTOMER NAME
+  const [customerName, setCustomerName] =
+    useState("");
+
+  // TAILOR NAME
+  const [tailorName, setTailorName] =
+    useState("");
+
+
+  // =========================
+  // FETCH ROOM DETAIL
+  // =========================
+
+  useEffect(() => {
+
+    const fetchRoom =
+      async () => {
+
+        try {
+
+          const roomRef =
+            doc(
+              db,
+              "chats",
+              roomId
+            );
+
+          const roomSnap =
+            await getDoc(roomRef);
+
+          if (roomSnap.exists()) {
+
+            const roomData =
+              roomSnap.data();
+
+            // CUSTOMER
+            setCustomerName(
+              roomData.customer_name ||
+              `Customer #${roomData.customer_id}`
+            );
+
+            // FETCH TAILOR
+            const response =
+              await axios.get(
+                `http://localhost:8080/api/tailors/${roomData.tailor_id}`
+              );
+
+            const tailorData =
+              response.data.data
+                ? response.data.data
+                : response.data;
+
+            setTailorName(
+              tailorData.name
+            );
+
+          }
+
+        } catch (error) {
+
+          console.log(
+            "ERROR FETCH ROOM:",
+            error
+          );
+
+        }
+
+      };
+
+    if (roomId) {
+      fetchRoom();
+    }
+
+  }, [roomId]);
+
+
+  // =========================
   // REALTIME LISTENER
+  // =========================
+
   useEffect(() => {
 
     const q = query(
@@ -65,7 +148,11 @@ const AdminChatRoom = () => {
 
   }, [roomId]);
 
+
+  // =========================
   // SEND MESSAGE
+  // =========================
+
   const sendMessage =
     async () => {
 
@@ -84,6 +171,8 @@ const AdminChatRoom = () => {
         {
           message,
 
+          sender_id: 0,
+
           sender_role:
             "admin",
 
@@ -96,6 +185,7 @@ const AdminChatRoom = () => {
       setMessage("");
 
     };
+
 
   return (
 
@@ -113,14 +203,71 @@ const AdminChatRoom = () => {
         style={{
           background: "#ffffff",
           padding: "20px",
-          fontWeight: "700",
-          fontSize: "22px",
           borderBottom:
             "1px solid #ddd",
+
+          display: "flex",
+          justifyContent:
+            "space-between",
+          alignItems: "center",
         }}
       >
-        Chat Admin
+
+        {/* LEFT */}
+        <div>
+
+          <div
+            style={{
+              fontSize: "22px",
+              fontWeight: "700",
+            }}
+          >
+            {customerName}
+          </div>
+
+          <div
+            style={{
+              fontSize: "14px",
+              color: "#6b7280",
+              marginTop: "4px",
+            }}
+          >
+            Customer
+          </div>
+
+        </div>
+
+
+        {/* RIGHT */}
+        <div
+          style={{
+            textAlign: "right",
+          }}
+        >
+
+          <div
+            style={{
+              fontSize: "22px",
+              fontWeight: "700",
+            }}
+          >
+            {tailorName}
+          </div>
+
+          <div
+            style={{
+              fontSize: "14px",
+              color: "#6b7280",
+              marginTop: "4px",
+            }}
+          >
+            Tailor
+          </div>
+
+        </div>
+
       </div>
+
 
       {/* BODY */}
       <div
@@ -174,6 +321,7 @@ const AdminChatRoom = () => {
         ))}
 
       </div>
+
 
       {/* INPUT */}
       <div

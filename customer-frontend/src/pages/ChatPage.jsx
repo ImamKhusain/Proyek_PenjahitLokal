@@ -45,11 +45,11 @@ const ChatPage = () => {
   const [message, setMessage] =
     useState("");
 
-  // ✅ STATE NAMA TAILOR
+  // STATE NAMA TAILOR
   const [tailorName, setTailorName] =
     useState("");
 
-  // ✅ AMBIL TAILOR ID DARI ROOM
+  // AMBIL TAILOR ID
   const tailorId =
     roomId?.split("_")[2];
 
@@ -98,10 +98,12 @@ const ChatPage = () => {
 
 
   // =========================
-  // REALTIME LISTENER
+  // REALTIME CHAT
   // =========================
 
   useEffect(() => {
+
+    if (!roomId) return;
 
     const q = query(
 
@@ -152,6 +154,7 @@ const ChatPage = () => {
       try {
 
         await axios.post(
+
           "http://localhost:8080/api/chats/send",
 
           {
@@ -168,6 +171,7 @@ const ChatPage = () => {
                 `Bearer ${user.token}`,
             },
           }
+
         );
 
         setMessage("");
@@ -180,7 +184,8 @@ const ChatPage = () => {
         );
 
       }
-  };
+
+    };
 
 
   return (
@@ -234,8 +239,8 @@ const ChatPage = () => {
             key={msg.id}
 
             className={
-              msg.sender_id ==
-              user.id
+              msg.sender_role ===
+              "customer"
                 ? "chat-bubble my-chat"
                 : "chat-bubble other-chat"
             }
@@ -268,9 +273,11 @@ const ChatPage = () => {
           }
 
           onKeyDown={(e) => {
+
             if (e.key === "Enter") {
               sendMessage();
             }
+
           }}
         />
 
@@ -283,7 +290,9 @@ const ChatPage = () => {
       </div>
 
     </div>
+
   );
+
 };
 
 export default ChatPage;

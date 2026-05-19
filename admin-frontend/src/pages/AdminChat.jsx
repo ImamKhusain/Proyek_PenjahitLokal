@@ -105,15 +105,18 @@ const AdminChat = () => {
             {/* LEFT */}
             <div>
 
-              <div
-                style={{
-                  fontWeight: "700",
-                  fontSize: "17px",
-                  marginBottom: "6px",
-                }}
-              >
-                Customer #{room.customer_id}
-              </div>
+ <div
+  style={{
+    fontWeight: "700",
+    fontSize: "17px",
+    marginBottom: "6px",
+  }}
+>
+  {
+    room.customer_name ||
+    `Customer #${room.customer_id}`
+  }
+</div>
 
               <div
                 style={{

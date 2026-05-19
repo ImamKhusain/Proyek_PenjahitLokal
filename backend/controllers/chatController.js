@@ -1,5 +1,7 @@
 const db = require("../config/firestore");
 
+const User = require("../models/User");
+
 const {
   collection,
   doc,
@@ -16,62 +18,112 @@ const {
 // ============================
 
 exports.sendMessage = async (req, res) => {
+
   try {
 
-    const { tailor_id, message } = req.body;
+    const {
+      tailor_id,
+      message,
+    } = req.body;
 
-    const customer_id = req.user.id;
+    const customer_id =
+      req.user.id;
 
-    const sender_role = req.user.role;
+    const sender_role =
+      req.user.role;
+
+    // AMBIL DATA USER DARI MYSQL
+    const user =
+      await User.findById(
+        customer_id
+      );
 
     if (!tailor_id || !message) {
+
       return res.status(400).json({
         success: false,
-        message: "tailor_id dan message wajib diisi",
+        message:
+          "tailor_id dan message wajib diisi",
       });
+
     }
 
-    // room id
-    const roomId = `room_${customer_id}_${tailor_id}`;
+    // ROOM ID
+    const roomId =
+      `room_${customer_id}_${tailor_id}`;
 
-    // room reference
-    const roomRef = doc(db, "chats", roomId);
+    // ROOM REF
+    const roomRef =
+      doc(
+        db,
+        "chats",
+        roomId
+      );
 
-    // create/update room
+    // CREATE / UPDATE ROOM
     await setDoc(
+
       roomRef,
+
       {
         customer_id,
+
+        customer_name:
+          user.name,
+
         tailor_id,
-        last_message: message,
-        last_sender_id: customer_id,
-        updated_at: new Date(),
-        created_at: new Date(),
+
+        last_message:
+          message,
+
+        last_sender_id:
+          customer_id,
+
+        updated_at:
+          new Date(),
+
+        created_at:
+          new Date(),
       },
-      { merge: true }
+
+      {
+        merge: true,
+      }
+
     );
 
-    // messages collection
-    const messagesRef = collection(
-      db,
-      "chats",
-      roomId,
-      "messages"
-    );
+    // MESSAGE COLLECTION
+    const messagesRef =
+      collection(
+        db,
+        "chats",
+        roomId,
+        "messages"
+      );
 
-    // add message
-    await addDoc(messagesRef, {
-      sender_id: customer_id,
-      sender_role,
-      message,
-      created_at: new Date(),
-      is_read: false,
-    });
+    // ADD MESSAGE
+    await addDoc(
+      messagesRef,
+      {
+        sender_id:
+          customer_id,
+
+        sender_role,
+
+        message,
+
+        created_at:
+          new Date(),
+
+        is_read: false,
+      }
+    );
 
     return res.status(201).json({
       success: true,
       room_id: roomId,
-      message: "Pesan berhasil dikirim",
+      message:
+        "Pesan berhasil dikirim",
     });
 
   } catch (error) {
@@ -84,6 +136,7 @@ exports.sendMessage = async (req, res) => {
     });
 
   }
+
 };
 
 
@@ -93,31 +146,40 @@ exports.sendMessage = async (req, res) => {
 // ============================
 
 exports.getMessages = async (req, res) => {
+
   try {
 
-    const { roomId } = req.params;
+    const { roomId } =
+      req.params;
 
-    const messagesRef = collection(
-      db,
-      "chats",
-      roomId,
-      "messages"
-    );
+    const messagesRef =
+      collection(
+        db,
+        "chats",
+        roomId,
+        "messages"
+      );
 
     const q = query(
       messagesRef,
-      orderBy("created_at", "asc")
+      orderBy(
+        "created_at",
+        "asc"
+      )
     );
 
-    const snapshot = await getDocs(q);
+    const snapshot =
+      await getDocs(q);
 
     const messages = [];
 
     snapshot.forEach((doc) => {
+
       messages.push({
         id: doc.id,
         ...doc.data(),
       });
+
     });
 
     return res.status(200).json({
@@ -135,6 +197,7 @@ exports.getMessages = async (req, res) => {
     });
 
   }
+
 };
 
 
@@ -144,6 +207,7 @@ exports.getMessages = async (req, res) => {
 // ============================
 
 exports.getMyChats = async (req, res) => {
+
   try {
 
     return res.status(200).json({
@@ -159,4 +223,5 @@ exports.getMyChats = async (req, res) => {
     });
 
   }
+
 };
