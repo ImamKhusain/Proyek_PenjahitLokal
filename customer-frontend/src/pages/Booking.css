@@ -1,39 +1,74 @@
+/* =========================================================
+   BOOKING PAGE PLATFORM DESIGN - ARKI PREMIUM
+========================================================= */
+
 .booking-page-container {
-  padding: 120px 5% 40px 5%;
-  background-color: #f9f9f9;
   min-height: 100vh;
-  font-family: sans-serif;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  box-sizing: border-box;
+  background-color: #fbf9f4; /* Latar krem lembut khas ARKI */
+  font-family: 'Inter', -apple-system, sans-serif;
+  
+  /* 🚀 TAMBAHKAN INI: Jarak aman agar tidak tertutup Navbar utama */
+  padding-top: 90px; 
+}
+.booking-content-wrapper {
+  flex: 1;
+  max-width: 840px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 40px 20px;
 }
 
-.booking-content-wrapper {
-  max-width: 1100px;
-  margin: 0 auto;
-  width: 100%;
+/* =========================================================
+   HEADER SECTION
+========================================================= */
+
+.booking-header {
+  margin-bottom: 32px;
+  text-align: left;
 }
 
 .booking-header h1 {
-  font-size: 26px;
-  font-weight: bold;
-  color: #801515; /* Warna Maroon ARKI */
-  margin: 0 0 6px 0;
+  font-size: 28px;
+  color: #111111;
+  font-weight: 800;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.5px;
 }
 
 .booking-header p {
-  font-size: 14px;
-  color: #666666;
-  margin: 0 0 40px 0;
+  font-size: 14.5px;
+  color: #66625a;
+  margin: 0;
 }
 
+/* =========================================================
+   ERROR NOTIFICATION
+========================================================= */
+
 .booking-error-message {
-  color: #c5221f;
-  text-align: center;
-  margin: 20px 0;
-  font-weight: bold;
+  background-color: #fff5f5;
+  border-left: 4px solid #e53e3e;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 2px 8px rgba(229, 62, 62, 0.05);
 }
+
+.booking-error-message p {
+  margin: 0;
+  font-size: 14px;
+  color: #c53030;
+  font-weight: 500;
+}
+
+/* =========================================================
+   PREMIUM BOOKING CARD UI
+========================================================= */
 
 .booking-list {
   display: flex;
@@ -42,101 +77,271 @@
 }
 
 .booking-card {
+  background: #ffffff;
+  border: 1px solid #eae6dc;
+  border-radius: 14px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.booking-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(139, 0, 0, 0.04);
+}
+
+/* Pembatas warna vertikal di ujung kiri berdasarkan status */
+.status-border-pending { border-left: 4px solid #ecc94b; }
+.status-border-accepted { border-left: 4px solid #319795; }
+.status-border-canceled { border-left: 4px solid #e53e3e; }
+
+.booking-card-main {
+  padding: 24px;
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.booking-details {
+  flex: 1;
+}
+
+.booking-card-header {
+  display: flex;
   align-items: center;
-  background-color: #ffffff;
-  border: 1px solid #e2e2e2;
-  border-radius: 12px;
-  padding: 24px 32px;
-  box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.04);
+  gap: 12px;
+  margin-bottom: 14px;
 }
 
 .booking-details h3 {
-  margin: 0 0 12px 0;
+  margin: 0;
   font-size: 18px;
-  color: #000000;
-}
-
-.booking-details p {
-  margin: 6px 0;
-  font-size: 14px;
-  color: #444444;
-}
-
-/* Penata tampilan teks agar enter/baris baru bekerja */
-.note-text-box {
-  display: block;
-  background-color: #f7f7f7;
-  padding: 12px 16px;
-  border-radius: 8px;
-  margin-top: 6px;
-  white-space: pre-line; /* Kunci penataan enter teks otomatis */
-  font-size: 13px;
-  color: #333333;
-  border-left: 4px solid #801515;
-  line-height: 1.6;
+  color: #111111;
+  font-weight: 700;
 }
 
 .booking-id-tag {
-  color: #801515;
-  font-weight: bold;
-  background-color: #fceaea;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  background-color: #f5f3ef;
+  color: #44423e;
+  padding: 4px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
 }
 
-/* Badge Status Dinamis mengikuti value database */
-.status-badge {
-  padding: 8px 18px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: bold;
+/* Kotak Teks Informasi Catatan Ukuran */
+.note-text-box-premium {
+  background-color: #fdfcf9;
+  border: 1px solid #f0ede4;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.note-category-title {
+  font-size: 13px;
   text-transform: uppercase;
-  min-width: 100px;
-  text-align: center;
-  display: inline-block;
+  color: #88847c;
+  margin: 12px 0 6px 0;
+  letter-spacing: 0.5px;
 }
 
-.status-badge.pending {
-  background-color: #ffeeba;
-  color: #856404;
-  border: 1px solid #ffe8a1;
+.note-category-title:first-child {
+  margin-top: 0;
 }
 
-.status-badge.accepted {
-  background-color: #e8f2ff;
-  color: #004085;
-  border: 1px solid #d4e7ff;
+.note-line-item {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  color: #33312c;
+  line-height: 1.5;
 }
 
-.status-badge.completed {
-  background-color: #e6f4ea;
-  color: #137333;
-  border: 1px solid #ceead6;
+.note-line-item:last-child {
+  margin-bottom: 0;
 }
 
-.booking-empty {
+/* Waktu & Tanggal Pertemuan */
+.booking-time-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #55524c;
+}
+
+.booking-time-info strong {
+  color: #111111;
+}
+
+/* =========================================================
+   STATUS BADGES
+========================================================= */
+
+.booking-status-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.status-badge-premium {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+}
+
+.badge-pending {
+  background-color: #fefcbf;
+  color: #b7791f;
+}
+
+.badge-accepted {
+  background-color: #e6fffa;
+  color: #234e52;
+}
+
+.badge-canceled {
+  background-color: #fff5f5;
+  color: #9b2c2c;
+}
+
+/* =========================================================
+   DYNAMIC CANCELED INTERACTIVE ACTION BAR
+========================================================= */
+
+.booking-action-bar {
+  background-color: #fffaf0;
+  border-top: 1px solid #feebc8;
+  padding: 14px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.action-message {
+  font-size: 13.5px;
+  color: #dd6b20;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.info-dot {
+  width: 6px;
+  height: 6px;
+  background-color: #dd6b20;
+  border-radius: 50%;
+}
+
+.action-buttons-group {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-action-primary {
+  background-color: #8B0000;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-action-primary:hover {
+  background-color: #6a0000;
+}
+
+.btn-action-secondary {
+  background-color: transparent;
+  color: #718096;
+  border: 1px solid #cbd5e0;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-action-secondary:hover {
+  background-color: #f7fafc;
+  color: #4a5568;
+  border-color: #a0aec0;
+}
+
+/* =========================================================
+   EMPTY STATE STYLING
+========================================================= */
+
+.booking-empty-state {
   text-align: center;
   padding: 60px 20px;
-  background-color: #ffffff;
-  border-radius: 12px;
-  border: 1px dashed #cccccc;
-  color: #777777;
+  background: #ffffff;
+  border: 1px dashed #dcd8cd;
+  border-radius: 14px;
+}
+
+.empty-box-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.booking-empty-state h3 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  color: #222222;
+}
+
+.booking-empty-state p {
+  color: #77746d;
+  font-size: 14px;
+  margin: 0 0 24px 0;
+}
+
+.btn-order-now {
+  background-color: #8B0000;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 24px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-order-now:hover {
+  background-color: #6a0000;
+}
+
+/* Loading & Footer */
+.booking-loading-screen {
+  text-align: center;
+  padding-top: 150px;
+  color: #444;
 }
 
 .booking-footer {
   text-align: center;
-  padding: 20px 0;
-  font-size: 14px;
-  font-weight: bold;
-  background-color: #fffde0; /* Kuning pastel navbar top */
-  margin-top: 60px;
-  width: 100vw;
-  position: relative;
-  left: 50%;
-  right: 50%;
-  margin-left: -50vw;
-  margin-right: -50vw;
+  padding: 32px 20px;
+  font-size: 12px;
+  color: #88847c;
+  line-height: 1.6;
+  background: #fffdf5;
+  border-top: 1px solid #eae6dc;
+}
+
+.booking-footer span {
+  font-weight: 600;
+  color: #555;
 }

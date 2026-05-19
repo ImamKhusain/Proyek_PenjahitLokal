@@ -1,17 +1,6 @@
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-  Outlet,
-} from "react-router-dom";
-
-import {
-  useContext,
-} from "react";
-
-import {
-  AuthContext,
-} from "../context/AuthContext";
+import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 
 import Login from "../pages/Login";
 import Home from "../pages/Home";
@@ -21,8 +10,9 @@ import Navbar from "../components/Navbar";
 import About from "../pages/About";
 import Layanan from "../pages/Layanan";
 import ChatPage from "../pages/ChatPage";
-import Booking from "../pages/Booking"; // 💡 1. IMPORT HALAMAN BOOKING DI SINI
+import Booking from "../pages/Booking";
 
+// Layout yang menempelkan Navbar secara otomatis di atas halaman
 const LayoutDenganNavbar = () => {
   return (
     <>
@@ -33,80 +23,51 @@ const LayoutDenganNavbar = () => {
 };
 
 const AppRoutes = () => {
-
-  const { user } =
-    useContext(AuthContext);
+  const { user } = useContext(AuthContext);
 
   return (
-
     <BrowserRouter>
-
       <Routes>
-
         {/* LOGIN */}
-        <Route
-          path="/"
-          element={<Login />}
-        />
+        <Route path="/" element={<Login />} />
 
-        {/* HALAMAN YANG BUTUH LOGIN */}
+        {/* ========================================================
+            KELOMPOK 1: HALAMAN YANG BUTUH LOGIN + PAKAI NAVBAR
+           ======================================================== */}
         <Route
-          element = {
-            user ? (
-              <LayoutDenganNavbar />
-            ) : (
-              <Login />
-            )
-          }
+          element={user ? <LayoutDenganNavbar /> : <Login />}
         >
-
           {/* HOME */}
-          <Route
-            path="/home"
-            element={<Home />}
-          />
+          <Route path="/home" element={<Home />} />
 
           {/* ABOUT */}
-          <Route
-            path="/about"
-            element={<About />}
-          />
+          <Route path="/about" element={<About />} />
 
           {/* LAYANAN */}
-          <Route
-            path="/layanan"
-            element={<Layanan />}
-          />
+          <Route path="/layanan" element={<Layanan />} />
 
           {/* DETAIL PENJAHIT */}
-          <Route
-            path="/detail/:id"
-            element={<TailorDetail />}
-          />
+          <Route path="/detail/:id" element={<TailorDetail />} />
 
           {/* PORTFOLIO */}
-          <Route
-            path="/portfolio-katalog/:id"
-            element={<PortfolioCard />}
-          />
-
-          {/* CHAT */}
-          <Route
-            path="/chat/:roomId"
-            element={<ChatPage />}
-          />
+          <Route path="/portfolio-katalog/:id" element={<PortfolioCard />} />
 
           {/* PESANAN SAYA */}
-          {/* 💡 2. TAMBAHKAN ROUTE PESANAN DI SINI */}
-          <Route
-            path="/pesanan"
-            element={<Booking />}
-          />
+          <Route path="/pesanan" element={<Booking />} />
+        </Route>
 
+        {/* ========================================================
+            KELOMPOK 2: HALAMAN YANG BUTUH LOGIN TAPI TANPA NAVBAR
+            (Dikeluarkan dari LayoutDenganNavbar agar bersih total)
+           ======================================================== */}
+        <Route 
+          element={user ? <Outlet /> : <Login />}
+        >
+          {/* CHAT */}
+          <Route path="/chat/:roomId" element={<ChatPage />} />
         </Route>
 
       </Routes>
-
     </BrowserRouter>
   );
 };

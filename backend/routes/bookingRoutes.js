@@ -46,7 +46,7 @@ router.put(
 router.delete(
   "/:id",
   authMiddleware,
-  adminMiddleware,
+  // adminMiddleware,
   deleteBooking
 );
 

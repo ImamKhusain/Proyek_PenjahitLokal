@@ -37,7 +37,8 @@ const PortfolioCard = () => {
     setIsModalOpen(true);
   };
 
-  const handleBookingSubmit = async ({ bookingDate, finalNote }) => {
+  // 🚀 PERUBAHAN DI SINI: Menambahkan productDetail bawaan modal ke dalam destructuring parameter
+  const handleBookingSubmit = async ({ bookingDate, finalNote, productDetail }) => {
     setIsSubmitting(true);
     try {
       const token = localStorage.getItem("token");
@@ -74,11 +75,13 @@ const PortfolioCard = () => {
         return;
       }
 
+      // 🚀 PERUBAHAN DI SINI: Menyisipkan portfolio_id ke payload agar tidak masuk NULL ke database
       const payload = {
         customer_id: parseInt(customerId, 10), 
         tailor_id: parseInt(id, 10),
         booking_date: bookingDate,
         body_size_note: finalNote,
+        portfolio_id: productDetail ? parseInt(productDetail.id, 10) : null // Ambil ID portofolio produk katalog
       };
 
       const response = await axios.post(

@@ -3,6 +3,7 @@ const sequelize = require("../config/database");
 
 const User = require("./User");
 const Tailor = require("./Tailor");
+const Portfolio = require("./Portfolio");
 
 const Booking = sequelize.define(
   "Booking",
@@ -21,6 +22,10 @@ const Booking = sequelize.define(
     tailor_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
+    },
+    portfolio_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
     },
 
     booking_date: {
@@ -71,5 +76,9 @@ Booking.belongsTo(Tailor, {
 Tailor.hasMany(Booking, {
   foreignKey: "tailor_id",
 });
+
+// 🚀 3. Relasi Portfolio di File Schema
+Booking.belongsTo(Portfolio, { foreignKey: "portfolio_id", as: "portfolio" });
+Portfolio.hasMany(Booking, { foreignKey: "portfolio_id" });
 
 module.exports = Booking;

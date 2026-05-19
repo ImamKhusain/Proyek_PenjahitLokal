@@ -7,6 +7,7 @@ import {
 import {
   useParams,
   useLocation,
+  useNavigate,
 } from "react-router-dom";
 
 import axios from "axios";
@@ -20,12 +21,12 @@ import {
 
 import db from "../services/firebaseService";
 
-import { AuthContext }
-from "../context/AuthContext";
+import { AuthContext } from "../context/AuthContext";
 
 import "./ChatPage.css";
 
 const ChatPage = () => {
+  const navigate = useNavigate();
 
   const { roomId } =
     useParams();
@@ -192,34 +193,28 @@ const ChatPage = () => {
 
     <div className="chat-page">
 
-      {/* HEADER */}
-
+      {/* HEADER MINIMALIS */}
       <div className="chat-header">
 
-        <div className="chat-user-info">
+        <div className="chat-header-left">
+          
+          <button 
+            className="chat-back-button" 
+            onClick={() => navigate(-1)}
+            title="Kembali"
+          >
+            ←
+          </button>
 
-          <div className="chat-avatar">
-
-            {(tailor?.name ||
-              tailorName ||
-              "T")
-              .charAt(0)
-              .toUpperCase()}
-
-          </div>
-
-          <div>
+          <div className="chat-user-info-block">
 
             <h2 className="chat-user-name">
-
-              {tailor?.name ||
-                tailorName ||
-                "Tailor"}
-
+              CS Admin ARKI
             </h2>
 
-            <p className="chat-user-status">
-              Sedang aktif
+            {/* Menampilkan nama penjahit secara langsung tanpa embel-embel teks statis */}
+            <p className="chat-tailor-context">
+              {tailor?.name || tailorName || "Tailor"}
             </p>
 
           </div>
