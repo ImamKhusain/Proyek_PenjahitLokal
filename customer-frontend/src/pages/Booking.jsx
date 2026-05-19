@@ -149,6 +149,15 @@ const Booking = () => {
     }
   };
 
+  // ==========================================
+// 4. ARAHKAN KE HALAMAN CHECKOUT / PEMBAYARAN
+// ==========================================
+const handlePaymentRedirect = (bookingId) => {
+  // SEBELUMNYA: navigate(`/payment/${bookingId}`);
+  // UBAH MENJADI:
+  navigate(`/pembayaran/${bookingId}`);
+};
+
   const handleDateChange = (bookingId, value) => {
     setSelectedNewDates(prev => ({
       ...prev,
@@ -215,7 +224,7 @@ const Booking = () => {
               const rawStatus = pesanan.status || "pending";
               const currentStatusClean = rawStatus.toLowerCase().trim();
 
-              const isCanceled = currentStatusClean === "cancelled" || currentStatusClean === "cancelled";
+              const isCanceled = currentStatusClean === "cancelled";
               const isAccepted = currentStatusClean === "accepted";
               const isCompleted = currentStatusClean === "completed";
 
@@ -241,7 +250,7 @@ const Booking = () => {
                         {renderFormattedNote(pesanan.body_size_note)}
                       </div>
 
-                      {/* 💰 🚀 NOMINAL HARGA ASLI BERDASARKAN DATABASE PORTOFOLIO */}
+                      {/* 💰 NOMINAL HARGA ASLI BERDASARKAN DATABASE PORTOFOLIO */}
                       <div className="booking-price-info" style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: '12px 0 6px 0' }}>
                         <span className="price-icon" style={{ fontSize: '1.2rem' }}>💰</span>
                         <p style={{ margin: 0, fontSize: '0.95rem', color: '#4b5563' }}>
@@ -251,12 +260,41 @@ const Booking = () => {
                         </p>
                       </div>
 
-                      <div className="booking-time-info">
+                      <div className="booking-time-info" style={{ marginBottom: isAccepted ? '4px' : '12px' }}>
                         <span className="calendar-icon">📅</span>
                         <p>
                           Rencana Pertemuan: <strong>{formatTanggal(pesanan.booking_date)}</strong>
                         </p>
                       </div>
+
+                      {/* 💳 BLOK TOMBOL PEMBAYARAN KHUSUS UNTUK STATUS DITERIMA (ACCEPTED) */}
+                      {isAccepted && (
+                        <div className="payment-action-box" style={{ margin: '16px 0 8px 0' }}>
+                          <button
+                            onClick={() => handlePaymentRedirect(pesanan.id)}
+                            style={{
+                              backgroundColor: '#10b981',
+                              color: '#ffffff',
+                              border: 'none',
+                              padding: '10px 20px',
+                              borderRadius: '6px',
+                              fontWeight: '600',
+                              fontSize: '0.95rem',
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '8px',
+                              boxShadow: '0 4px 6px -1px rgba(16, 185, 129, 0.2), 0 2px 4px -1px rgba(16, 185, 129, 0.06)',
+                              transition: 'all 0.2s ease-in-out'
+                            }}
+                            onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#059669'}
+                            onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#10b981'}
+                          >
+                            💳 Lanjut Ke Pembayaran
+                          </button>
+                        </div>
+                      )}
+
                     </div>
 
                     <div className="booking-status-wrapper">
