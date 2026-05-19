@@ -1,9 +1,16 @@
-//controller
+// controller
+
 const paymentModel =
   require("../models/Payment");
 
 const firebaseService =
   require("../services/firebaseService");
+
+const {
+  createPaymentNotification,
+} = require(
+  "../services/notificationService"
+);
 
 
 // =====================================
@@ -145,6 +152,23 @@ const createPayment =
             "pending",
 
         });
+
+
+      // =====================================
+      // CREATE NOTIFICATION
+      // =====================================
+
+      await createPaymentNotification({
+
+        user_id:
+          req.user?.id,
+
+        booking_id,
+
+        payment_status:
+          "pending",
+
+      });
 
 
       res.status(201).json({
@@ -317,6 +341,27 @@ const updatePayment =
         );
 
 
+      // =====================================
+      // CREATE NOTIFICATION
+      // =====================================
+
+      if (payment_status) {
+
+        await createPaymentNotification({
+
+          user_id:
+            req.user?.id,
+
+          booking_id:
+            payment.booking_id,
+
+          payment_status,
+
+        });
+
+      }
+
+
       res.status(200).json({
 
         message:
@@ -357,11 +402,33 @@ const updatePaymentStatus =
         payment_status,
       } = req.body;
 
+      const payment =
+        await paymentModel
+          .findById(id);
+
       await paymentModel
         .updateStatus(
           id,
           payment_status
         );
+
+
+      // =====================================
+      // CREATE NOTIFICATION
+      // =====================================
+
+      await createPaymentNotification({
+
+        user_id:
+          req.user?.id,
+
+        booking_id:
+          payment.booking_id,
+
+        payment_status,
+
+      });
+
 
       res.status(200).json({
 

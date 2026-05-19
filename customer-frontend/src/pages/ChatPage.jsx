@@ -21,12 +21,16 @@ import {
 
 import db from "../services/firebaseService";
 
-import { AuthContext } from "../context/AuthContext";
+import {
+  AuthContext,
+} from "../context/AuthContext";
 
 import "./ChatPage.css";
 
 const ChatPage = () => {
-  const navigate = useNavigate();
+
+  const navigate =
+    useNavigate();
 
   const { roomId } =
     useParams();
@@ -46,17 +50,18 @@ const ChatPage = () => {
   const [message, setMessage] =
     useState("");
 
-  // STATE NAMA TAILOR
-  const [tailorName, setTailorName] =
-    useState("");
+  const [
+    tailorName,
+    setTailorName,
+  ] = useState("");
 
-  // AMBIL TAILOR ID
-  const tailorId =
+  // AMBIL ADMIN ID
+  const adminId =
     roomId?.split("_")[2];
 
 
   // =========================
-  // FETCH DETAIL TAILOR
+  // FETCH TAILOR
   // =========================
 
   useEffect(() => {
@@ -68,7 +73,7 @@ const ChatPage = () => {
 
           const response =
             await axios.get(
-              `http://localhost:8080/api/tailors/${tailorId}`
+              `http://localhost:8080/api/tailors/${adminId}`
             );
 
           const data =
@@ -91,11 +96,13 @@ const ChatPage = () => {
 
       };
 
-    if (tailorId) {
+    if (adminId) {
+
       fetchTailor();
+
     }
 
-  }, [tailorId]);
+  }, [adminId]);
 
 
   // =========================
@@ -123,21 +130,25 @@ const ChatPage = () => {
     );
 
     const unsubscribe =
-      onSnapshot(q, (snapshot) => {
+      onSnapshot(
+        q,
+        (snapshot) => {
 
-        const chats =
-          snapshot.docs.map(
-            (doc) => ({
-              id: doc.id,
-              ...doc.data(),
-            })
-          );
+          const chats =
+            snapshot.docs.map(
+              (doc) => ({
+                id: doc.id,
+                ...doc.data(),
+              })
+            );
 
-        setMessages(chats);
+          setMessages(chats);
 
-      });
+        }
+      );
 
-    return () => unsubscribe();
+    return () =>
+      unsubscribe();
 
   }, [roomId]);
 
@@ -154,26 +165,51 @@ const ChatPage = () => {
 
       try {
 
-        await axios.post(
+        // SIMPAN CHAT
+        const response =
+          await axios.post(
 
-          "http://localhost:8080/api/chats/send",
+            "http://localhost:8080/api/chats/send",
 
-          {
-            tailor_id:
-              tailor?.id ||
-              tailorId,
+            {
 
-            message,
-          },
+              tailor_id:
+                tailor?.user_id ||
+                adminId,
 
-          {
-            headers: {
-              Authorization:
-                `Bearer ${user.token}`,
+              message,
+
             },
-          }
 
-        );
+            {
+              headers: {
+
+                Authorization:
+                  `Bearer ${user.token}`,
+
+              },
+            }
+
+          );
+
+        // AMBIL ROOM YANG BENAR
+        const newRoomId =
+          response.data.room_id;
+
+        // PINDAH KE ROOM BARU
+        if (
+          newRoomId &&
+          newRoomId !== roomId
+        ) {
+
+          navigate(
+            `/chat/${newRoomId}`,
+            {
+              replace: true,
+            }
+          );
+
+        }
 
         setMessage("");
 
@@ -193,15 +229,18 @@ const ChatPage = () => {
 
     <div className="chat-page">
 
-      {/* HEADER MINIMALIS */}
+      {/* HEADER */}
+
       <div className="chat-header">
 
         <div className="chat-header-left">
-          
-          <button 
-            className="chat-back-button" 
-            onClick={() => navigate(-1)}
-            title="Kembali"
+
+          <button
+            className="chat-back-button"
+
+            onClick={() =>
+              navigate(-1)
+            }
           >
             ←
           </button>
@@ -212,9 +251,14 @@ const ChatPage = () => {
               CS Admin ARKI
             </h2>
 
-            {/* Menampilkan nama penjahit secara langsung tanpa embel-embel teks statis */}
             <p className="chat-tailor-context">
-              {tailor?.name || tailorName || "Tailor"}
+
+              {
+                tailor?.name ||
+                tailorName ||
+                "Tailor"
+              }
+
             </p>
 
           </div>
@@ -234,10 +278,14 @@ const ChatPage = () => {
             key={msg.id}
 
             className={
+
               msg.sender_role ===
               "customer"
+
                 ? "chat-bubble my-chat"
+
                 : "chat-bubble other-chat"
+
             }
           >
 
@@ -269,8 +317,12 @@ const ChatPage = () => {
 
           onKeyDown={(e) => {
 
-            if (e.key === "Enter") {
+            if (
+              e.key === "Enter"
+            ) {
+
               sendMessage();
+
             }
 
           }}

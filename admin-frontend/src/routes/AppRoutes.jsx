@@ -13,20 +13,29 @@ import {
 } from "../context/AuthContext";
 
 import Login from "../pages/Login";
+
 import Dashboard from "../pages/Dashboard";
+
 import AdminChat from "../pages/AdminChat";
+
 import AdminChatRoom from "../pages/AdminChatRoom";
+
 import ManagePortfolio from "../pages/ManagePortfolio";
+
 import ManageTailor from "../pages/ManageTailor";
 
 import TailorDetail from "../pages/TailorDetail";
 
 import PortfolioPage from "../pages/PortfolioPage";
+
 import PortfolioDetail from "../pages/PortfolioDetail";
 
 import PortofolioForm from "../components/PortofolioForm";
 
 import BookingPage from "../pages/BookingPage";
+
+// ✅ TAMBAHAN
+import AdminPayments from "../pages/AdminPayments";
 
 const AppRoutes = () => {
 
@@ -69,6 +78,18 @@ const AppRoutes = () => {
           }
         />
 
+        {/* ✅ PAYMENT PAGE */}
+        <Route
+          path="/payments"
+          element={
+            user ? (
+              <AdminPayments />
+            ) : (
+              <Login />
+            )
+          }
+        />
+
         {/* PORTFOLIO PAGE */}
         <Route
           path="/portfolio"
@@ -92,15 +113,31 @@ const AppRoutes = () => {
             )
           }
         />
-        <Route
-  path="/admin-chat"
-  element={<AdminChat />}
-/>
 
-<Route
-  path="/admin-chat/:roomId"
-  element={<AdminChatRoom />}
-/>
+        {/* ADMIN CHAT */}
+        <Route
+          path="/admin-chat"
+          element={
+            user ? (
+              <AdminChat />
+            ) : (
+              <Login />
+            )
+          }
+        />
+
+        {/* ADMIN CHAT ROOM */}
+        <Route
+          path="/admin-chat/:roomId"
+          element={
+            user ? (
+              <AdminChatRoom />
+            ) : (
+              <Login />
+            )
+          }
+        />
+
         {/* MANAGE PORTFOLIO */}
         <Route
           path="/manage-portfolio/:id"

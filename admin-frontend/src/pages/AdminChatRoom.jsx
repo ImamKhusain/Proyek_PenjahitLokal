@@ -16,6 +16,7 @@ import {
   serverTimestamp,
   doc,
   getDoc,
+  updateDoc,
 } from "firebase/firestore";
 
 import axios from "axios";
@@ -34,12 +35,16 @@ const AdminChatRoom = () => {
     useState("");
 
   // CUSTOMER NAME
-  const [customerName, setCustomerName] =
-    useState("");
+  const [
+    customerName,
+    setCustomerName,
+  ] = useState("");
 
   // TAILOR NAME
-  const [tailorName, setTailorName] =
-    useState("");
+  const [
+    tailorName,
+    setTailorName,
+  ] = useState("");
 
 
   // =========================
@@ -70,8 +75,11 @@ const AdminChatRoom = () => {
 
             // CUSTOMER
             setCustomerName(
+
               roomData.customer_name ||
+
               `Customer #${roomData.customer_id}`
+
             );
 
             // FETCH TAILOR
@@ -110,6 +118,67 @@ const AdminChatRoom = () => {
 
 
   // =========================
+  // UPDATE READ STATUS
+  // =========================
+
+  useEffect(() => {
+
+    const updateReadStatus =
+      async () => {
+
+        try {
+
+          const roomRef =
+            doc(
+              db,
+              "chats",
+              roomId
+            );
+
+          const roomSnap =
+            await getDoc(roomRef);
+
+          if (roomSnap.exists()) {
+
+            const roomData =
+              roomSnap.data();
+
+            if (
+              roomData.is_read === false
+            ) {
+
+              await updateDoc(
+                roomRef,
+                {
+                  is_read: true,
+                }
+              );
+
+            }
+
+          }
+
+        } catch (error) {
+
+          console.log(
+            "ERROR UPDATE READ:",
+            error
+          );
+
+        }
+
+      };
+
+    if (roomId) {
+
+      updateReadStatus();
+
+    }
+
+  }, [roomId]);
+
+
+  // =========================
   // REALTIME LISTENER
   // =========================
 
@@ -132,19 +201,25 @@ const AdminChatRoom = () => {
     );
 
     const unsubscribe =
-      onSnapshot(q, (snapshot) => {
+      onSnapshot(
+        q,
+        (snapshot) => {
 
-        const data =
-          snapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
+          const data =
+            snapshot.docs.map(
+              (doc) => ({
+                id: doc.id,
+                ...doc.data(),
+              })
+            );
 
-        setMessages(data);
+          setMessages(data);
 
-      });
+        }
+      );
 
-    return () => unsubscribe();
+    return () =>
+      unsubscribe();
 
   }, [roomId]);
 
@@ -159,30 +234,120 @@ const AdminChatRoom = () => {
       if (!message.trim())
         return;
 
-      await addDoc(
+      try {
 
-        collection(
-          db,
-          "chats",
-          roomId,
-          "messages"
-        ),
+        // AMBIL CUSTOMER ID
+        const customerId =
+          roomId.split("_")[1];
 
-        {
-          message,
+        // =========================
+        // ADD MESSAGE
+        // =========================
 
-          sender_id: 0,
+        await addDoc(
 
-          sender_role:
-            "admin",
+          collection(
+            db,
+            "chats",
+            roomId,
+            "messages"
+          ),
 
-          created_at:
-            serverTimestamp(),
-        }
+          {
 
-      );
+            message,
 
-      setMessage("");
+            sender_id: 0,
+
+            sender_role:
+              "admin",
+
+            created_at:
+              serverTimestamp(),
+
+            is_read: false,
+
+          }
+
+        );
+
+
+        // =========================
+        // UPDATE ROOM
+        // =========================
+
+        await updateDoc(
+
+          doc(
+            db,
+            "chats",
+            roomId
+          ),
+
+          {
+
+            last_message:
+              message,
+
+            updated_at:
+              serverTimestamp(),
+
+            is_read: true,
+
+          }
+
+        );
+
+
+        // =========================
+        // CREATE NOTIFICATION
+        // =========================
+
+        await addDoc(
+
+          collection(
+            db,
+            "notifications"
+          ),
+
+          {
+
+            user_id:
+              Number(
+                customerId
+              ),
+
+            type: "chat",
+
+            title:
+              "Pesan Baru",
+
+            message:
+              `Adminmengirim pesan baru`,
+
+            redirect_url:
+              `/chat/${roomId}`,
+
+            is_read: false,
+
+            created_at:
+              serverTimestamp(),
+
+          }
+
+        );
+
+
+        setMessage("");
+
+      } catch (error) {
+
+        console.log(
+          "ERROR SEND MESSAGE:",
+          error
+        );
+
+      }
 
     };
 
@@ -193,23 +358,33 @@ const AdminChatRoom = () => {
       style={{
         height: "100vh",
         display: "flex",
-        flexDirection: "column",
-        background: "#f3f4f6",
+        flexDirection:
+          "column",
+        background:
+          "#f3f4f6",
       }}
     >
 
       {/* HEADER */}
       <div
         style={{
-          background: "#ffffff",
-          padding: "20px",
+          background:
+            "#ffffff",
+
+          padding:
+            "20px",
+
           borderBottom:
             "1px solid #ddd",
 
-          display: "flex",
+          display:
+            "flex",
+
           justifyContent:
             "space-between",
-          alignItems: "center",
+
+          alignItems:
+            "center",
         }}
       >
 
@@ -218,8 +393,11 @@ const AdminChatRoom = () => {
 
           <div
             style={{
-              fontSize: "22px",
-              fontWeight: "700",
+              fontSize:
+                "22px",
+
+              fontWeight:
+                "700",
             }}
           >
             {customerName}
@@ -227,9 +405,14 @@ const AdminChatRoom = () => {
 
           <div
             style={{
-              fontSize: "14px",
-              color: "#6b7280",
-              marginTop: "4px",
+              fontSize:
+                "14px",
+
+              color:
+                "#6b7280",
+
+              marginTop:
+                "4px",
             }}
           >
             Customer
@@ -241,14 +424,18 @@ const AdminChatRoom = () => {
         {/* RIGHT */}
         <div
           style={{
-            textAlign: "right",
+            textAlign:
+              "right",
           }}
         >
 
           <div
             style={{
-              fontSize: "22px",
-              fontWeight: "700",
+              fontSize:
+                "22px",
+
+              fontWeight:
+                "700",
             }}
           >
             {tailorName}
@@ -256,9 +443,14 @@ const AdminChatRoom = () => {
 
           <div
             style={{
-              fontSize: "14px",
-              color: "#6b7280",
-              marginTop: "4px",
+              fontSize:
+                "14px",
+
+              color:
+                "#6b7280",
+
+              marginTop:
+                "4px",
             }}
           >
             Tailor
@@ -273,11 +465,19 @@ const AdminChatRoom = () => {
       <div
         style={{
           flex: 1,
-          overflowY: "auto",
-          padding: "20px",
 
-          display: "flex",
-          flexDirection: "column",
+          overflowY:
+            "auto",
+
+          padding:
+            "20px",
+
+          display:
+            "flex",
+
+          flexDirection:
+            "column",
+
           gap: "12px",
         }}
       >
@@ -288,22 +488,32 @@ const AdminChatRoom = () => {
             key={msg.id}
 
             style={{
+
               alignSelf:
+
                 msg.sender_role ===
                 "admin"
+
                   ? "flex-end"
+
                   : "flex-start",
 
               background:
+
                 msg.sender_role ===
                 "admin"
+
                   ? "#2563eb"
+
                   : "#ffffff",
 
               color:
+
                 msg.sender_role ===
                 "admin"
+
                   ? "#ffffff"
+
                   : "#111827",
 
               padding:
@@ -312,7 +522,11 @@ const AdminChatRoom = () => {
               borderRadius:
                 "14px",
 
-              maxWidth: "70%",
+              maxWidth:
+                "70%",
+
+              boxShadow:
+                "0 2px 8px rgba(0,0,0,0.06)",
             }}
           >
             {msg.message}
@@ -326,10 +540,18 @@ const AdminChatRoom = () => {
       {/* INPUT */}
       <div
         style={{
-          background: "#ffffff",
-          padding: "16px",
-          display: "flex",
-          gap: "12px",
+          background:
+            "#ffffff",
+
+          padding:
+            "16px",
+
+          display:
+            "flex",
+
+          gap:
+            "12px",
+
           borderTop:
             "1px solid #ddd",
         }}
@@ -350,9 +572,18 @@ const AdminChatRoom = () => {
 
           style={{
             flex: 1,
-            padding: "12px",
-            borderRadius: "10px",
-            border: "1px solid #d1d5db",
+
+            padding:
+              "12px",
+
+            borderRadius:
+              "10px",
+
+            border:
+              "1px solid #d1d5db",
+
+            outline:
+              "none",
           }}
         />
 
@@ -360,13 +591,26 @@ const AdminChatRoom = () => {
           onClick={sendMessage}
 
           style={{
-            border: "none",
-            background: "#2563eb",
-            color: "#ffffff",
-            padding: "0 22px",
-            borderRadius: "10px",
-            cursor: "pointer",
-            fontWeight: "700",
+            border:
+              "none",
+
+            background:
+              "#2563eb",
+
+            color:
+              "#ffffff",
+
+            padding:
+              "0 22px",
+
+            borderRadius:
+              "10px",
+
+            cursor:
+              "pointer",
+
+            fontWeight:
+              "700",
           }}
         >
           Kirim

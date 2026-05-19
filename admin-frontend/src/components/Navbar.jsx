@@ -54,6 +54,18 @@ const Navbar = ({
               : "PS"}
           </button>
 
+          {/* PEMBAYARAN */}
+          <button
+            className="menu-btn"
+            onClick={() =>
+              navigate("/payments")
+            }
+          >
+            {isSidebarOpen
+              ? "Data Pembayaran"
+              : "BY"}
+          </button>
+
           {/* PORTFOLIO */}
           <button
             className="menu-btn"
@@ -66,18 +78,18 @@ const Navbar = ({
               : "PF"}
           </button>
 
- {/* CHAT */}
-<button
-  className="menu-btn"
+          {/* CHAT */}
+          <button
+            className="menu-btn"
+            onClick={() =>
+              navigate("/admin-chat")
+            }
+          >
+            {isSidebarOpen
+              ? "Chat"
+              : "CH"}
+          </button>
 
-  onClick={() =>
-    navigate("/admin-chat")
-  }
->
-  {isSidebarOpen
-    ? "Chat"
-    : "CH"}
-</button>
         </div>
       </div>
 
