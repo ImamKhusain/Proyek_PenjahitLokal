@@ -1,14 +1,27 @@
-const express = require("express");
+//routes 
+const express =
+  require("express");
 
-const router = express.Router();
+const router =
+  express.Router();
 
 const {
+
   getAllPayments,
+
   createPayment,
+
   getPaymentById,
+
   updatePayment,
+
+  updatePaymentStatus,
+
   deletePayment,
-} = require("../controllers/paymentController");
+
+} = require(
+  "../controllers/paymentController"
+);
 
 const authMiddleware =
   require("../middleware/authMiddleware");
@@ -19,43 +32,112 @@ const adminMiddleware =
 const upload =
   require("../middleware/uploadMiddleware");
 
+
+// =====================================
 // GET ALL PAYMENTS
+// ADMIN ONLY
+// =====================================
+
 router.get(
+
   "/",
+
   authMiddleware,
-  adminMiddleware,
+
+  // adminMiddleware,
+
   getAllPayments
+
 );
 
+
+// =====================================
 // GET PAYMENT BY ID
+// =====================================
+
 router.get(
+
   "/:id",
+
   authMiddleware,
+
   getPaymentById
+
 );
 
+
+// =====================================
 // CREATE PAYMENT
+// =====================================
+
 router.post(
+
   "/",
+
   authMiddleware,
-  upload.single("payment_proof"),
+
+  upload.firebase.single(
+    "payment_proof"
+  ),
+
   createPayment
+
 );
 
+
+// =====================================
 // UPDATE PAYMENT
+// =====================================
+
 router.put(
+
   "/:id",
+
   authMiddleware,
-  upload.single("payment_proof"),
+
+  upload.firebase.single(
+    "payment_proof"
+  ),
+
   updatePayment
+
 );
 
-// DELETE PAYMENT
-router.delete(
-  "/:id",
+
+// =====================================
+// UPDATE PAYMENT STATUS
+// ADMIN ONLY
+// =====================================
+
+router.patch(
+
+  "/:id/status",
+
   authMiddleware,
+
   adminMiddleware,
-  deletePayment
+
+  updatePaymentStatus
+
 );
+
+
+// =====================================
+// DELETE PAYMENT
+// ADMIN ONLY
+// =====================================
+
+router.delete(
+
+  "/:id",
+
+  authMiddleware,
+
+  adminMiddleware,
+
+  deletePayment
+
+);
+
 
 module.exports = router;

@@ -11,6 +11,7 @@ import About from "../pages/About";
 import Layanan from "../pages/Layanan";
 import ChatPage from "../pages/ChatPage";
 import Booking from "../pages/Booking";
+import PaymentsPage from "../pages/PaymentsPage";
 import Pembayaran from "../pages/Pembayaran"; // 💡 Tetap aman, mengimport halaman Pembayaran barumu
 
 // Layout yang menempelkan Navbar secara otomatis di atas halaman
@@ -55,6 +56,11 @@ const AppRoutes = () => {
 
           {/* PESANAN SAYA */}
           <Route path="/pesanan" element={<Booking />} />
+          
+                    <Route
+            path="/payments"
+            element={<PaymentsPage />}
+          />
 
           {/* HALAMAN PEMBAYARAN 
               Diletakkan di sini agar senada menggunakan Navbar ARKI & membawa params :bookingId */}

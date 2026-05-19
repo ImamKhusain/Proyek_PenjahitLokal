@@ -1,55 +1,514 @@
-import { useParams, useNavigate } from "react-router-dom";
+import {
+  useState,
+  useContext,
+} from "react";
+
+import {
+  useParams,
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
+
+import axios from "axios";
+
+import {
+  AuthContext,
+} from "../context/AuthContext";
+
 
 const Pembayaran = () => {
-  const { bookingId } = useParams(); // Mengambil ID dari URL (/pembayaran/:bookingId)
-  const navigate = useNavigate();
+
+  const { bookingId } =
+    useParams();
+
+  const navigate =
+    useNavigate();
+
+  const location =
+    useLocation();
+
+  const booking =
+    location.state?.booking;
+
+  const { user } =
+    useContext(AuthContext);
+
+
+  // =========================
+  // STATE
+  // =========================
+
+  const [paymentMethod, setPaymentMethod] =
+    useState("Transfer Bank");
+
+  const [amount, setAmount] =
+    useState(
+      booking?.portfolio?.price || 0
+    );
+
+  const [paymentProof, setPaymentProof] =
+    useState(null);
+
+  const [preview, setPreview] =
+    useState(null);
+
+  const [loading, setLoading] =
+    useState(false);
+
+
+  // =========================
+  // HANDLE FILE
+  // =========================
+
+  const handleFileChange =
+    (e) => {
+
+      const file =
+        e.target.files[0];
+
+      if (!file) return;
+
+      setPaymentProof(file);
+
+      setPreview(
+        URL.createObjectURL(file)
+      );
+
+  };
+
+
+  // =========================
+  // HANDLE SUBMIT
+  // =========================
+
+  const handleSubmit =
+    async () => {
+
+      try {
+
+        if (!paymentProof) {
+
+          alert(
+            "Upload bukti pembayaran dulu"
+          );
+
+          return;
+
+        }
+
+        setLoading(true);
+
+        const formData =
+          new FormData();
+
+        formData.append(
+          "booking_id",
+          bookingId
+        );
+
+        formData.append(
+          "payment_method",
+          paymentMethod
+        );
+
+        formData.append(
+          "amount",
+          amount
+        );
+
+        formData.append(
+          "payment_proof",
+          paymentProof
+        );
+
+
+        // API
+        await axios.post(
+
+          "http://localhost:8080/api/payments",
+
+          formData,
+
+          {
+            headers: {
+
+              Authorization:
+                `Bearer ${user.token}`,
+
+              "Content-Type":
+                "multipart/form-data",
+
+            },
+          }
+
+        );
+
+        alert(
+          "Pembayaran berhasil diupload"
+        );
+
+        navigate("/pesanan");
+
+      } catch (error) {
+
+        console.log(error);
+
+        alert(
+          error.response?.data?.message ||
+          "Upload payment gagal"
+        );
+
+      } finally {
+
+        setLoading(false);
+
+      }
+
+  };
+
 
   return (
-    <div style={{ padding: "140px 20px 40px 20px", textAlign: "center", fontFamily: "sans-serif" }}>
-      <div style={{
-        maxWidth: "500px", 
-        margin: "0 auto", 
-        border: "1px solid #e8e8c8", 
-        padding: "30px", 
-        borderRadius: "12px",
-        boxShadow: "0px 8px 24px rgba(0, 0, 0, 0.04)"
-      }}>
-        <h2 style={{ color: "#000000" }}>Halaman Pembayaran</h2>
-        <p style={{ color: "#6b7280" }}>Kode Billing: <strong>ARKI-{bookingId}</strong></p>
-        
-        <hr style={{ border: "none", borderTop: "1px solid #e8e8c8", margin: "20px 0" }} />
-        
-        <div style={{ backgroundColor: "#fafafa", padding: "15px", borderRadius: "8px", marginBottom: "20px" }}>
-          <p style={{ margin: "5px 0", fontSize: "14px", color: "#4b5563" }}>Transfer ke Rekening Resmi ARKI:</p>
-          <strong style={{ fontSize: "18px", color: "#000000" }}>BCA — 8042-3312-99</strong>
-          <p style={{ margin: "5px 0", fontSize: "12px", color: "#6b7280" }}>a.n PT ARKI BUSANA NUSANTARA</p>
+
+    <div
+      style={{
+        padding:
+          "140px 20px 40px 20px",
+
+        fontFamily:
+          "sans-serif",
+
+        background:
+          "#fafafa",
+
+        minHeight:
+          "100vh",
+      }}
+    >
+
+      <div
+        style={{
+
+          maxWidth:
+            "550px",
+
+          margin:
+            "0 auto",
+
+          background:
+            "#ffffff",
+
+          borderRadius:
+            "18px",
+
+          padding:
+            "32px",
+
+          boxShadow:
+            "0 8px 30px rgba(0,0,0,0.06)",
+        }}
+      >
+
+        {/* TITLE */}
+
+        <h2
+          style={{
+            marginBottom:
+              "8px",
+          }}
+        >
+          Pembayaran Booking
+        </h2>
+
+        <p
+          style={{
+            color: "#6b7280",
+            marginBottom: "24px",
+          }}
+        >
+          Kode Billing:
+          <strong>
+            {" "}ARKI-{bookingId}
+          </strong>
+        </p>
+
+
+        {/* INFO PESANAN */}
+
+        <div
+          style={{
+            background:
+              "#f9fafb",
+
+            padding:
+              "18px",
+
+            borderRadius:
+              "12px",
+
+            marginBottom:
+              "24px",
+          }}
+        >
+
+          <p>
+            <strong>Penjahit:</strong>{" "}
+            {booking?.tailor?.name}
+          </p>
+
+          <p>
+            <strong>Model:</strong>{" "}
+            {booking?.portfolio?.title}
+          </p>
+
+          <p>
+            <strong>Harga:</strong>{" "}
+            Rp{" "}
+            {Number(amount)
+              .toLocaleString("id-ID")}
+          </p>
+
         </div>
 
-        {/* Input file dummy simulasi upload bukti */}
-        <input type="file" accept="image/*" style={{ marginBottom: "20px" }} />
 
-        <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
-          <button 
-            onClick={() => navigate("/pesanan")} 
-            style={{ padding: "10px 20px", cursor: "pointer", borderRadius: "6px", border: "1px solid #ccc", background: "#fff" }}
+        {/* BANK INFO */}
+
+        <div
+          style={{
+            background:
+              "#f9fafb",
+
+            padding:
+              "18px",
+
+            borderRadius:
+              "12px",
+
+            marginBottom:
+              "24px",
+          }}
+        >
+
+          <p
+            style={{
+              margin:
+                "0 0 8px 0",
+            }}
+          >
+            Transfer ke rekening:
+          </p>
+
+          <h3
+            style={{
+              margin:
+                "0",
+            }}
+          >
+            BCA — 8042331299
+          </h3>
+
+          <small>
+            a.n PT ARKI BUSANA NUSANTARA
+          </small>
+
+        </div>
+
+
+        {/* METHOD */}
+
+        <div
+          style={{
+            marginBottom:
+              "20px",
+          }}
+        >
+
+          <label>
+            Metode Pembayaran
+          </label>
+
+          <select
+
+            value={paymentMethod}
+
+            onChange={(e) =>
+              setPaymentMethod(
+                e.target.value
+              )
+            }
+
+            style={{
+              width: "100%",
+              padding: "12px",
+              marginTop: "8px",
+              borderRadius: "8px",
+              border: "1px solid #ddd",
+            }}
+          >
+
+            <option>
+              Transfer Bank
+            </option>
+
+            <option>
+              QRIS
+            </option>
+
+            <option>
+              E-Wallet
+            </option>
+
+          </select>
+
+        </div>
+
+
+        {/* AMOUNT */}
+
+        <div
+          style={{
+            marginBottom:
+              "20px",
+          }}
+        >
+
+          <label>
+            Nominal
+          </label>
+
+          <input
+            type="number"
+
+            value={amount}
+
+            readOnly
+
+            style={{
+              width: "100%",
+              padding: "12px",
+              marginTop: "8px",
+              borderRadius: "8px",
+              border: "1px solid #ddd",
+              background:
+                "#f3f4f6",
+            }}
+          />
+
+        </div>
+
+
+        {/* FILE */}
+
+        <div
+          style={{
+            marginBottom:
+              "24px",
+          }}
+        >
+
+          <label>
+            Upload Bukti Pembayaran
+          </label>
+
+          <input
+            type="file"
+
+            accept="image/*"
+
+            onChange={handleFileChange}
+
+            style={{
+              marginTop: "10px",
+            }}
+          />
+
+        </div>
+
+
+        {/* PREVIEW */}
+
+        {preview && (
+
+          <div
+            style={{
+              marginBottom:
+                "24px",
+            }}
+          >
+
+            <img
+              src={preview}
+
+              alt="Preview"
+
+              style={{
+                width: "100%",
+                borderRadius: "12px",
+              }}
+            />
+
+          </div>
+
+        )}
+
+
+        {/* BUTTONS */}
+
+        <div
+          style={{
+            display: "flex",
+            gap: "12px",
+          }}
+        >
+
+          <button
+
+            onClick={() =>
+              navigate("/pesanan")
+            }
+
+            style={{
+              flex: 1,
+              padding: "14px",
+              borderRadius: "10px",
+              border: "1px solid #ddd",
+              background: "#fff",
+              cursor: "pointer",
+            }}
           >
             Kembali
           </button>
-          
-          <button 
-            onClick={() => {
-              alert("Pembayaran berhasil disimulasi!");
-              navigate("/pesanan");
-            }} 
-            style={{ padding: "10px 20px", cursor: "pointer", borderRadius: "6px", border: "none", background: "#10b981", color: "#fff", fontWeight: "bold" }}
+
+          <button
+
+            onClick={handleSubmit}
+
+            disabled={loading}
+
+            style={{
+              flex: 1,
+              padding: "14px",
+              borderRadius: "10px",
+              border: "none",
+              background: "#10b981",
+              color: "#fff",
+              fontWeight: "700",
+              cursor: "pointer",
+            }}
           >
-            Konfirmasi
+
+            {loading
+              ? "Uploading..."
+              : "Konfirmasi"}
+
           </button>
+
         </div>
+
       </div>
+
     </div>
   );
+
 };
 
-// Ini yang paling penting agar AppRoutes tidak error lagi!
 export default Pembayaran;

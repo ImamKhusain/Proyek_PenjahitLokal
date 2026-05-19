@@ -40,6 +40,7 @@ const Navbar = () => {
           <Link to="/home" className="nav-link">HOME</Link>
           <Link to="/about" className="nav-link">ABOUT</Link>
           <Link to="/layanan" className="nav-link">LAYANAN</Link>
+          <Link to="/payments" className="nav-link">PEMBAYARAN</Link>
           <Link to="/pesanan" className="nav-link">PESANAN</Link>
           
           <button className="logout-btn" onClick={logout}>

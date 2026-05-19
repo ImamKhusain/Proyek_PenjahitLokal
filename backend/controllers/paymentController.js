@@ -1,249 +1,458 @@
-const paymentModel = require("../models/Payment");
+//controller
+const paymentModel =
+  require("../models/Payment");
 
 const firebaseService =
   require("../services/firebaseService");
 
+
+// =====================================
 // GET ALL PAYMENTS
-const getAllPayments = async (req, res) => {
-  try {
+// =====================================
 
-    const payments =
-      await paymentModel.findAll();
+const getAllPayments =
+  async (req, res) => {
 
-    res.status(200).json({
-      message:
-        "Payments retrieved successfully",
-      data: payments,
-    });
+    try {
 
-  } catch (error) {
+      const payments =
+        await paymentModel
+          .findAll();
 
-    res.status(500).json({
-      message:
-        "Error retrieving payments",
-      error: error.message,
-    });
+      res.status(200).json({
 
-  }
+        message:
+          "Payments retrieved successfully",
+
+        data: payments,
+
+      });
+
+    } catch (error) {
+
+      res.status(500).json({
+
+        message:
+          "Error retrieving payments",
+
+        error:
+          error.message,
+
+      });
+
+    }
+
 };
 
+
+// =====================================
 // CREATE PAYMENT
-const createPayment = async (req, res) => {
+// =====================================
 
-  try {
+const createPayment =
+  async (req, res) => {
 
-    const {
-      booking_id,
-      payment_method,
-      amount,
-    } = req.body;
+    try {
 
-    let paymentProofUrl = null;
+      const {
 
-    // upload file ke firebase storage
-    if (req.file) {
-
-      const uploadResult =
-        await firebaseService
-          .uploadPaymentProof(
-            req.file,
-            booking_id,
-            req.user?.id || null
-          );
-
-      paymentProofUrl =
-        uploadResult.imageUrl;
-
-    }
-
-    // simpan ke mysql
-    const newPayment =
-      await paymentModel.create({
         booking_id,
+
         payment_method,
+
         amount,
-        payment_proof:
-          paymentProofUrl,
-      });
 
-    res.status(201).json({
-      message:
-        "Payment created successfully",
-      data: newPayment,
-    });
+      } = req.body;
 
-  } catch (error) {
 
-    res.status(500).json({
-      message:
-        "Error creating payment",
-      error: error.message,
-    });
+      // =====================================
+      // VALIDASI FILE
+      // =====================================
 
-  }
+      if (!req.file) {
 
-};
+        return res.status(400).json({
 
-// GET PAYMENT BY ID
-const getPaymentById = async (
-  req,
-  res
-) => {
+          message:
+            "Bukti pembayaran wajib diupload",
 
-  try {
+        });
 
-    const { id } = req.params;
+      }
 
-    const payment =
-      await paymentModel.findById(id);
 
-    if (!payment) {
-
-      return res.status(404).json({
-        message:
-          "Payment not found",
-      });
-
-    }
-
-    res.status(200).json({
-      message:
-        "Payment retrieved successfully",
-      data: payment,
-    });
-
-  } catch (error) {
-
-    res.status(500).json({
-      message:
-        "Error retrieving payment",
-      error: error.message,
-    });
-
-  }
-
-};
-
-// UPDATE PAYMENT
-const updatePayment = async (
-  req,
-  res
-) => {
-
-  try {
-
-    const { id } = req.params;
-
-    const payment =
-      await paymentModel.findById(id);
-
-    if (!payment) {
-
-      return res.status(404).json({
-        message:
-          "Payment not found",
-      });
-
-    }
-
-    const {
-      payment_method,
-      amount,
-      payment_status,
-    } = req.body;
-
-    let paymentProofUrl =
-      payment.payment_proof;
-
-    // kalau upload bukti baru
-    if (req.file) {
+      // =====================================
+      // UPLOAD KE FIREBASE STORAGE
+      // =====================================
 
       const uploadResult =
         await firebaseService
           .uploadPaymentProof(
+
             req.file,
-            payment.booking_id,
+
+            booking_id,
+
             req.user?.id || null
+
           );
 
-      paymentProofUrl =
-        uploadResult.imageUrl;
 
-    }
+      // ambil url gambar
+      const paymentProofUrl =
+        uploadResult.image_url;
 
-    await paymentModel.updateById(
-      id,
-      {
-        payment_method,
-        amount,
-        payment_status,
-        payment_proof:
-          paymentProofUrl,
-      }
-    );
 
-    res.status(200).json({
-      message:
-        "Payment updated successfully",
-    });
+      // =====================================
+      // SIMPAN KE MYSQL
+      // =====================================
 
-  } catch (error) {
+      const newPayment =
+        await paymentModel
+          .create({
 
-    res.status(500).json({
-      message:
-        "Error updating payment",
-      error: error.message,
-    });
+            booking_id,
 
-  }
+            payment_method,
 
-};
+            amount,
 
-// DELETE PAYMENT
-const deletePayment = async (
-  req,
-  res
-) => {
+            payment_status:
+              "pending",
 
-  try {
+            payment_proof:
+              paymentProofUrl,
 
-    const { id } = req.params;
+          });
 
-    const payment =
-      await paymentModel.findById(id);
 
-    if (!payment) {
+      // =====================================
+      // SIMPAN KE FIRESTORE
+      // =====================================
 
-      return res.status(404).json({
+      await firebaseService
+        .savePaymentToFirestore({
+
+          booking_id,
+
+          customer_id:
+            req.user?.id || null,
+
+          image_url:
+            paymentProofUrl,
+
+          status:
+            "pending",
+
+        });
+
+
+      res.status(201).json({
+
         message:
-          "Payment not found",
+          "Payment created successfully",
+
+        data:
+          newPayment,
+
+      });
+
+    } catch (error) {
+
+      console.log(error);
+
+      res.status(500).json({
+
+        message:
+          "Error creating payment",
+
+        error:
+          error.message,
+
       });
 
     }
 
-    await paymentModel.deleteById(id);
+};
 
-    res.status(200).json({
-      message:
-        "Payment deleted successfully",
-    });
 
-  } catch (error) {
+// =====================================
+// GET PAYMENT BY ID
+// =====================================
 
-    res.status(500).json({
-      message:
-        "Error deleting payment",
-      error: error.message,
-    });
+const getPaymentById =
+  async (req, res) => {
 
-  }
+    try {
+
+      const { id } =
+        req.params;
+
+      const payment =
+        await paymentModel
+          .findById(id);
+
+      if (!payment) {
+
+        return res.status(404).json({
+
+          message:
+            "Payment not found",
+
+        });
+
+      }
+
+      res.status(200).json({
+
+        message:
+          "Payment retrieved successfully",
+
+        data:
+          payment,
+
+      });
+
+    } catch (error) {
+
+      res.status(500).json({
+
+        message:
+          "Error retrieving payment",
+
+        error:
+          error.message,
+
+      });
+
+    }
 
 };
+
+
+// =====================================
+// UPDATE PAYMENT
+// =====================================
+
+const updatePayment =
+  async (req, res) => {
+
+    try {
+
+      const { id } =
+        req.params;
+
+      const payment =
+        await paymentModel
+          .findById(id);
+
+      if (!payment) {
+
+        return res.status(404).json({
+
+          message:
+            "Payment not found",
+
+        });
+
+      }
+
+      const {
+
+        payment_method,
+
+        amount,
+
+        payment_status,
+
+      } = req.body;
+
+
+      let paymentProofUrl =
+        payment.payment_proof;
+
+
+      // =====================================
+      // UPLOAD BUKTI BARU
+      // =====================================
+
+      if (req.file) {
+
+        const uploadResult =
+          await firebaseService
+            .uploadPaymentProof(
+
+              req.file,
+
+              payment.booking_id,
+
+              req.user?.id || null
+
+            );
+
+        paymentProofUrl =
+          uploadResult.image_url;
+
+      }
+
+
+      await paymentModel
+        .updateById(
+
+          id,
+
+          {
+
+            payment_method,
+
+            amount,
+
+            payment_status,
+
+            payment_proof:
+              paymentProofUrl,
+
+          }
+
+        );
+
+
+      res.status(200).json({
+
+        message:
+          "Payment updated successfully",
+
+      });
+
+    } catch (error) {
+
+      res.status(500).json({
+
+        message:
+          "Error updating payment",
+
+        error:
+          error.message,
+
+      });
+
+    }
+
+};
+
+
+// =====================================
+// UPDATE PAYMENT STATUS
+// =====================================
+
+const updatePaymentStatus =
+  async (req, res) => {
+
+    try {
+
+      const { id } =
+        req.params;
+
+      const {
+        payment_status,
+      } = req.body;
+
+      await paymentModel
+        .updateStatus(
+          id,
+          payment_status
+        );
+
+      res.status(200).json({
+
+        message:
+          "Payment status updated",
+
+      });
+
+    } catch (error) {
+
+      res.status(500).json({
+
+        message:
+          "Error update payment status",
+
+        error:
+          error.message,
+
+      });
+
+    }
+
+};
+
+
+// =====================================
+// DELETE PAYMENT
+// =====================================
+
+const deletePayment =
+  async (req, res) => {
+
+    try {
+
+      const { id } =
+        req.params;
+
+      const payment =
+        await paymentModel
+          .findById(id);
+
+      if (!payment) {
+
+        return res.status(404).json({
+
+          message:
+            "Payment not found",
+
+        });
+
+      }
+
+      await paymentModel
+        .deleteById(id);
+
+      res.status(200).json({
+
+        message:
+          "Payment deleted successfully",
+
+      });
+
+    } catch (error) {
+
+      res.status(500).json({
+
+        message:
+          "Error deleting payment",
+
+        error:
+          error.message,
+
+      });
+
+    }
+
+};
+
 
 module.exports = {
+
   getAllPayments,
+
   createPayment,
+
   getPaymentById,
+
   updatePayment,
+
+  updatePaymentStatus,
+
   deletePayment,
+
 };

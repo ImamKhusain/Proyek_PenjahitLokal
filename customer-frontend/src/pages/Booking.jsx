@@ -152,10 +152,17 @@ const Booking = () => {
   // ==========================================
 // 4. ARAHKAN KE HALAMAN CHECKOUT / PEMBAYARAN
 // ==========================================
-const handlePaymentRedirect = (bookingId) => {
-  // SEBELUMNYA: navigate(`/payment/${bookingId}`);
-  // UBAH MENJADI:
-  navigate(`/pembayaran/${bookingId}`);
+const handlePaymentRedirect = (pesanan) => {
+
+  navigate(
+    `/pembayaran/${pesanan.id}`,
+    {
+      state: {
+        booking: pesanan,
+      },
+    }
+  );
+
 };
 
   const handleDateChange = (bookingId, value) => {
@@ -270,28 +277,38 @@ const handlePaymentRedirect = (bookingId) => {
                       {/* 💳 BLOK TOMBOL PEMBAYARAN KHUSUS UNTUK STATUS DITERIMA (ACCEPTED) */}
                       {isAccepted && (
                         <div className="payment-action-box" style={{ margin: '16px 0 8px 0' }}>
-                          <button
-                            onClick={() => handlePaymentRedirect(pesanan.id)}
-                            style={{
-                              backgroundColor: '#10b981',
-                              color: '#ffffff',
-                              border: 'none',
-                              padding: '10px 20px',
-                              borderRadius: '6px',
-                              fontWeight: '600',
-                              fontSize: '0.95rem',
-                              cursor: 'pointer',
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '8px',
-                              boxShadow: '0 4px 6px -1px rgba(16, 185, 129, 0.2), 0 2px 4px -1px rgba(16, 185, 129, 0.06)',
-                              transition: 'all 0.2s ease-in-out'
-                            }}
-                            onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#059669'}
-                            onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#10b981'}
-                          >
-                            💳 Lanjut Ke Pembayaran
-                          </button>
+<button
+  onClick={() =>
+    handlePaymentRedirect(
+      pesanan
+    )
+  }
+  style={{
+    backgroundColor: '#10b981',
+    color: '#ffffff',
+    border: 'none',
+    padding: '10px 20px',
+    borderRadius: '6px',
+    fontWeight: '600',
+    fontSize: '0.95rem',
+    cursor: 'pointer',
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '8px',
+    boxShadow: '0 4px 6px -1px rgba(16, 185, 129, 0.2), 0 2px 4px -1px rgba(16, 185, 129, 0.06)',
+    transition: 'all 0.2s ease-in-out'
+  }}
+  onMouseOver={(e) =>
+    e.currentTarget.style.backgroundColor =
+      '#059669'
+  }
+  onMouseOut={(e) =>
+    e.currentTarget.style.backgroundColor =
+      '#10b981'
+  }
+>
+  💳 Lanjut Ke Pembayaran
+</button>
                         </div>
                       )}
 
