@@ -17,7 +17,7 @@ const adminMiddleware = require("../middleware/adminMiddleware");
 router.get(
   "/",
   authMiddleware,
-  adminMiddleware,
+  // adminMiddleware,
   getAllBookings
 );
 

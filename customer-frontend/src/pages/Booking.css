@@ -1,0 +1,142 @@
+.booking-page-container {
+  padding: 120px 5% 40px 5%;
+  background-color: #f9f9f9;
+  min-height: 100vh;
+  font-family: sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+.booking-content-wrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.booking-header h1 {
+  font-size: 26px;
+  font-weight: bold;
+  color: #801515; /* Warna Maroon ARKI */
+  margin: 0 0 6px 0;
+}
+
+.booking-header p {
+  font-size: 14px;
+  color: #666666;
+  margin: 0 0 40px 0;
+}
+
+.booking-error-message {
+  color: #c5221f;
+  text-align: center;
+  margin: 20px 0;
+  font-weight: bold;
+}
+
+.booking-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.booking-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #ffffff;
+  border: 1px solid #e2e2e2;
+  border-radius: 12px;
+  padding: 24px 32px;
+  box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.booking-details h3 {
+  margin: 0 0 12px 0;
+  font-size: 18px;
+  color: #000000;
+}
+
+.booking-details p {
+  margin: 6px 0;
+  font-size: 14px;
+  color: #444444;
+}
+
+/* Penata tampilan teks agar enter/baris baru bekerja */
+.note-text-box {
+  display: block;
+  background-color: #f7f7f7;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-top: 6px;
+  white-space: pre-line; /* Kunci penataan enter teks otomatis */
+  font-size: 13px;
+  color: #333333;
+  border-left: 4px solid #801515;
+  line-height: 1.6;
+}
+
+.booking-id-tag {
+  color: #801515;
+  font-weight: bold;
+  background-color: #fceaea;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+/* Badge Status Dinamis mengikuti value database */
+.status-badge {
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  min-width: 100px;
+  text-align: center;
+  display: inline-block;
+}
+
+.status-badge.pending {
+  background-color: #ffeeba;
+  color: #856404;
+  border: 1px solid #ffe8a1;
+}
+
+.status-badge.accepted {
+  background-color: #e8f2ff;
+  color: #004085;
+  border: 1px solid #d4e7ff;
+}
+
+.status-badge.completed {
+  background-color: #e6f4ea;
+  color: #137333;
+  border: 1px solid #ceead6;
+}
+
+.booking-empty {
+  text-align: center;
+  padding: 60px 20px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  border: 1px dashed #cccccc;
+  color: #777777;
+}
+
+.booking-footer {
+  text-align: center;
+  padding: 20px 0;
+  font-size: 14px;
+  font-weight: bold;
+  background-color: #fffde0; /* Kuning pastel navbar top */
+  margin-top: 60px;
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+}

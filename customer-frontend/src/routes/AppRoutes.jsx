@@ -21,6 +21,7 @@ import Navbar from "../components/Navbar";
 import About from "../pages/About";
 import Layanan from "../pages/Layanan";
 import ChatPage from "../pages/ChatPage";
+import Booking from "../pages/Booking"; // 💡 1. IMPORT HALAMAN BOOKING DI SINI
 
 const LayoutDenganNavbar = () => {
   return (
@@ -50,7 +51,7 @@ const AppRoutes = () => {
 
         {/* HALAMAN YANG BUTUH LOGIN */}
         <Route
-          element={
+          element = {
             user ? (
               <LayoutDenganNavbar />
             ) : (
@@ -89,9 +90,17 @@ const AppRoutes = () => {
             element={<PortfolioCard />}
           />
 
+          {/* CHAT */}
           <Route
             path="/chat/:roomId"
             element={<ChatPage />}
+          />
+
+          {/* PESANAN SAYA */}
+          {/* 💡 2. TAMBAHKAN ROUTE PESANAN DI SINI */}
+          <Route
+            path="/pesanan"
+            element={<Booking />}
           />
 
         </Route>

@@ -77,10 +77,13 @@ ${bodySizeNote}`
         : `Model Pakaian: ${selectedProduct.name}
 Metode Ukuran: Ukuran Standar Katalog (${selectedSize})`;
 
+    // 🚀 DI SINI PERUBAHANNYA: Kita tambahkan object selectedProduct ke dalam parameter onSubmit
+    // agar file parent (Layanan.jsx) tahu id tailor dan bisa melacak ID booking setelah disubmit.
     onSubmit({
       bookingDate,
       finalNote,
       selectedSize,
+      productDetail: selectedProduct, // Tambahan aman tanpa merusak form
     });
   };
 
