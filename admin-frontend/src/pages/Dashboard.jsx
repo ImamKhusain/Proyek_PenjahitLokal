@@ -5,6 +5,7 @@ import { getMyTailor } from "../services/tailorService";
 import { FiBell } from "react-icons/fi";
 import Navbar from "../components/Navbar";
 
+
 const BASE_URL_BACKEND =
   "http://localhost:8080/uploads/";
 
@@ -160,10 +161,20 @@ const Dashboard = () => {
               gap: "14px",
             }}
           >
-            <FiBell
-              size={18}
-              color="#111827"
-            />
+<FiBell
+  size={18}
+  color="#111827"
+
+  onClick={() =>
+    navigate(
+      "/notifications"
+    )
+  }
+
+  style={{
+    cursor: "pointer",
+  }}
+/>
 
             <div
               style={{

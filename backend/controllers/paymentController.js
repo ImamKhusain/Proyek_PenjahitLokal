@@ -4,11 +4,18 @@ const paymentModel =
 const Booking =
   require("../schema/Booking");
 
+const Tailor =
+  require("../schema/Tailor");
+
 const firebaseService =
   require("../services/firebaseService");
 
 const {
+
   createPaymentNotification,
+
+  createAdminPaymentNotification,
+
 } = require(
   "../services/notificationService"
 );
@@ -97,9 +104,13 @@ const createPayment =
     try {
 
       const {
+
         booking_id,
+
         payment_method,
+
         amount,
+
       } = req.body;
 
       let paymentProofUrl =
@@ -124,7 +135,7 @@ const createPayment =
             );
 
         paymentProofUrl =
-           uploadResult.imageurl;
+          uploadResult.imageurl;
 
       }
 
@@ -146,6 +157,66 @@ const createPayment =
               paymentProofUrl,
 
           });
+
+      // =====================================
+      // GET BOOKING
+      // =====================================
+
+      const booking =
+        await Booking.findByPk(
+          booking_id
+        );
+
+      // =====================================
+      // ADMIN NOTIFICATION
+      // =====================================
+
+      if (booking) {
+
+        // GET TAILOR
+        const tailor =
+          await Tailor.findByPk(
+            booking.tailor_id
+          );
+
+        // SEND NOTIF
+        if (tailor) {
+
+          await createAdminPaymentNotification({
+
+            user_id:
+              tailor.user_id,
+
+            booking_id,
+
+            payment_status:
+              "pembayaran masuk",
+
+          });
+
+        }
+
+      }
+
+      // =====================================
+      // CUSTOMER NOTIFICATION
+      // =====================================
+
+      await createPaymentNotification({
+
+        user_id:
+          req.user.id,
+
+        booking_id,
+
+        payment_status:
+          "berhasil dilakukan",
+
+      });
+
+      // =====================================
+      // RESPONSE
+      // =====================================
 
       res.status(201).json({
 
@@ -288,7 +359,7 @@ const updatePayment =
             );
 
         paymentProofUrl =
-           uploadResult.imageurl;
+          uploadResult.imageurl;
 
       }
 

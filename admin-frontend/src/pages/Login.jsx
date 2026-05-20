@@ -33,7 +33,7 @@ const Login = () => {
 
       const response = await loginAdmin(formData);
 
-      login(response.token, response.role);
+      login(response.token, response.role,response.id);
 
       if (response.role === "admin") {
         navigate("/dashboard");

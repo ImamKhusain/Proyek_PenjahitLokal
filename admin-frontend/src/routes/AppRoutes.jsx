@@ -12,6 +12,7 @@ import {
   AuthContext,
 } from "../context/AuthContext";
 
+import NotificationPage from "../pages/NotificationPage";
 import Login from "../pages/Login";
 
 import Dashboard from "../pages/Dashboard";
@@ -113,7 +114,12 @@ const AppRoutes = () => {
             )
           }
         />
-
+        <Route
+  path="/notifications"
+  element={
+    <NotificationPage />
+  }
+/>
         {/* ADMIN CHAT */}
         <Route
           path="/admin-chat"

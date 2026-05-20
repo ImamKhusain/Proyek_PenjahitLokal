@@ -12,6 +12,7 @@ const Portfolio =
 
 const {
   createBookingNotification,
+   createAdminBookingNotification,
 } = require(
   "../services/notificationService"
 );
@@ -139,7 +140,7 @@ const createBooking =
 
 
       // =====================================
-      // CREATE NOTIFICATION
+      // CUSTOMER NOTIFICATION
       // =====================================
 
       await createBookingNotification({
@@ -154,6 +155,33 @@ const createBooking =
           "berhasil dibuat",
 
       });
+
+
+      // =====================================
+      // ADMIN / TAILOR NOTIFICATION
+      // =====================================
+
+      const tailor =
+        await Tailor.findByPk(
+          tailor_id
+        );
+
+      if (tailor) {
+
+        await createAdminBookingNotification({
+
+          user_id:
+            tailor.user_id,
+
+          booking_id:
+            newBooking.id,
+
+          booking_status:
+            "pesanan masuk",
+
+        });
+
+      }
 
 
       res.status(201).json({
@@ -401,7 +429,7 @@ const deleteBooking =
           message:
             "Booking not found",
 
-          });
+        });
 
       }
 

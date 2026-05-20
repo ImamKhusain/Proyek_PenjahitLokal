@@ -11,15 +11,35 @@ const {
 );
 
 
-// =========================
-// NOTIF CHAT BARU
-// =========================
+// =====================================
+// CUSTOMER COLLECTION
+// =====================================
+
+const CUSTOMER_NOTIFICATION =
+  "notifications";
+
+
+// =====================================
+// ADMIN COLLECTION
+// =====================================
+
+const ADMIN_NOTIFICATION =
+  "admin_notifications";
+
+
+// =====================================
+// CHAT CUSTOMER
+// =====================================
 
 const createChatNotification =
   async ({
+
     user_id,
+
     sender_name,
+
     room_id,
+
   }) => {
 
     try {
@@ -28,13 +48,15 @@ const createChatNotification =
 
         collection(
           db,
-          "notifications"
+          CUSTOMER_NOTIFICATION
         ),
 
         {
+
           user_id,
 
-          type: "chat",
+          type:
+            "chat",
 
           title:
             "Pesan Baru",
@@ -43,12 +65,14 @@ const createChatNotification =
             `${sender_name} mengirim pesan baru`,
 
           redirect_url:
-            `/admin-chat/${room_id}`,
+            `/chat/${room_id}`,
 
-          is_read: false,
+          is_read:
+            false,
 
           created_at:
             new Date(),
+
         }
 
       );
@@ -65,15 +89,19 @@ const createChatNotification =
   };
 
 
-// =========================
-// NOTIF PAYMENT
-// =========================
+// =====================================
+// CHAT ADMIN
+// =====================================
 
-const createPaymentNotification =
+const createAdminChatNotification =
   async ({
+
     user_id,
-    booking_id,
-    payment_status,
+
+    sender_name,
+
+    room_id,
+
   }) => {
 
     try {
@@ -82,15 +110,79 @@ const createPaymentNotification =
 
         collection(
           db,
-          "notifications"
+          ADMIN_NOTIFICATION
         ),
 
         {
+
+          user_id,
+
+          type:
+            "chat",
+
+          title:
+            "Pesan Baru",
+
+          message:
+            `${sender_name} mengirim pesan baru`,
+
+          redirect_url:
+            `/admin-chat/${room_id}`,
+
+          is_read:
+            false,
+
+          created_at:
+            new Date(),
+
+        }
+
+      );
+
+    } catch (error) {
+
+      console.log(
+        "ADMIN CHAT NOTIF ERROR:",
+        error
+      );
+
+    }
+
+  };
+
+
+// =====================================
+// PAYMENT CUSTOMER
+// =====================================
+
+const createPaymentNotification =
+  async ({
+
+    user_id,
+
+    booking_id,
+
+    payment_status,
+
+  }) => {
+
+    try {
+
+      await addDoc(
+
+        collection(
+          db,
+          CUSTOMER_NOTIFICATION
+        ),
+
+        {
+
           user_id,
 
           booking_id,
 
-          type: "payment",
+          type:
+            "payment",
 
           title:
             "Status Pembayaran",
@@ -101,10 +193,12 @@ const createPaymentNotification =
           redirect_url:
             `/booking/${booking_id}`,
 
-          is_read: false,
+          is_read:
+            false,
 
           created_at:
             new Date(),
+
         }
 
       );
@@ -121,15 +215,19 @@ const createPaymentNotification =
   };
 
 
-// =========================
-// NOTIF BOOKING
-// =========================
+// =====================================
+// PAYMENT ADMIN
+// =====================================
 
-const createBookingNotification =
+const createAdminPaymentNotification =
   async ({
+
     user_id,
+
     booking_id,
-    booking_status,
+
+    payment_status,
+
   }) => {
 
     try {
@@ -138,15 +236,81 @@ const createBookingNotification =
 
         collection(
           db,
-          "notifications"
+          ADMIN_NOTIFICATION
         ),
 
         {
+
           user_id,
 
           booking_id,
 
-          type: "booking",
+          type:
+            "payment",
+
+          title:
+            "Pembayaran Baru",
+
+          message:
+            `Pembayaran booking #${booking_id} ${payment_status}`,
+
+          redirect_url:
+            `/booking/${booking_id}`,
+
+          is_read:
+            false,
+
+          created_at:
+            new Date(),
+
+        }
+
+      );
+
+    } catch (error) {
+
+      console.log(
+        "ADMIN PAYMENT NOTIF ERROR:",
+        error
+      );
+
+    }
+
+  };
+
+
+// =====================================
+// BOOKING CUSTOMER
+// =====================================
+
+const createBookingNotification =
+  async ({
+
+    user_id,
+
+    booking_id,
+
+    booking_status,
+
+  }) => {
+
+    try {
+
+      await addDoc(
+
+        collection(
+          db,
+          CUSTOMER_NOTIFICATION
+        ),
+
+        {
+
+          user_id,
+
+          booking_id,
+
+          type:
+            "booking",
 
           title:
             "Update Pesanan",
@@ -157,10 +321,12 @@ const createBookingNotification =
           redirect_url:
             `/booking/${booking_id}`,
 
-          is_read: false,
+          is_read:
+            false,
 
           created_at:
             new Date(),
+
         }
 
       );
@@ -177,16 +343,84 @@ const createBookingNotification =
   };
 
 
-// =========================
+// =====================================
+// BOOKING ADMIN
+// =====================================
+
+const createAdminBookingNotification =
+  async ({
+
+    user_id,
+
+    booking_id,
+
+    booking_status,
+
+  }) => {
+
+    try {
+
+      await addDoc(
+
+        collection(
+          db,
+          ADMIN_NOTIFICATION
+        ),
+
+        {
+
+          user_id,
+
+          booking_id,
+
+          type:
+            "booking",
+
+          title:
+            "Pesanan Baru",
+
+          message:
+            `Booking #${booking_id} ${booking_status}`,
+
+          redirect_url:
+            `/booking/${booking_id}`,
+
+          is_read:
+            false,
+
+          created_at:
+            new Date(),
+
+        }
+
+      );
+
+    } catch (error) {
+
+      console.log(
+        "ADMIN BOOKING NOTIF ERROR:",
+        error
+      );
+
+    }
+
+  };
+
+
+// =====================================
 // EXPORT
-// =========================
+// =====================================
 
 module.exports = {
 
+  // CUSTOMER
   createChatNotification,
-
   createPaymentNotification,
-
   createBookingNotification,
+
+  // ADMIN
+  createAdminChatNotification,
+  createAdminPaymentNotification,
+  createAdminBookingNotification,
 
 };
