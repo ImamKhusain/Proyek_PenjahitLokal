@@ -47,11 +47,9 @@ exports.sendMessage = async (
     const sender_role =
       req.user.role;
 
-    // AMBIL DATA USER
-    const user =
-      await User.findById(
-        sender_id
-      );
+    // ============================
+    // VALIDASI
+    // ============================
 
     if (!message) {
 
@@ -66,18 +64,21 @@ exports.sendMessage = async (
 
     }
 
+    // ============================
+    // AMBIL USER
+    // ============================
 
-    // ============================
-    // ROOM ID
-    // ============================
+    const user =
+      await User.findById(
+        sender_id
+      );
 
     let realCustomerId;
-    let adminId;
+    let realTailorId;
     let roomId;
 
-
     // ============================
-    // CUSTOMER CHAT KE ADMIN
+    // CUSTOMER -> ADMIN
     // ============================
 
     if (
@@ -88,24 +89,17 @@ exports.sendMessage = async (
       realCustomerId =
         sender_id;
 
-      // AMBIL DATA TAILOR
-      const tailorData =
-        await Tailor.findById(
-          tailor_id
-        );
-
-      // USER ADMIN
-      adminId =
-        tailorData.user_id;
+      // PAKAI TAILOR ID LANGSUNG
+      realTailorId =
+        Number(tailor_id);
 
       roomId =
-        `room_${realCustomerId}_${adminId}`;
+        `room_${realCustomerId}_${realTailorId}`;
 
     }
 
-
     // ============================
-    // ADMIN CHAT KE CUSTOMER
+    // ADMIN -> CUSTOMER
     // ============================
 
     else {
@@ -113,14 +107,14 @@ exports.sendMessage = async (
       realCustomerId =
         Number(customer_id);
 
-      adminId =
-        sender_id;
+      // PAKAI TAILOR ID DARI FE
+      realTailorId =
+        Number(tailor_id);
 
       roomId =
-        `room_${realCustomerId}_${adminId}`;
+        `room_${realCustomerId}_${realTailorId}`;
 
     }
-
 
     // ============================
     // ROOM REF
@@ -132,7 +126,6 @@ exports.sendMessage = async (
         "chats",
         roomId
       );
-
 
     // ============================
     // CREATE / UPDATE ROOM
@@ -157,7 +150,7 @@ exports.sendMessage = async (
             : customer_name,
 
         tailor_id:
-          adminId,
+          realTailorId,
 
         last_message:
           message,
@@ -181,7 +174,6 @@ exports.sendMessage = async (
 
     );
 
-
     // ============================
     // MESSAGE COLLECTION
     // ============================
@@ -193,7 +185,6 @@ exports.sendMessage = async (
         roomId,
         "messages"
       );
-
 
     // ============================
     // ADD MESSAGE
@@ -220,23 +211,25 @@ exports.sendMessage = async (
 
     );
 
-
     // ============================
-    // CREATE NOTIFICATION
+    // NOTIFICATION
     // ============================
 
-    // CUSTOMER CHAT
-    // notif ke admin
-
+    // CUSTOMER -> ADMIN
     if (
       sender_role ===
       "customer"
     ) {
 
+      const tailorData =
+        await Tailor.findById(
+          realTailorId
+        );
+
       await createChatNotification({
 
         user_id:
-          adminId,
+          tailorData.user_id,
 
         sender_name:
           user.name,
@@ -248,10 +241,7 @@ exports.sendMessage = async (
 
     }
 
-
-    // ADMIN CHAT
-    // notif ke customer
-
+    // ADMIN -> CUSTOMER
     else {
 
       await createChatNotification({
@@ -268,7 +258,6 @@ exports.sendMessage = async (
       });
 
     }
-
 
     return res.status(201).json({
 

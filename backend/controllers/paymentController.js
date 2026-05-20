@@ -1,7 +1,8 @@
-// controller
-
 const paymentModel =
   require("../models/Payment");
+
+const Booking =
+  require("../schema/Booking");
 
 const firebaseService =
   require("../services/firebaseService");
@@ -25,6 +26,40 @@ const getAllPayments =
       const payments =
         await paymentModel
           .findAll();
+
+      // =====================================
+      // CUSTOMER HANYA LIHAT MILIKNYA
+      // =====================================
+
+      if (
+        req.user.role !==
+        "admin"
+      ) {
+
+        const filteredPayments =
+          payments.filter(
+            (payment) =>
+
+              payment.Booking
+                ?.customer_id ===
+              req.user.id
+          );
+
+        return res.status(200).json({
+
+          message:
+            "Payments retrieved successfully",
+
+          data:
+            filteredPayments,
+
+        });
+
+      }
+
+      // =====================================
+      // ADMIN LIHAT SEMUA
+      // =====================================
 
       res.status(200).json({
 
@@ -62,56 +97,39 @@ const createPayment =
     try {
 
       const {
-
         booking_id,
-
         payment_method,
-
         amount,
-
       } = req.body;
 
+      let paymentProofUrl =
+        null;
 
       // =====================================
-      // VALIDASI FILE
+      // UPLOAD FIREBASE
       // =====================================
 
-      if (!req.file) {
+      if (req.file) {
 
-        return res.status(400).json({
+        const uploadResult =
+          await firebaseService
+            .uploadPaymentProof(
 
-          message:
-            "Bukti pembayaran wajib diupload",
+              req.file,
 
-        });
+              booking_id,
+
+              req.user?.id
+
+            );
+
+        paymentProofUrl =
+           uploadResult.imageurl;
 
       }
 
-
       // =====================================
-      // UPLOAD KE FIREBASE STORAGE
-      // =====================================
-
-      const uploadResult =
-        await firebaseService
-          .uploadPaymentProof(
-
-            req.file,
-
-            booking_id,
-
-            req.user?.id || null
-
-          );
-
-
-      // ambil url gambar
-      const paymentProofUrl =
-        uploadResult.image_url;
-
-
-      // =====================================
-      // SIMPAN KE MYSQL
+      // CREATE PAYMENT MYSQL
       // =====================================
 
       const newPayment =
@@ -124,52 +142,10 @@ const createPayment =
 
             amount,
 
-            payment_status:
-              "pending",
-
             payment_proof:
               paymentProofUrl,
 
           });
-
-
-      // =====================================
-      // SIMPAN KE FIRESTORE
-      // =====================================
-
-      await firebaseService
-        .savePaymentToFirestore({
-
-          booking_id,
-
-          customer_id:
-            req.user?.id || null,
-
-          image_url:
-            paymentProofUrl,
-
-          status:
-            "pending",
-
-        });
-
-
-      // =====================================
-      // CREATE NOTIFICATION
-      // =====================================
-
-      await createPaymentNotification({
-
-        user_id:
-          req.user?.id,
-
-        booking_id,
-
-        payment_status:
-          "pending",
-
-      });
-
 
       res.status(201).json({
 
@@ -232,8 +208,7 @@ const getPaymentById =
         message:
           "Payment retrieved successfully",
 
-        data:
-          payment,
+        data: payment,
 
       });
 
@@ -291,10 +266,8 @@ const updatePayment =
 
       } = req.body;
 
-
       let paymentProofUrl =
         payment.payment_proof;
-
 
       // =====================================
       // UPLOAD BUKTI BARU
@@ -310,15 +283,18 @@ const updatePayment =
 
               payment.booking_id,
 
-              req.user?.id || null
+              req.user?.id
 
             );
 
         paymentProofUrl =
-          uploadResult.image_url;
+           uploadResult.imageurl;
 
       }
 
+      // =====================================
+      // UPDATE MYSQL
+      // =====================================
 
       await paymentModel
         .updateById(
@@ -340,27 +316,34 @@ const updatePayment =
 
         );
 
-
       // =====================================
-      // CREATE NOTIFICATION
+      // NOTIFICATION KE CUSTOMER
       // =====================================
 
       if (payment_status) {
 
-        await createPaymentNotification({
+        const booking =
+          await Booking.findByPk(
+            payment.booking_id
+          );
 
-          user_id:
-            req.user?.id,
+        if (booking) {
 
-          booking_id:
-            payment.booking_id,
+          await createPaymentNotification({
 
-          payment_status,
+            user_id:
+              booking.customer_id,
 
-        });
+            booking_id:
+              payment.booking_id,
+
+            payment_status,
+
+          });
+
+        }
 
       }
-
 
       res.status(200).json({
 
@@ -370,6 +353,8 @@ const updatePayment =
       });
 
     } catch (error) {
+
+      console.log(error);
 
       res.status(500).json({
 
@@ -402,25 +387,54 @@ const updatePaymentStatus =
         payment_status,
       } = req.body;
 
+      // PAYMENT
       const payment =
         await paymentModel
           .findById(id);
 
+      if (!payment) {
+
+        return res.status(404).json({
+
+          message:
+            "Payment not found",
+
+        });
+
+      }
+
+      // BOOKING
+      const booking =
+        await Booking.findByPk(
+          payment.booking_id
+        );
+
+      if (!booking) {
+
+        return res.status(404).json({
+
+          message:
+            "Booking not found",
+
+        });
+
+      }
+
+      // UPDATE STATUS
       await paymentModel
         .updateStatus(
           id,
           payment_status
         );
 
-
       // =====================================
-      // CREATE NOTIFICATION
+      // NOTIF CUSTOMER
       // =====================================
 
       await createPaymentNotification({
 
         user_id:
-          req.user?.id,
+          booking.customer_id,
 
         booking_id:
           payment.booking_id,
@@ -428,7 +442,6 @@ const updatePaymentStatus =
         payment_status,
 
       });
-
 
       res.status(200).json({
 
@@ -438,6 +451,8 @@ const updatePaymentStatus =
       });
 
     } catch (error) {
+
+      console.log(error);
 
       res.status(500).json({
 

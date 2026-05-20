@@ -1,4 +1,3 @@
-//model
 const Payment =
   require("../schema/Payment");
 
@@ -17,13 +16,21 @@ const findAll = async () => {
     include: [
 
       {
+
         model: Booking,
 
         attributes: [
+
           "id",
+
+          "customer_id", // TAMBAHAN
+
           "booking_date",
+
           "status",
+
         ],
+
       },
 
     ],
@@ -85,12 +92,19 @@ const findById = async (
       include: [
 
         {
+
           model: Booking,
 
           attributes: [
+
             "id",
+
+            "customer_id", // TAMBAHAN
+
             "booking_date",
+
             "status",
+
           ],
 
         },

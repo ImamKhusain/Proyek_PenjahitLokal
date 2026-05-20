@@ -2,6 +2,7 @@ import {
   useEffect,
   useState,
   useContext,
+  useRef,
 } from "react";
 
 import {
@@ -55,8 +56,15 @@ const ChatPage = () => {
     setTailorName,
   ] = useState("");
 
-  // AMBIL ADMIN ID
-  const adminId =
+  const messagesEndRef =
+    useRef(null);
+
+  // =========================
+  // AMBIL TAILOR ID
+  // room_customerId_tailorId
+  // =========================
+
+  const tailorId =
     roomId?.split("_")[2];
 
 
@@ -73,7 +81,7 @@ const ChatPage = () => {
 
           const response =
             await axios.get(
-              `http://localhost:8080/api/tailors/${adminId}`
+              `http://localhost:8080/api/tailors/${tailorId}`
             );
 
           const data =
@@ -96,13 +104,13 @@ const ChatPage = () => {
 
       };
 
-    if (adminId) {
+    if (tailorId) {
 
       fetchTailor();
 
     }
 
-  }, [adminId]);
+  }, [tailorId]);
 
 
   // =========================
@@ -154,75 +162,68 @@ const ChatPage = () => {
 
 
   // =========================
+  // AUTO SCROLL
+  // =========================
+
+  useEffect(() => {
+
+    messagesEndRef.current
+      ?.scrollIntoView({
+        behavior: "smooth",
+      });
+
+  }, [messages]);
+
+
+  // =========================
   // SEND MESSAGE
   // =========================
 
-  const sendMessage =
-    async () => {
+ const sendMessage =
+  async () => {
 
-      if (!message.trim())
-        return;
+    if (!message.trim())
+      return;
 
-      try {
+    try {
 
-        // SIMPAN CHAT
-        const response =
-          await axios.post(
+      await axios.post(
 
-            "http://localhost:8080/api/chats/send",
+        "http://localhost:8080/api/chats/send",
 
-            {
+        {
 
-              tailor_id:
-                tailor?.user_id ||
-                adminId,
+          // FIX FINAL
+          tailor_id:
+            Number(tailorId),
 
-              message,
+          message,
 
-            },
+        },
 
-            {
-              headers: {
+        {
+          headers: {
 
-                Authorization:
-                  `Bearer ${user.token}`,
+            Authorization:
+              `Bearer ${user.token}`,
 
-              },
-            }
-
-          );
-
-        // AMBIL ROOM YANG BENAR
-        const newRoomId =
-          response.data.room_id;
-
-        // PINDAH KE ROOM BARU
-        if (
-          newRoomId &&
-          newRoomId !== roomId
-        ) {
-
-          navigate(
-            `/chat/${newRoomId}`,
-            {
-              replace: true,
-            }
-          );
-
+          },
         }
 
-        setMessage("");
+      );
 
-      } catch (error) {
+      setMessage("");
 
-        console.log(
-          "SEND ERROR:",
-          error
-        );
+    } catch (error) {
 
-      }
+      console.log(
+        "SEND ERROR:",
+        error
+      );
 
-    };
+    }
+
+  };
 
 
   return (
@@ -245,21 +246,41 @@ const ChatPage = () => {
             ←
           </button>
 
-          <div className="chat-user-info-block">
+          <div className="chat-user-info">
 
-            <h2 className="chat-user-name">
-              CS Admin ARKI
-            </h2>
-
-            <p className="chat-tailor-context">
+            <div className="chat-avatar">
 
               {
-                tailor?.name ||
-                tailorName ||
-                "Tailor"
+                (
+                  tailor?.name ||
+                  tailorName ||
+                  "T"
+                )
+
+                  .charAt(0)
+
+                  .toUpperCase()
               }
 
-            </p>
+            </div>
+
+            <div>
+
+              <h2 className="chat-user-name">
+                CS Admin ARKI
+              </h2>
+
+              <p className="chat-user-status">
+
+                {
+                  tailor?.name ||
+                  tailorName ||
+                  "Tailor"
+                }
+
+              </p>
+
+            </div>
 
           </div>
 
@@ -294,6 +315,8 @@ const ChatPage = () => {
           </div>
 
         ))}
+
+        <div ref={messagesEndRef} />
 
       </div>
 

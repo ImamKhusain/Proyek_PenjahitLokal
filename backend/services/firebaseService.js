@@ -258,7 +258,7 @@ const uploadPaymentProof =
         id:
           paymentDoc.id,
 
-        image_url:
+        imageurl:
           imageUrl,
 
       };
