@@ -271,7 +271,7 @@ const NotificationPage = () => {
                 >
                   {notif.title}
                 </div>
-
+{/* acc */}
                 <div
                   style={{
                     color:
