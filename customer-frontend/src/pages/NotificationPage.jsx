@@ -49,6 +49,7 @@ const NotificationPage = () => {
     setNotifications,
   ] = useState([]);
 
+
   // =========================
   // FETCH NOTIFICATIONS
   // =========================
@@ -64,7 +65,6 @@ const NotificationPage = () => {
         "notifications"
       ),
 
-      // FIX REFRESH HILANG
       where(
         "user_id",
         "==",
@@ -113,17 +113,34 @@ const NotificationPage = () => {
 
 
   // =========================
+  // SAAT MASUK HALAMAN NOTIF
+  // HILANGKAN BADGE MERAH
+  // =========================
+
+  useEffect(() => {
+
+    localStorage.setItem(
+      "customerNotifSeen",
+      "true"
+    );
+
+  }, []);
+
+
+  // =========================
   // MARK AS READ
   // =========================
 
   const markAsRead =
     async (
       notificationId,
-      redirect_url
+      redirect_url,
+      title
     ) => {
 
       try {
 
+        // UPDATE STATUS
         await updateDoc(
 
           doc(
@@ -138,8 +155,52 @@ const NotificationPage = () => {
 
         );
 
-        // REDIRECT
-        if (redirect_url) {
+
+        // =========================
+        // REDIRECT OTOMATIS
+        // =========================
+
+        // PEMBAYARAN
+
+        if (
+
+          title
+            ?.toLowerCase()
+            .includes(
+              "pembayaran"
+            )
+
+        ) {
+
+          navigate(
+            "/payments"
+          );
+
+        }
+
+        // PESANAN
+
+        else if (
+
+          title
+            ?.toLowerCase()
+            .includes(
+              "pesanan"
+            )
+
+        ) {
+
+          navigate(
+            "/pesanan"
+          );
+
+        }
+
+        // DEFAULT
+
+        else if (
+          redirect_url
+        ) {
 
           navigate(
             redirect_url
@@ -171,6 +232,7 @@ const NotificationPage = () => {
     >
 
       {/* SIDEBAR */}
+
       <Navbar
         logout={logout}
         navigate={navigate}
@@ -179,7 +241,9 @@ const NotificationPage = () => {
         }
       />
 
+
       {/* CONTENT */}
+
       <div
         style={{
           flex: 1,
@@ -188,6 +252,7 @@ const NotificationPage = () => {
       >
 
         {/* HEADER */}
+
         <div
           style={{
             display: "flex",
@@ -243,6 +308,7 @@ const NotificationPage = () => {
 
 
         {/* LIST */}
+
         <div
           style={{
             display: "flex",
@@ -289,7 +355,8 @@ const NotificationPage = () => {
                   onClick={() =>
                     markAsRead(
                       notif.id,
-                      notif.redirect_url
+                      notif.redirect_url,
+                      notif.title
                     )
                   }
 
@@ -332,6 +399,7 @@ const NotificationPage = () => {
                 >
 
                   {/* LEFT */}
+
                   <div
                     style={{
                       display:
@@ -345,6 +413,7 @@ const NotificationPage = () => {
                   >
 
                     {/* ICON */}
+
                     <div
                       style={{
                         width: "54px",
@@ -383,6 +452,7 @@ const NotificationPage = () => {
 
 
                     {/* TEXT */}
+
                     <div>
 
                       <div
@@ -456,6 +526,7 @@ const NotificationPage = () => {
 
 
                   {/* STATUS */}
+
                   <div>
 
                     {notif.is_read ? (

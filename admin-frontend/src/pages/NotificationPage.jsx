@@ -5,15 +5,22 @@ import {
 } from "react";
 
 import {
+  useNavigate,
+} from "react-router-dom";
+
+import {
   collection,
   onSnapshot,
   query,
   where,
   orderBy,
+  updateDoc,
+  doc,
 } from "firebase/firestore";
 
 import {
   FiBell,
+  FiArrowLeft,
 } from "react-icons/fi";
 
 import db from "../services/firebaseService";
@@ -23,6 +30,9 @@ import {
 } from "../context/AuthContext";
 
 const NotificationPage = () => {
+
+  const navigate =
+    useNavigate();
 
   const {
     user,
@@ -41,7 +51,6 @@ const NotificationPage = () => {
 
   useEffect(() => {
 
-    // BELUM LOGIN
     if (!user?.id) return;
 
     const q = query(
@@ -104,6 +113,88 @@ const NotificationPage = () => {
 
   }, [user]);
 
+
+  // =====================================
+  // HANDLE CLICK NOTIFICATION
+  // =====================================
+
+  const handleNotificationClick =
+    async (notif) => {
+
+      try {
+
+        // UPDATE STATUS DIBACA
+
+        await updateDoc(
+
+          doc(
+            db,
+            "admin_notifications",
+            notif.id
+          ),
+
+          {
+            is_read: true,
+          }
+
+        );
+
+
+        // =====================================
+        // REDIRECT HALAMAN
+        // =====================================
+
+        // CHAT
+
+        if (
+          notif.title ===
+          "Pesan Baru"
+        ) {
+
+          navigate(
+            "/admin-chat"
+          );
+
+        }
+
+        // BOOKING
+
+        else if (
+          notif.title ===
+          "Pesanan Baru"
+        ) {
+
+          navigate(
+            "/bookings"
+          );
+
+        }
+
+        // PAYMENT
+
+        else if (
+          notif.title ===
+          "Pembayaran Baru"
+        ) {
+
+          navigate(
+            "/payments"
+          );
+
+        }
+
+      } catch (error) {
+
+        console.log(
+          "CLICK NOTIF ERROR:",
+          error
+        );
+
+      }
+
+    };
+
+
   return (
 
     <div
@@ -112,27 +203,159 @@ const NotificationPage = () => {
           "100vh",
 
         background:
-          "#f3f4f6",
+          "#f5f7fb",
 
         padding:
-          "30px",
+          "32px",
       }}
     >
 
-      <h1
-        style={{
-          fontSize:
-            "36px",
+      {/* HEADER */}
 
-          fontWeight:
-            "700",
+      <div
+        style={{
+
+          display: "flex",
+
+          alignItems:
+            "center",
+
+          gap: "14px",
 
           marginBottom:
-            "24px",
+            "28px",
+
         }}
       >
-        Notifikasi Admin
-      </h1>
+
+        {/* BACK BUTTON */}
+
+        <button
+
+          onClick={() =>
+            navigate(-1)
+          }
+
+          style={{
+
+            width: "44px",
+
+            height: "44px",
+
+            borderRadius:
+              "50%",
+
+            border: "none",
+
+            background:
+              "#ffffff",
+
+            display:
+              "flex",
+
+            alignItems:
+              "center",
+
+            justifyContent:
+              "center",
+
+            cursor:
+              "pointer",
+
+            color:
+              "#111827",
+
+            boxShadow:
+              "0 2px 10px rgba(0,0,0,0.06)",
+
+            transition:
+              "0.2s ease",
+
+          }}
+
+          onMouseEnter={(e) => {
+
+            e.currentTarget.style.transform =
+              "translateY(-2px)";
+
+            e.currentTarget.style.background =
+              "#2563eb";
+
+            e.currentTarget.style.color =
+              "#ffffff";
+
+            e.currentTarget.style.boxShadow =
+              "0 8px 18px rgba(37,99,235,0.20)";
+
+          }}
+
+          onMouseLeave={(e) => {
+
+            e.currentTarget.style.transform =
+              "translateY(0px)";
+
+            e.currentTarget.style.background =
+              "#ffffff";
+
+            e.currentTarget.style.color =
+              "#111827";
+
+            e.currentTarget.style.boxShadow =
+              "0 2px 10px rgba(0,0,0,0.06)";
+
+          }}
+
+        >
+
+          <FiArrowLeft
+            size={20}
+          />
+
+        </button>
+
+
+        {/* TITLE */}
+
+        <div>
+
+          <h1
+            style={{
+              fontSize:
+                "32px",
+
+              fontWeight:
+                "700",
+
+              margin: 0,
+
+              color:
+                "#111827",
+            }}
+          >
+            Notifikasi Admin
+          </h1>
+
+          <p
+            style={{
+              margin:
+                "4px 0 0 0",
+
+              color:
+                "#6b7280",
+
+              fontSize:
+                "14px",
+            }}
+          >
+            Semua aktivitas terbaru admin
+          </p>
+
+        </div>
+
+      </div>
+
+
+      {/* LIST */}
 
       <div
         style={{
@@ -143,7 +366,7 @@ const NotificationPage = () => {
             "column",
 
           gap:
-            "18px",
+            "16px",
         }}
       >
 
@@ -154,16 +377,22 @@ const NotificationPage = () => {
           <div
             style={{
               background:
-                "#fff",
+                "#ffffff",
 
               padding:
                 "24px",
 
               borderRadius:
-                "16px",
+                "18px",
 
               fontSize:
-                "16px",
+                "15px",
+
+              color:
+                "#6b7280",
+
+              boxShadow:
+                "0 2px 10px rgba(0,0,0,0.05)",
             }}
           >
             Belum ada notifikasi
@@ -171,22 +400,31 @@ const NotificationPage = () => {
 
         )}
 
-        {/* LIST */}
+
+        {/* NOTIFICATION LIST */}
 
         {notifications.map((notif) => (
 
           <div
+
             key={notif.id}
 
+            onClick={() =>
+              handleNotificationClick(
+                notif
+              )
+            }
+
             style={{
+
               background:
-                "#fff",
+                "#ffffff",
 
               borderRadius:
                 "18px",
 
               padding:
-                "22px",
+                "20px",
 
               display:
                 "flex",
@@ -198,8 +436,36 @@ const NotificationPage = () => {
                 "space-between",
 
               boxShadow:
-                "0 2px 10px rgba(0,0,0,0.05)",
+                "0 3px 12px rgba(0,0,0,0.05)",
+
+              cursor:
+                "pointer",
+
+              transition:
+                "0.2s ease",
+
             }}
+
+            onMouseEnter={(e) => {
+
+              e.currentTarget.style.transform =
+                "translateY(-2px)";
+
+              e.currentTarget.style.boxShadow =
+                "0 8px 20px rgba(0,0,0,0.08)";
+
+            }}
+
+            onMouseLeave={(e) => {
+
+              e.currentTarget.style.transform =
+                "translateY(0px)";
+
+              e.currentTarget.style.boxShadow =
+                "0 3px 12px rgba(0,0,0,0.05)";
+
+            }}
+
           >
 
             {/* LEFT */}
@@ -222,16 +488,18 @@ const NotificationPage = () => {
               <div
                 style={{
                   width:
-                    "54px",
+                    "52px",
 
                   height:
-                    "54px",
+                    "52px",
 
                   borderRadius:
-                    "50%",
+                    "14px",
 
                   background:
-                    "#2563eb",
+                    notif.is_read
+                      ? "#f3f4f6"
+                      : "#2563eb",
 
                   display:
                     "flex",
@@ -243,7 +511,9 @@ const NotificationPage = () => {
                     "center",
 
                   color:
-                    "#fff",
+                    notif.is_read
+                      ? "#6b7280"
+                      : "#ffffff",
                 }}
               >
 
@@ -252,6 +522,7 @@ const NotificationPage = () => {
                 />
 
               </div>
+
 
               {/* CONTENT */}
 
@@ -263,22 +534,28 @@ const NotificationPage = () => {
                       "700",
 
                     fontSize:
-                      "18px",
+                      "17px",
 
                     marginBottom:
-                      "5px",
+                      "4px",
+
+                    color:
+                      "#111827",
                   }}
                 >
                   {notif.title}
                 </div>
-{/* acc */}
+
                 <div
                   style={{
                     color:
                       "#6b7280",
 
                     fontSize:
-                      "15px",
+                      "14px",
+
+                    lineHeight:
+                      "1.5",
                   }}
                 >
                   {notif.message}
@@ -288,15 +565,21 @@ const NotificationPage = () => {
 
             </div>
 
+
             {/* BADGE */}
 
             <div
               style={{
+
                 background:
-                  "#dbeafe",
+                  notif.is_read
+                    ? "#f3f4f6"
+                    : "#dbeafe",
 
                 color:
-                  "#2563eb",
+                  notif.is_read
+                    ? "#6b7280"
+                    : "#2563eb",
 
                 padding:
                   "8px 14px",
@@ -311,7 +594,11 @@ const NotificationPage = () => {
                   "12px",
               }}
             >
-              Baru
+
+              {notif.is_read
+                ? "Dibaca"
+                : "Baru"}
+
             </div>
 
           </div>

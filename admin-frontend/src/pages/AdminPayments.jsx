@@ -10,10 +10,6 @@ import {
   useNavigate,
 } from "react-router-dom";
 
-import {
-  FiBell,
-} from "react-icons/fi";
-
 import Navbar from "../components/Navbar";
 
 import {
@@ -157,18 +153,24 @@ const AdminPayments = () => {
     >
 
       {/* SIDEBAR */}
+
       <Navbar
         isSidebarOpen={
           isSidebarOpen
         }
+
         setIsSidebarOpen={
           setIsSidebarOpen
         }
+
         logout={logout}
+
         navigate={navigate}
       />
 
+
       {/* MAIN */}
+
       <div
         style={{
           flex: 1,
@@ -179,6 +181,7 @@ const AdminPayments = () => {
       >
 
         {/* TOPBAR */}
+
         <div
           style={{
             height: "60px",
@@ -197,12 +200,14 @@ const AdminPayments = () => {
         >
 
           {/* MENU */}
+
           <div
             onClick={() =>
               setIsSidebarOpen(
                 !isSidebarOpen
               )
             }
+
             style={{
               cursor: "pointer",
               fontSize: "20px",
@@ -212,37 +217,29 @@ const AdminPayments = () => {
             ☰
           </div>
 
+
           {/* RIGHT */}
+
           <div
             style={{
-              display: "flex",
-              alignItems:
-                "center",
-              gap: "14px",
+              fontWeight:
+                "700",
+
+              fontSize:
+                "13px",
+
+              color:
+                "#111827",
             }}
           >
-
-            <FiBell
-              size={18}
-              color="#111827"
-            />
-
-            <div
-              style={{
-                fontWeight:
-                  "700",
-                fontSize:
-                  "13px",
-              }}
-            >
-              ARKI
-            </div>
-
+            ARKI
           </div>
 
         </div>
 
+
         {/* CONTENT */}
+
         <div
           style={{
             padding: "30px",
@@ -250,6 +247,7 @@ const AdminPayments = () => {
         >
 
           {/* HEADER */}
+
           <div
             style={{
               marginBottom: "30px",
@@ -278,7 +276,9 @@ const AdminPayments = () => {
 
           </div>
 
+
           {/* GRID */}
+
           <div
             style={{
               display: "grid",
@@ -314,6 +314,7 @@ const AdminPayments = () => {
               >
 
                 {/* IMAGE */}
+
                 <div
                   style={{
                     width: "100%",
@@ -365,7 +366,9 @@ const AdminPayments = () => {
 
                 </div>
 
+
                 {/* BODY */}
+
                 <div
                   style={{
                     padding: "22px",
@@ -373,6 +376,7 @@ const AdminPayments = () => {
                 >
 
                   {/* TOP */}
+
                   <div
                     style={{
                       display: "flex",
@@ -386,6 +390,7 @@ const AdminPayments = () => {
                   >
 
                     {/* BOOKING */}
+
                     <div
                       style={{
                         fontSize: "15px",
@@ -411,7 +416,9 @@ const AdminPayments = () => {
 
                     </div>
 
+
                     {/* STATUS */}
+
                     <select
 
                       value={
@@ -503,7 +510,9 @@ const AdminPayments = () => {
 
                   </div>
 
+
                   {/* METHOD */}
+
                   <h2
                     style={{
                       fontSize: "26px",
@@ -519,7 +528,9 @@ const AdminPayments = () => {
                     }
                   </h2>
 
+
                   {/* AMOUNT */}
+
                   <div>
 
                     <p

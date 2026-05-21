@@ -15,10 +15,6 @@ import {
   useNavigate,
 } from "react-router-dom";
 
-import {
-  FiBell,
-} from "react-icons/fi";
-
 import db from "../services/firebaseService";
 
 import Navbar from "../components/Navbar";
@@ -110,18 +106,23 @@ const AdminChat = () => {
     >
 
       {/* SIDEBAR */}
+
       <Navbar
         isSidebarOpen={
           isSidebarOpen
         }
+
         setIsSidebarOpen={
           setIsSidebarOpen
         }
+
         logout={logout}
+
         navigate={navigate}
       />
 
       {/* MAIN */}
+
       <div
         style={{
           flex: 1,
@@ -132,6 +133,7 @@ const AdminChat = () => {
       >
 
         {/* TOPBAR */}
+
         <div
           style={{
             height: "60px",
@@ -150,12 +152,14 @@ const AdminChat = () => {
         >
 
           {/* LEFT */}
+
           <div
             onClick={() =>
               setIsSidebarOpen(
                 !isSidebarOpen
               )
             }
+
             style={{
               cursor: "pointer",
               fontSize: "20px",
@@ -165,37 +169,29 @@ const AdminChat = () => {
             ☰
           </div>
 
+
           {/* RIGHT */}
+
           <div
             style={{
-              display: "flex",
-              alignItems:
-                "center",
-              gap: "14px",
+              fontWeight:
+                "700",
+
+              fontSize:
+                "13px",
+
+              color:
+                "#111827",
             }}
           >
-
-            <FiBell
-              size={18}
-              color="#111827"
-            />
-
-            <div
-              style={{
-                fontWeight:
-                  "700",
-                fontSize:
-                  "13px",
-              }}
-            >
-              ARKI
-            </div>
-
+            ARKI
           </div>
 
         </div>
 
+
         {/* CONTENT */}
+
         <div
           style={{
             padding: "24px",
@@ -204,6 +200,7 @@ const AdminChat = () => {
         >
 
           {/* HEADER */}
+
           <div
             style={{
               marginBottom:
@@ -236,7 +233,9 @@ const AdminChat = () => {
 
           </div>
 
+
           {/* CHAT LIST */}
+
           <div
             style={{
               display: "flex",
@@ -323,6 +322,7 @@ const AdminChat = () => {
                 >
 
                   {/* LEFT */}
+
                   <div
                     style={{
                       display:
@@ -334,6 +334,7 @@ const AdminChat = () => {
                   >
 
                     {/* AVATAR */}
+
                     <div
                       style={{
                         width: "58px",
@@ -375,10 +376,13 @@ const AdminChat = () => {
                         .toUpperCase()}
                     </div>
 
+
                     {/* TEXT */}
+
                     <div>
 
                       {/* NAME */}
+
                       <div
                         style={{
                           display:
@@ -414,7 +418,9 @@ const AdminChat = () => {
                           }
                         </div>
 
+
                         {/* RED DOT */}
+
                         {isUnread && (
 
                           <div
@@ -435,7 +441,9 @@ const AdminChat = () => {
 
                       </div>
 
+
                       {/* MESSAGE */}
+
                       <div
                         style={{
                           color:
@@ -462,7 +470,9 @@ const AdminChat = () => {
 
                   </div>
 
+
                   {/* RIGHT */}
+
                   <div>
 
                     {isUnread ? (
@@ -533,7 +543,9 @@ const AdminChat = () => {
 
       </div>
 
+
       {/* ANIMATION */}
+
       <style>
         {`
 

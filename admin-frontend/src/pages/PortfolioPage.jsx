@@ -8,10 +8,6 @@ import {
   useNavigate,
 } from "react-router-dom";
 
-import {
-  FiBell,
-} from "react-icons/fi";
-
 import Navbar from "../components/Navbar";
 
 import {
@@ -30,6 +26,7 @@ const BASE_URL_BACKEND =
   "http://localhost:8080/uploads/";
 
 const PortfolioPage = () => {
+
   const navigate =
     useNavigate();
 
@@ -76,16 +73,23 @@ const PortfolioPage = () => {
   ] = useState(false);
 
   useEffect(() => {
+
     if (!user) {
+
       navigate("/");
       return;
+
     }
 
     fetchTailors();
+
   }, [user, navigate]);
 
+
   useEffect(() => {
-    if (!selectedTailorId) return;
+
+    if (!selectedTailorId)
+      return;
 
     const currentTailor =
       tailors.find(
@@ -104,15 +108,21 @@ const PortfolioPage = () => {
       selectedTailorId
     );
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     selectedTailorId,
     tailors,
   ]);
 
+
+  // =========================
+  // FETCH TAILORS
+  // =========================
+
   const fetchTailors =
     async () => {
+
       try {
+
         setLoadingTailors(
           true
         );
@@ -138,23 +148,39 @@ const PortfolioPage = () => {
           list.length > 0 &&
           !selectedTailorId
         ) {
+
           setSelectedTailorId(
             String(list[0].id)
           );
+
         }
+
       } catch (error) {
+
         console.log(error);
+
         setTailors([]);
+
       } finally {
+
         setLoadingTailors(
           false
         );
+
       }
+
     };
+
+
+  // =========================
+  // FETCH PORTFOLIOS
+  // =========================
 
   const fetchPortfolios =
     async (tailorId) => {
+
       try {
+
         setLoadingPortfolios(
           true
         );
@@ -174,29 +200,50 @@ const PortfolioPage = () => {
               : responseData;
 
         setPortfolios(
+
           Array.isArray(
             actualData
           )
+
             ? actualData
+
             : []
+
         );
+
       } catch (error) {
+
         console.log(error);
+
         setPortfolios([]);
+
       } finally {
+
         setLoadingPortfolios(
           false
         );
+
       }
+
     };
+
+
+  // =========================
+  // IMAGE URL
+  // =========================
 
   const getImageUrl = (
     imageUrl
   ) => {
+
     if (!imageUrl) {
+
       return selectedTailor?.photo
+
         ? `${BASE_URL_BACKEND}${selectedTailor.photo}`
+
         : "https://via.placeholder.com/56";
+
     }
 
     if (
@@ -204,13 +251,18 @@ const PortfolioPage = () => {
         "http"
       )
     ) {
+
       return imageUrl;
+
     }
 
     return `${BASE_URL_BACKEND}${imageUrl}`;
+
   };
 
+
   return (
+
     <div
       style={{
         display: "flex",
@@ -221,16 +273,25 @@ const PortfolioPage = () => {
           "Arial, sans-serif",
       }}
     >
+
+      {/* SIDEBAR */}
+
       <Navbar
         isSidebarOpen={
           isSidebarOpen
         }
+
         setIsSidebarOpen={
           setIsSidebarOpen
         }
+
         logout={logout}
+
         navigate={navigate}
       />
+
+
+      {/* MAIN */}
 
       <div
         style={{
@@ -240,6 +301,9 @@ const PortfolioPage = () => {
             "column",
         }}
       >
+
+        {/* TOPBAR */}
+
         <div
           style={{
             height: "60px",
@@ -256,12 +320,16 @@ const PortfolioPage = () => {
               "0 24px",
           }}
         >
+
+          {/* MENU */}
+
           <div
             onClick={() =>
               setIsSidebarOpen(
                 !isSidebarOpen
               )
             }
+
             style={{
               cursor: "pointer",
               fontSize: "20px",
@@ -271,43 +339,58 @@ const PortfolioPage = () => {
             ☰
           </div>
 
+
+          {/* RIGHT */}
+
           <div
             style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "14px",
+              fontWeight:
+                "700",
+
+              fontSize:
+                "13px",
+
+              color:
+                "#111827",
             }}
           >
-            <FiBell
-              size={18}
-              color="#111827"
-            />
-            <div
-              style={{
-                fontWeight: "700",
-                fontSize: "13px",
-              }}
-            >
-              ARKI
-            </div>
+            ARKI
           </div>
+
         </div>
 
-        <div style={{ padding: "24px", flex: 1 }}>
+
+        {/* CONTENT */}
+
+        <div
+          style={{
+            padding: "24px",
+            flex: 1,
+          }}
+        >
+
+          {/* HEADER */}
+
           <div
             style={{
               display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: "20px",
+              justifyContent:
+                "space-between",
+              alignItems:
+                "center",
+              marginBottom:
+                "20px",
             }}
           >
+
             <div>
+
               <h1
                 style={{
                   margin: 0,
                   fontSize: "30px",
-                  fontWeight: "700",
+                  fontWeight:
+                    "700",
                   color: "#111827",
                 }}
               >
@@ -323,7 +406,11 @@ const PortfolioPage = () => {
               >
                 Daftar katalog portofolio dari database
               </p>
+
             </div>
+
+
+            {/* BUTTON */}
 
             <button
               onClick={() =>
@@ -331,6 +418,7 @@ const PortfolioPage = () => {
                   `/manage-portfolio/${selectedTailorId}/add`
                 )
               }
+
               style={{
                 border: "none",
                 background:
@@ -352,7 +440,11 @@ const PortfolioPage = () => {
             >
               + Tambah Portofolio
             </button>
+
           </div>
+
+
+          {/* BODY */}
 
           <div
             style={{
@@ -362,6 +454,9 @@ const PortfolioPage = () => {
                 "flex-start",
             }}
           >
+
+            {/* LEFT */}
+
             <div
               style={{
                 width: "230px",
@@ -377,6 +472,7 @@ const PortfolioPage = () => {
                   "0 4px 12px rgba(0,0,0,0.03)",
               }}
             >
+
               <div
                 style={{
                   display:
@@ -386,7 +482,9 @@ const PortfolioPage = () => {
                   gap: "12px",
                 }}
               >
+
                 {loadingTailors ? (
+
                   <div
                     style={{
                       fontSize:
@@ -399,11 +497,16 @@ const PortfolioPage = () => {
                   >
                     Memuat penjahit...
                   </div>
-                ) : tailors.length > 0 ? (
+
+                ) : tailors.length >
+                  0 ? (
+
                   tailors.map(
                     (tailor) => (
+
                       <div
                         key={tailor.id}
+
                         onClick={() =>
                           setSelectedTailorId(
                             String(
@@ -411,6 +514,7 @@ const PortfolioPage = () => {
                             )
                           )
                         }
+
                         style={{
                           cursor:
                             "pointer",
@@ -446,9 +550,12 @@ const PortfolioPage = () => {
                       >
                         {tailor.name}
                       </div>
+
                     )
                   )
+
                 ) : (
+
                   <div
                     style={{
                       fontSize:
@@ -461,12 +568,20 @@ const PortfolioPage = () => {
                   >
                     Tidak ada data penjahit
                   </div>
+
                 )}
+
               </div>
+
             </div>
 
+
+            {/* RIGHT */}
+
             <div style={{ flex: 1 }}>
+
               {loadingPortfolios ? (
+
                 <div
                   style={{
                     background:
@@ -487,7 +602,10 @@ const PortfolioPage = () => {
                 >
                   Memuat portofolio...
                 </div>
-              ) : portfolios.length > 0 ? (
+
+              ) : portfolios.length >
+                0 ? (
+
                 <div
                   style={{
                     display: "grid",
@@ -496,10 +614,13 @@ const PortfolioPage = () => {
                     gap: "20px",
                   }}
                 >
+
                   {portfolios.map(
                     (item) => (
+
                       <div
                         key={item.id}
+
                         style={{
                           background:
                             "#ffffff",
@@ -513,11 +634,14 @@ const PortfolioPage = () => {
                             "0.2s ease",
                         }}
                       >
+
                         <img
                           src={getImageUrl(
                             item.image_url
                           )}
+
                           alt={item.name}
+
                           style={{
                             width: "100%",
                             height: "220px",
@@ -600,6 +724,7 @@ const PortfolioPage = () => {
                               "14px",
                           }}
                         >
+
                           <span
                             style={{
                               color:
@@ -622,12 +747,15 @@ const PortfolioPage = () => {
                             }}
                           >
                             Rp{" "}
+
                             {Number(
                               item.price
                             ).toLocaleString(
                               "id-ID"
                             )}
+
                           </span>
+
                         </div>
 
                         <button
@@ -636,6 +764,7 @@ const PortfolioPage = () => {
                               `/portfolio-detail/${item.id}`
                             )
                           }
+
                           style={{
                             width: "100%",
                             border: "none",
@@ -656,11 +785,16 @@ const PortfolioPage = () => {
                         >
                           Edit
                         </button>
+
                       </div>
+
                     )
                   )}
+
                 </div>
+
               ) : (
+
                 <div
                   style={{
                     background:
@@ -679,16 +813,23 @@ const PortfolioPage = () => {
                       "0 4px 12px rgba(0,0,0,0.03)",
                   }}
                 >
-                  Belum ada
-                  portofolio
+                  Belum ada portofolio
                 </div>
+
               )}
+
             </div>
+
           </div>
+
         </div>
+
       </div>
+
     </div>
+
   );
+
 };
 
 export default PortfolioPage;

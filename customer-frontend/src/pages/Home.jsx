@@ -15,6 +15,15 @@ import {
 } from "react-icons/fi";
 
 import {
+  collection,
+  query,
+  where,
+  onSnapshot,
+} from "firebase/firestore";
+
+import db from "../services/firebaseService";
+
+import {
   AuthContext,
 } from "../context/AuthContext";
 
@@ -47,6 +56,18 @@ const Home = () => {
     searchQuery,
     setSearchQuery,
   ] = useState("");
+
+  // BADGE NOTIF
+  const [
+    hasNewNotif,
+    setHasNewNotif,
+  ] = useState(false);
+
+  // TOTAL NOTIF
+  const [
+    notifications,
+    setNotifications,
+  ] = useState([]);
 
 
   // =========================
@@ -90,6 +111,86 @@ const Home = () => {
       }
 
     };
+
+
+  // =========================
+  // REALTIME NOTIFICATION
+  // =========================
+
+  useEffect(() => {
+
+    if (!user?.id) return;
+
+    const q = query(
+
+      collection(
+        db,
+        "notifications"
+      ),
+
+      where(
+        "user_id",
+        "==",
+        Number(user.id)
+      ),
+
+      where(
+        "is_read",
+        "==",
+        false
+      )
+
+    );
+
+    const unsubscribe =
+      onSnapshot(
+        q,
+        (snapshot) => {
+
+          const data =
+            snapshot.docs.map(
+              (doc) => ({
+                id: doc.id,
+                ...doc.data(),
+              })
+            );
+
+          setNotifications(
+            data
+          );
+
+          const totalNotif =
+            data.length;
+
+          const lastTotal =
+            Number(
+
+              localStorage.getItem(
+                "customerLastNotifTotal"
+              ) || 0
+
+            );
+
+          // ADA NOTIF BARU
+
+          if (
+            totalNotif >
+            lastTotal
+          ) {
+
+            setHasNewNotif(
+              true
+            );
+
+          }
+
+        }
+      );
+
+    return () =>
+      unsubscribe();
+
+  }, [user]);
 
 
   // =========================
@@ -150,9 +251,11 @@ const Home = () => {
       <div className="home-container">
 
         {/* HEADER */}
+
         <div className="home-header-layout">
 
           {/* LEFT */}
+
           <div className="user-welcome-section">
 
             <h1>
@@ -168,18 +271,40 @@ const Home = () => {
 
 
           {/* RIGHT */}
+
           <div className="header-actions-section">
 
             {/* NOTIFICATION */}
+
             <button
 
               className="notification-bell-btn"
 
-              onClick={() =>
+              onClick={() => {
+
+                // HILANGKAN BADGE
+
+                setHasNewNotif(
+                  false
+                );
+
+                // SIMPAN TOTAL NOTIF TERAKHIR
+
+                localStorage.setItem(
+
+                  "customerLastNotifTotal",
+
+                  String(
+                    notifications.length
+                  )
+
+                );
+
                 navigate(
                   "/notifications"
-                )
-              }
+                );
+
+              }}
 
               style={{
                 position:
@@ -219,10 +344,44 @@ const Home = () => {
                 color="#111827"
               />
 
+              {/* BADGE MERAH */}
+
+              {hasNewNotif && (
+
+                <div
+                  style={{
+
+                    position:
+                      "absolute",
+
+                    top: "8px",
+
+                    right: "8px",
+
+                    width: "10px",
+
+                    height:
+                      "10px",
+
+                    borderRadius:
+                      "50%",
+
+                    background:
+                      "#ef4444",
+
+                    border:
+                      "2px solid white",
+
+                  }}
+                />
+
+              )}
+
             </button>
 
 
             {/* SEARCH */}
+
             <div className="search-input-wrapper">
 
               <input
@@ -253,6 +412,7 @@ const Home = () => {
 
 
         {/* TAILOR GRID */}
+
         <div className="tailor-list">
 
           {filteredTailors.length >

@@ -8,10 +8,6 @@ import {
   useNavigate,
 } from "react-router-dom";
 
-import {
-  FiBell,
-} from "react-icons/fi";
-
 import Navbar from "../components/Navbar";
 
 import {
@@ -50,17 +46,24 @@ const BookingPage = () => {
     setLoading,
   ] = useState(true);
 
+
+  // ======================
+  // CHECK LOGIN
+  // ======================
+
   useEffect(() => {
 
     if (!user) {
 
       navigate("/");
       return;
+
     }
 
     fetchBookings();
 
   }, [user]);
+
 
   // ======================
   // FETCH BOOKINGS
@@ -77,9 +80,13 @@ const BookingPage = () => {
           await getBookings();
 
         setBookings(
+
           Array.isArray(data)
+
             ? data
+
             : data.data || []
+
         );
 
       } catch (error) {
@@ -89,8 +96,11 @@ const BookingPage = () => {
       } finally {
 
         setLoading(false);
+
       }
+
     };
+
 
   // ======================
   // UPDATE STATUS
@@ -110,14 +120,20 @@ const BookingPage = () => {
         );
 
         setBookings((prev) =>
+
           prev.map((item) =>
+
             item.id === id
+
               ? {
                   ...item,
                   status,
                 }
+
               : item
+
           )
+
         );
 
       } catch (error) {
@@ -127,8 +143,11 @@ const BookingPage = () => {
         alert(
           "Gagal update status"
         );
+
       }
+
     };
+
 
   return (
 
@@ -136,25 +155,31 @@ const BookingPage = () => {
       style={{
         display: "flex",
         minHeight: "100vh",
-        background: "#f3f4f6",
+        background: "#f5f7fb",
         fontFamily:
           "Arial, sans-serif",
       }}
     >
 
       {/* SIDEBAR */}
+
       <Navbar
         isSidebarOpen={
           isSidebarOpen
         }
+
         setIsSidebarOpen={
           setIsSidebarOpen
         }
+
         logout={logout}
+
         navigate={navigate}
       />
 
+
       {/* MAIN */}
+
       <div
         style={{
           flex: 1,
@@ -165,6 +190,7 @@ const BookingPage = () => {
       >
 
         {/* TOPBAR */}
+
         <div
           style={{
             height: "60px",
@@ -182,12 +208,15 @@ const BookingPage = () => {
           }}
         >
 
+          {/* SIDEBAR BUTTON */}
+
           <div
             onClick={() =>
               setIsSidebarOpen(
                 !isSidebarOpen
               )
             }
+
             style={{
               cursor: "pointer",
               fontSize: "20px",
@@ -197,67 +226,84 @@ const BookingPage = () => {
             ☰
           </div>
 
+
+          {/* RIGHT */}
+
           <div
             style={{
-              display: "flex",
-              alignItems:
-                "center",
-              gap: "14px",
+              fontWeight:
+                "700",
+
+              fontSize:
+                "13px",
+
+              color:
+                "#111827",
             }}
           >
-
-            <FiBell
-              size={18}
-              color="#111827"
-            />
-
-            <div
-              style={{
-                fontWeight:
-                  "700",
-                fontSize:
-                  "13px",
-              }}
-            >
-              ARKI
-            </div>
-
+            ARKI
           </div>
 
         </div>
 
+
         {/* CONTENT */}
+
         <div
           style={{
             padding: "24px",
           }}
         >
 
-          <h1
+          {/* TITLE */}
+
+          <div
             style={{
-              margin: 0,
-              fontSize: "30px",
-              fontWeight:
-                "700",
-              color: "#111827",
               marginBottom:
-                "20px",
+                "24px",
             }}
           >
-            Daftar Pesanan
-          </h1>
+
+            <h1
+              style={{
+                margin: 0,
+                fontSize: "30px",
+                fontWeight:
+                  "700",
+                color: "#111827",
+              }}
+            >
+              Daftar Pesanan
+            </h1>
+
+            <p
+              style={{
+                marginTop:
+                  "6px",
+                color:
+                  "#6b7280",
+                fontSize:
+                  "14px",
+              }}
+            >
+              Kelola semua data pesanan customer
+            </p>
+
+          </div>
+
 
           {/* TABLE */}
+
           <div
             style={{
               background:
                 "#ffffff",
               borderRadius:
-                "14px",
+                "18px",
               overflow:
                 "hidden",
               boxShadow:
-                "0 4px 12px rgba(0,0,0,0.04)",
+                "0 4px 14px rgba(0,0,0,0.04)",
             }}
           >
 
@@ -268,6 +314,8 @@ const BookingPage = () => {
                   "collapse",
               }}
             >
+
+              {/* TABLE HEAD */}
 
               <thead
                 style={{
@@ -306,6 +354,9 @@ const BookingPage = () => {
 
               </thead>
 
+
+              {/* TABLE BODY */}
+
               <tbody>
 
                 {loading ? (
@@ -316,9 +367,11 @@ const BookingPage = () => {
                       colSpan="6"
                       style={{
                         padding:
-                          "20px",
+                          "24px",
                         textAlign:
                           "center",
+                        color:
+                          "#6b7280",
                       }}
                     >
                       Memuat data...
@@ -336,6 +389,7 @@ const BookingPage = () => {
                         key={
                           item.id
                         }
+
                         style={{
                           borderTop:
                             "1px solid #f3f4f6",
@@ -343,6 +397,7 @@ const BookingPage = () => {
                       >
 
                         {/* ID */}
+
                         <td
                           style={
                             tdStyle
@@ -353,7 +408,9 @@ const BookingPage = () => {
                           }
                         </td>
 
+
                         {/* CUSTOMER */}
+
                         <td
                           style={
                             tdStyle
@@ -364,7 +421,9 @@ const BookingPage = () => {
                           }
                         </td>
 
+
                         {/* TAILOR */}
+
                         <td
                           style={
                             tdStyle
@@ -375,7 +434,9 @@ const BookingPage = () => {
                           }
                         </td>
 
+
                         {/* DATE */}
+
                         <td
                           style={
                             tdStyle
@@ -386,7 +447,9 @@ const BookingPage = () => {
                           }
                         </td>
 
+
                         {/* STATUS */}
+
                         <td
                           style={
                             tdStyle
@@ -394,6 +457,7 @@ const BookingPage = () => {
                         >
 
                           <select
+
                             value={
                               item.status
                             }
@@ -401,14 +465,17 @@ const BookingPage = () => {
                             onChange={(
                               e
                             ) =>
+
                               handleUpdateStatus(
                                 item.id,
                                 e.target
                                   .value
                               )
+
                             }
 
                             style={{
+
                               padding:
                                 "8px 12px",
 
@@ -430,26 +497,39 @@ const BookingPage = () => {
                               background:
                                 item.status ===
                                 "pending"
+
                                   ? "#fef3c7"
+
                                   : item.status ===
                                     "accepted"
+
                                   ? "#dbeafe"
+
                                   : item.status ===
                                     "completed"
+
                                   ? "#dcfce7"
+
                                   : "#fee2e2",
 
                               color:
                                 item.status ===
                                 "pending"
+
                                   ? "#92400e"
+
                                   : item.status ===
                                     "accepted"
+
                                   ? "#1d4ed8"
+
                                   : item.status ===
                                     "completed"
+
                                   ? "#166534"
+
                                   : "#b91c1c",
+
                             }}
                           >
 
@@ -473,7 +553,9 @@ const BookingPage = () => {
 
                         </td>
 
+
                         {/* CATATAN */}
+
                         <td
                           style={{
                             ...tdStyle,
@@ -489,6 +571,7 @@ const BookingPage = () => {
                         </td>
 
                       </tr>
+
                     )
                   )
 
@@ -500,13 +583,14 @@ const BookingPage = () => {
                       colSpan="6"
                       style={{
                         padding:
-                          "20px",
+                          "24px",
                         textAlign:
                           "center",
+                        color:
+                          "#6b7280",
                       }}
                     >
-                      Belum ada
-                      pesanan
+                      Belum ada pesanan
                     </td>
 
                   </tr>
@@ -524,8 +608,11 @@ const BookingPage = () => {
       </div>
 
     </div>
+
   );
+
 };
+
 
 const thStyle = {
 
@@ -538,7 +625,9 @@ const thStyle = {
   fontWeight: "700",
 
   color: "#374151",
+
 };
+
 
 const tdStyle = {
 
@@ -547,6 +636,8 @@ const tdStyle = {
   fontSize: "14px",
 
   color: "#111827",
+
 };
+
 
 export default BookingPage;
