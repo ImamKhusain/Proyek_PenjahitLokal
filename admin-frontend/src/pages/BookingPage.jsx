@@ -8,6 +8,8 @@ import {
   useNavigate,
 } from "react-router-dom";
 
+import toast from "react-hot-toast";
+
 import Navbar from "../components/Navbar";
 
 import {
@@ -93,6 +95,10 @@ const BookingPage = () => {
 
         console.log(error);
 
+        toast.error(
+          "Gagal mengambil data pesanan"
+        );
+
       } finally {
 
         setLoading(false);
@@ -136,11 +142,15 @@ const BookingPage = () => {
 
         );
 
+        toast.success(
+          "Status berhasil diperbarui"
+        );
+
       } catch (error) {
 
         console.log(error);
 
-        alert(
+        toast.error(
           "Gagal update status"
         );
 
@@ -205,6 +215,13 @@ const BookingPage = () => {
               "space-between",
             padding:
               "0 24px",
+
+            position:
+              "sticky",
+
+            top: 0,
+
+            zIndex: 20,
           }}
         >
 
@@ -252,6 +269,8 @@ const BookingPage = () => {
         <div
           style={{
             padding: "24px",
+
+            marginTop: "20px",
           }}
         >
 

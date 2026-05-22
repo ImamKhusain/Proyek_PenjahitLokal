@@ -132,11 +132,21 @@
    ========================================================================== */
 
 .tailor-list {
+
   display: grid;
-  /* auto-fill dikombinasikan dengan 1fr membuat barisan kartu melebar penuh ke kanan-kiri */
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 24px; /* Jarak pas antar kartu */
+
+  grid-template-columns:
+    repeat(
+      auto-fill,
+      minmax(240px, 1fr)
+    );
+
+  gap: 20px;
+
   width: 100%;
+
+  align-items: start;
+
 }
 
 /* Kondisi Saat Hasil Filter Kosong */

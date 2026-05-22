@@ -1,114 +1,286 @@
-import { useState, useContext } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { loginAdmin } from "../services/authService";
-import { AuthContext } from "../context/AuthContext";
+import {
+  useState,
+  useContext,
+} from "react";
+
+import {
+  useNavigate,
+  Link,
+} from "react-router-dom";
+
+import {
+  FaEye,
+  FaEyeSlash,
+} from "react-icons/fa";
+
+import toast from "react-hot-toast";
+
+import {
+  loginAdmin,
+} from "../services/authService";
+
+import {
+  AuthContext,
+} from "../context/AuthContext";
+
 import logo from "../assets/logo.png";
+
 import "../App.css";
 
 const Login = () => {
-  const navigate = useNavigate();
-  const { login } = useContext(AuthContext);
 
-  const [formData, setFormData] = useState({
+  const navigate =
+    useNavigate();
+
+  const {
+    login,
+  } = useContext(
+    AuthContext
+  );
+
+  const [
+    formData,
+    setFormData,
+  ] = useState({
+
     email: "",
+
     password: "",
+
   });
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [
+    showPassword,
+    setShowPassword,
+  ] = useState(false);
 
-  const handleChange = (e) => {
+  const [
+    loading,
+    setLoading,
+  ] = useState(false);
+
+  const handleChange = (
+    e
+  ) => {
+
     setFormData({
+
       ...formData,
-      [e.target.name]: e.target.value,
+
+      [e.target.name]:
+        e.target.value,
+
     });
+
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit =
+    async (e) => {
 
-    try {
-      setLoading(true);
+      e.preventDefault();
 
-      const response = await loginAdmin(formData);
+      try {
 
-      login(response.token, response.role,response.id);
+        setLoading(true);
 
-      if (response.role === "admin") {
-        navigate("/dashboard");
-      } else {
-        alert("Akun ini bukan admin");
+        const response =
+          await loginAdmin(
+            formData
+          );
+
+        login(
+
+          response.token,
+
+          response.role,
+
+          response.id
+
+        );
+
+        if (
+          response.role ===
+          "admin"
+        ) {
+
+          toast.success(
+            "Login admin berhasil!"
+          );
+
+          navigate(
+            "/dashboard"
+          );
+
+        } else {
+
+          toast.error(
+            "Akun ini bukan admin"
+          );
+
+        }
+
+      } catch (error) {
+
+        toast.dismiss();
+
+        toast.error(
+
+          error.response
+            ?.data?.message ||
+
+          "Login gagal"
+
+        );
+
+      } finally {
+
+        setLoading(false);
+
       }
-    } catch (error) {
-      alert(error.response?.data?.message || "Login gagal");
-    } finally {
-      setLoading(false);
-    }
-  };
+
+    };
 
   return (
+
     <div className="login-page">
+
       <div className="login-card">
+
         <div className="login-brand">
-          <img src={logo} alt="ARKI" className="login-logo" />
-          <p className="login-subtitle">SIGN IN</p>
+
+          <img
+            src={logo}
+            alt="ARKI"
+            className="login-logo"
+          />
+
+          <p className="login-subtitle">
+            SIGN IN
+          </p>
+
         </div>
 
-        <form onSubmit={handleSubmit} className="login-form">
+        <form
+          onSubmit={
+            handleSubmit
+          }
+          className="login-form"
+        >
+
           <div className="input-group">
-            <label>Email address</label>
+
+            <label>
+              Email address
+            </label>
+
             <input
               type="email"
               name="email"
               placeholder="Enter your email"
-              value={formData.email}
-              onChange={handleChange}
+              value={
+                formData.email
+              }
+              onChange={
+                handleChange
+              }
               required
             />
+
           </div>
 
           <div className="input-group">
-            <label>Password</label>
+
+            <label>
+              Password
+            </label>
+
             <div className="password-wrapper">
+
               <input
-                type={showPassword ? "text" : "password"}
+                type={
+                  showPassword
+                    ? "text"
+                    : "password"
+                }
                 name="password"
                 placeholder="Enter your password"
-                value={formData.password}
-                onChange={handleChange}
+                value={
+                  formData.password
+                }
+                onChange={
+                  handleChange
+                }
                 required
               />
 
               <button
                 type="button"
                 className="toggle-password"
-                onClick={() => setShowPassword(!showPassword)}
-                aria-label={showPassword ? "Hide password" : "Show password"}
+                onClick={() =>
+                  setShowPassword(
+                    !showPassword
+                  )
+                }
+                aria-label={
+                  showPassword
+                    ? "Hide password"
+                    : "Show password"
+                }
               >
-                {showPassword ? <FaEye /> : <FaEyeSlash />}
+
+                {showPassword
+                  ? <FaEye />
+                  : <FaEyeSlash />
+                }
+
               </button>
+
             </div>
+
           </div>
 
           <div className="login-options">
+
             <label className="remember-me">
+
               <input type="checkbox" />
-              <span>Remember me</span>
+
+              <span>
+                Remember me
+              </span>
+
             </label>
 
-            <Link to="/register" className="signup-text">
+            <Link
+              to="/register"
+              className="signup-text"
+            >
               or sign up for an account
             </Link>
+
           </div>
 
-          <button type="submit" className="login-btn" disabled={loading}>
-            {loading ? "Loading..." : "Login"}
+          <button
+            type="submit"
+            className="login-btn"
+            disabled={loading}
+          >
+
+            {loading
+              ? "Loading..."
+              : "Login"
+            }
+
           </button>
+
         </form>
+
       </div>
+
     </div>
+
   );
+
 };
 
 export default Login;

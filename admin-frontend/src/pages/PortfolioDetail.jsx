@@ -14,49 +14,83 @@ import {
   FiEdit2,
 } from "react-icons/fi";
 
+import toast from "react-hot-toast";
+
 import Navbar from "../components/Navbar";
 
-import { AuthContext } from "../context/AuthContext";
+import {
+  AuthContext,
+} from "../context/AuthContext";
 
 import api from "../services/api";
 
 import "./ManageTailor.css";
 
 const PortfolioDetail = () => {
-  const { id } = useParams();
 
-  const navigate = useNavigate();
+  const { id } =
+    useParams();
 
-  const { logout } =
-    useContext(AuthContext);
+  const navigate =
+    useNavigate();
 
-  const [isSidebarOpen, setIsSidebarOpen] =
-    useState(true);
+  const {
+    logout,
+  } = useContext(
+    AuthContext
+  );
 
-  const [loading, setLoading] =
-    useState(true);
+  const [
+    isSidebarOpen,
+    setIsSidebarOpen,
+  ] = useState(true);
 
-  const [preview, setPreview] =
-    useState(null);
+  const [
+    loading,
+    setLoading,
+  ] = useState(true);
 
-  const [photo, setPhoto] =
-    useState(null);
+  const [
+    preview,
+    setPreview,
+  ] = useState(null);
 
-  const [formData, setFormData] =
-    useState({
-      name: "",
-      size: "",
-      description: "",
-      price: "",
-    });
+  const [
+    photo,
+    setPhoto,
+  ] = useState(null);
+
+  const [
+    showDeleteModal,
+    setShowDeleteModal,
+  ] = useState(false);
+
+  const [
+    formData,
+    setFormData,
+  ] = useState({
+
+    name: "",
+
+    size: "",
+
+    description: "",
+
+    price: "",
+
+  });
 
   useEffect(() => {
+
     fetchPortfolioDetail();
+
   }, [id]);
 
   const fetchPortfolioDetail =
     async () => {
+
       try {
+
         setLoading(true);
 
         const response =
@@ -70,6 +104,7 @@ const PortfolioDetail = () => {
             : response.data;
 
         setFormData({
+
           name:
             data.name || "",
 
@@ -81,143 +116,181 @@ const PortfolioDetail = () => {
 
           price:
             data.price || "",
+
         });
 
-        if (data.image_url) {
+        if (
+          data.image_url
+        ) {
+
           setPreview(
             data.image_url
           );
-        } else if (data.image) {
+
+        } else if (
+          data.image
+        ) {
+
           setPreview(
             `http://localhost:8080/uploads/${data.image}`
           );
+
         }
+
       } catch (error) {
+
         console.log(error);
+
+        toast.error(
+          "Gagal mengambil detail portfolio"
+        );
+
       } finally {
+
         setLoading(false);
+
       }
+
     };
 
-  // HANDLE INPUT
-  const handleChange = (e) => {
+  const handleChange = (
+    e
+  ) => {
+
     setFormData({
+
       ...formData,
 
       [e.target.name]:
         e.target.value,
+
     });
+
   };
 
-  // HANDLE IMAGE
-  const handleImageChange = (e) => {
+  const handleImageChange = (
+    e
+  ) => {
+
     const file =
       e.target.files[0];
 
     if (file) {
+
       setPhoto(file);
 
       setPreview(
-        URL.createObjectURL(file)
+
+        URL.createObjectURL(
+          file
+        )
+
       );
+
     }
+
   };
 
-  // UPDATE
-  const handleSubmit = async (
-    e
-  ) => {
-    e.preventDefault();
+  const handleSubmit =
+    async (e) => {
 
-    try {
-      const token =
-        localStorage.getItem(
-          "token"
-        );
+      e.preventDefault();
 
-      console.log(
-        "TOKEN:",
-        token
-      );
+      try {
 
-      const submitData =
-        new FormData();
+        const token =
+          localStorage.getItem(
+            "token"
+          );
 
-      submitData.append(
-        "name",
-        formData.name
-      );
+        const submitData =
+          new FormData();
 
-      submitData.append(
-        "size",
-        formData.size
-      );
-
-      submitData.append(
-        "description",
-        formData.description
-      );
-
-      submitData.append(
-        "price",
-        formData.price
-      );
-
-      if (photo) {
         submitData.append(
-          "image",
-          photo
+          "name",
+          formData.name
         );
+
+        submitData.append(
+          "size",
+          formData.size
+        );
+
+        submitData.append(
+          "description",
+          formData.description
+        );
+
+        submitData.append(
+          "price",
+          formData.price
+        );
+
+        if (photo) {
+
+          submitData.append(
+            "image",
+            photo
+          );
+
+        }
+
+        await api.put(
+
+          `/portfolios/${id}`,
+
+          submitData,
+
+          {
+
+            headers: {
+
+              "Content-Type":
+                "multipart/form-data",
+
+              Authorization:
+                token,
+
+            },
+
+          }
+
+        );
+
+        toast.success(
+          "Portfolio berhasil diupdate!"
+        );
+
+        navigate(-1);
+
+      } catch (error) {
+
+        console.log(error);
+
+        toast.error(
+
+          error.response
+            ?.data?.message ||
+
+          "Gagal update portfolio!"
+
+        );
+
       }
 
-      await api.put(
-        `/portfolios/${id}`,
-        submitData,
-        {
-          headers: {
-            "Content-Type":
-              "multipart/form-data",
+    };
 
-            // FIX TOKEN
-            Authorization:
-              token,
-          },
-        }
-      );
-
-      alert(
-        "Portfolio berhasil diupdate!"
-      );
-
-      navigate(-1);
-
-    } catch (error) {
-
-      console.log(error);
-
-      console.log(
-        error.response?.data
-      );
-
-      alert(
-        error.response?.data
-          ?.message ||
-          "Gagal update portfolio!"
-      );
-    }
-  };
-
-  // DELETE
   const handleDelete =
+    () => {
+
+      setShowDeleteModal(
+        true
+      );
+
+    };
+
+  const confirmDelete =
     async () => {
-
-      const confirmDelete =
-        window.confirm(
-          "Yakin ingin menghapus portfolio ini?"
-        );
-
-      if (!confirmDelete)
-        return;
 
       try {
 
@@ -227,18 +300,23 @@ const PortfolioDetail = () => {
           );
 
         await api.delete(
+
           `/portfolios/${id}`,
+
           {
+
             headers: {
 
-              // FIX TOKEN
               Authorization:
                 token,
+
             },
+
           }
+
         );
 
-        alert(
+        toast.success(
           "Portfolio berhasil dihapus!"
         );
 
@@ -248,45 +326,51 @@ const PortfolioDetail = () => {
 
         console.log(error);
 
-        alert(
-          error.response?.data
-            ?.message ||
-            "Gagal menghapus portfolio!"
+        toast.error(
+          "Gagal menghapus portfolio!"
         );
+
       }
+
     };
 
   if (loading) {
+
     return (
+
       <div className="manage-page">
         Loading...
       </div>
+
     );
+
   }
 
   return (
+
     <div className="manage-page">
 
-      {/* SIDEBAR */}
       <Navbar
         isSidebarOpen={
           isSidebarOpen
         }
+
         setIsSidebarOpen={
           setIsSidebarOpen
         }
+
         logout={logout}
+
         navigate={navigate}
       />
 
-      {/* MAIN */}
       <div className="manage-main">
 
-        {/* TOPBAR */}
         <div className="manage-topbar">
 
           <div
             className="menu-toggle"
+
             onClick={() =>
               setIsSidebarOpen(
                 !isSidebarOpen
@@ -297,21 +381,23 @@ const PortfolioDetail = () => {
           </div>
 
           <div className="topbar-right">
+
             <FiBell size={18} />
 
             <div className="profile-name">
               ARKI
             </div>
+
           </div>
+
         </div>
 
-        {/* CONTENT */}
         <div className="manage-content">
 
-          {/* HEADER */}
           <div className="manage-header">
 
             <div>
+
               <h1 className="page-title">
                 Edit Portfolio
               </h1>
@@ -319,32 +405,35 @@ const PortfolioDetail = () => {
               <p className="page-subtitle">
                 Edit data portfolio
               </p>
+
             </div>
 
             <button
               className="back-btn"
+
               onClick={() =>
                 navigate(-1)
               }
             >
               Kembali
             </button>
+
           </div>
 
-          {/* GRID */}
           <div className="content-grid">
 
-            {/* FORM */}
             <div className="form-card">
 
               <form
                 onSubmit={
                   handleSubmit
                 }
+
                 className="tailor-form"
               >
 
                 <div className="form-group">
+
                   <label>
                     Nama Pakaian
                   </label>
@@ -359,9 +448,11 @@ const PortfolioDetail = () => {
                       handleChange
                     }
                   />
+
                 </div>
 
                 <div className="form-group">
+
                   <label>
                     Size
                   </label>
@@ -376,9 +467,11 @@ const PortfolioDetail = () => {
                       handleChange
                     }
                   />
+
                 </div>
 
                 <div className="form-group">
+
                   <label>
                     Description
                   </label>
@@ -392,9 +485,11 @@ const PortfolioDetail = () => {
                       handleChange
                     }
                   />
+
                 </div>
 
                 <div className="form-group">
+
                   <label>
                     Harga
                   </label>
@@ -409,6 +504,7 @@ const PortfolioDetail = () => {
                       handleChange
                     }
                   />
+
                 </div>
 
                 <div
@@ -441,10 +537,11 @@ const PortfolioDetail = () => {
                   </button>
 
                 </div>
+
               </form>
+
             </div>
 
-            {/* IMAGE */}
             <div className="upload-card">
 
               <label className="upload-box">
@@ -459,6 +556,7 @@ const PortfolioDetail = () => {
                 />
 
                 {preview ? (
+
                   <div className="preview-wrapper">
 
                     <img
@@ -468,12 +566,17 @@ const PortfolioDetail = () => {
                     />
 
                     <div className="edit-image-btn">
+
                       <FiEdit2
                         size={16}
                       />
+
                     </div>
+
                   </div>
+
                 ) : (
+
                   <div className="upload-content">
 
                     <div className="upload-text">
@@ -488,16 +591,222 @@ const PortfolioDetail = () => {
                       Upload foto
                       portfolio
                     </small>
+
                   </div>
+
                 )}
+
               </label>
+
             </div>
 
           </div>
+
         </div>
+
       </div>
+
+      {showDeleteModal && (
+
+        <div
+          style={{
+
+            position: "fixed",
+
+            top: 0,
+
+            left: 0,
+
+            width: "100vw",
+
+            height: "100vh",
+
+            background:
+              "rgba(0,0,0,0.45)",
+
+            display: "flex",
+
+            justifyContent:
+              "center",
+
+            alignItems:
+              "center",
+
+            zIndex: 999999999,
+
+          }}
+        >
+
+          <div
+            style={{
+
+              width: "100%",
+
+              maxWidth: "420px",
+
+              background: "#fff",
+
+              borderRadius:
+                "24px",
+
+              padding:
+                "32px 28px",
+
+              boxShadow:
+                "0 20px 60px rgba(0,0,0,0.2)",
+
+              textAlign:
+                "center",
+
+            }}
+          >
+
+            <h2
+              style={{
+
+                margin: 0,
+
+                fontSize:
+                  "32px",
+
+                fontWeight:
+                  "700",
+
+                color:
+                  "#111827",
+
+                marginBottom:
+                  "12px",
+
+              }}
+            >
+              Hapus Portfolio
+            </h2>
+
+            <p
+              style={{
+
+                margin: 0,
+
+                fontSize:
+                  "16px",
+
+                lineHeight:
+                  "1.6",
+
+                color:
+                  "#6b7280",
+
+                marginBottom:
+                  "28px",
+
+              }}
+            >
+              Yakin ingin menghapus
+              portfolio ini?
+            </p>
+
+            <div
+              style={{
+
+                display: "flex",
+
+                justifyContent:
+                  "center",
+
+                gap: "14px",
+
+              }}
+            >
+
+              <button
+
+                onClick={() =>
+                  setShowDeleteModal(
+                    false
+                  )
+                }
+
+                style={{
+
+                  border:
+                    "none",
+
+                  background:
+                    "#e5e7eb",
+
+                  color:
+                    "#111827",
+
+                  padding:
+                    "13px 24px",
+
+                  borderRadius:
+                    "14px",
+
+                  fontWeight:
+                    "600",
+
+                  cursor:
+                    "pointer",
+
+                  minWidth:
+                    "120px",
+
+                }}
+              >
+                Cancel
+              </button>
+
+              <button
+
+                onClick={
+                  confirmDelete
+                }
+
+                style={{
+
+                  border:
+                    "none",
+
+                  background:
+                    "#dc2626",
+
+                  color:
+                    "#fff",
+
+                  padding:
+                    "13px 24px",
+
+                  borderRadius:
+                    "14px",
+
+                  fontWeight:
+                    "600",
+
+                  cursor:
+                    "pointer",
+
+                  minWidth:
+                    "120px",
+
+                }}
+              >
+                Delete
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      )}
+
     </div>
+
   );
+
 };
 
 export default PortfolioDetail;

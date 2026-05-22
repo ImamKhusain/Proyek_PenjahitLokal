@@ -9,13 +9,18 @@ import {
 } from "react";
 
 import {
+  Toaster,
+} from "react-hot-toast";
+
+import {
   AuthContext,
 } from "../context/AuthContext";
 
-import NotificationPage from "../pages/NotificationPage";
 import Login from "../pages/Login";
 
 import Dashboard from "../pages/Dashboard";
+
+import NotificationPage from "../pages/NotificationPage";
 
 import AdminChat from "../pages/AdminChat";
 
@@ -35,17 +40,25 @@ import PortofolioForm from "../components/PortofolioForm";
 
 import BookingPage from "../pages/BookingPage";
 
-// ✅ TAMBAHAN
 import AdminPayments from "../pages/AdminPayments";
 
 const AppRoutes = () => {
 
-  const { user } =
-    useContext(AuthContext);
+  const {
+    user,
+  } = useContext(
+    AuthContext
+  );
 
   return (
 
     <BrowserRouter>
+
+      {/* TOAST */}
+      <Toaster
+        position="top-center"
+        reverseOrder={false}
+      />
 
       <Routes>
 
@@ -67,7 +80,7 @@ const AppRoutes = () => {
           }
         />
 
-        {/* BOOKING PAGE */}
+        {/* BOOKINGS */}
         <Route
           path="/bookings"
           element={
@@ -79,7 +92,7 @@ const AppRoutes = () => {
           }
         />
 
-        {/* ✅ PAYMENT PAGE */}
+        {/* PAYMENTS */}
         <Route
           path="/payments"
           element={
@@ -91,7 +104,19 @@ const AppRoutes = () => {
           }
         />
 
-        {/* PORTFOLIO PAGE */}
+        {/* NOTIFICATIONS */}
+        <Route
+          path="/notifications"
+          element={
+            user ? (
+              <NotificationPage />
+            ) : (
+              <Login />
+            )
+          }
+        />
+
+        {/* PORTFOLIO */}
         <Route
           path="/portfolio"
           element={
@@ -114,12 +139,7 @@ const AppRoutes = () => {
             )
           }
         />
-        <Route
-  path="/notifications"
-  element={
-    <NotificationPage />
-  }
-/>
+
         {/* ADMIN CHAT */}
         <Route
           path="/admin-chat"
@@ -183,7 +203,7 @@ const AppRoutes = () => {
           }
         />
 
-        {/* TAMBAH PENJAHIT */}
+        {/* MANAGE TAILOR */}
         <Route
           path="/manage-tailor"
           element={
@@ -199,7 +219,9 @@ const AppRoutes = () => {
       </Routes>
 
     </BrowserRouter>
+
   );
+
 };
 
 export default AppRoutes;

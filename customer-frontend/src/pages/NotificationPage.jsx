@@ -248,6 +248,7 @@ const NotificationPage = () => {
         style={{
           flex: 1,
           padding: "30px",
+          marginTop: "90px",
         }}
       >
 

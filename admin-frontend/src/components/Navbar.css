@@ -4,6 +4,7 @@
 
 /* SIDEBAR */
 .sidebar {
+
   width: 78px;
 
   min-height: 100vh;
@@ -23,14 +24,19 @@
   transition: 0.3s ease;
 
   flex-shrink: 0;
+
 }
 
 .sidebar.open {
+
   width: 240px;
+
 }
+
 
 /* TITLE */
 .sidebar-title {
+
   margin: 0 0 34px;
 
   font-size: 18px;
@@ -38,18 +44,25 @@
   font-weight: 700;
 
   color: #111827;
+
 }
+
 
 /* MENU */
 .sidebar-menu {
+
   display: flex;
 
   flex-direction: column;
 
   gap: 18px;
+
 }
 
+
+/* MENU BUTTON */
 .menu-btn {
+
   border: none;
 
   background: transparent;
@@ -65,10 +78,47 @@
   color: #111827;
 
   padding: 0;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
 }
+
+
+/* CHAT BUTTON */
+.chat-btn {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+}
+
+
+/* RED DOT */
+.chat-red-dot {
+
+  width: 10px;
+
+  height: 10px;
+
+  border-radius: 50%;
+
+  background: #ef4444;
+
+  flex-shrink: 0;
+
+}
+
 
 /* LOGOUT */
 .logout-btn {
+
   border: none;
 
   background: transparent;
@@ -86,4 +136,5 @@
   font-weight: 600;
 
   color: #111827;
+
 }
