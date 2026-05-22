@@ -1,95 +1,220 @@
-body {
-  margin: 0;
-  padding: 0;
-  font-family: Arial, Helvetica, sans-serif;
-  background-color: #f5f5f5;
+/* ==========================================================================
+   RESET & GLOBAL STYLES
+   ========================================================================== */
+* {
+  box-sizing: border-box;
 }
 
-.login-container {
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
   width: 100%;
-  height: 100vh;
+  min-height: 100%;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f3f4f6;
+}
 
+/* ==========================================================================
+   HALAMAN LOGIN (DI PAKAI BERSAMA: ADMIN & CUSTOMER)
+   ========================================================================== */
+
+/* 1. Pembungkus Utama Layar */
+.login-page {
+  width: 100%;
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.login-card {
-  width: 350px;
-
-  background-color: white;
-
   padding: 30px;
-
-  border-radius: 10px;
-
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  background: 
+    radial-gradient(circle at top left, rgba(28, 53, 84, 0.08), transparent 30%),
+    radial-gradient(circle at bottom right, rgba(28, 53, 84, 0.08), transparent 25%),
+    #f3f4f6;
 }
 
-.login-title {
+/* 2. Kartu Putih Login */
+.login-card {
+  width: 100%;
+  max-width: 480px; /* Ukuran ideal agar proporsional di desktop & mobile */
+  background: white;
+  padding: 50px 42px;
+  border-radius: 20px;
+  border: 1px solid #ececec;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+}
+
+/* 3. Bagian Logo & Subtitle */
+.login-brand {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 38px;
+}
+
+/* Kunci utama agar logo terkunci rapi dan tidak kebesaran */
+.login-logo {
+  max-width: 130px;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto 12px;
+}
+
+.login-subtitle {
+  margin-top: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+/* 4. Struktur Form & Kotak Input */
+.login-form {
+  width: 100%;
 }
 
 .input-group {
-  margin-bottom: 15px;
+  margin-bottom: 24px;
 }
 
 .input-group label {
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e293b;
+  text-align: left;
 }
 
 .input-group input {
   width: 100%;
-
-  padding: 10px;
-
-  border: 1px solid #ccc;
-
-  border-radius: 5px;
+  height: 52px;
+  padding: 0 16px;
+  border: 1px solid #dbe2ea;
+  border-radius: 12px;
+  outline: none;
+  background: white;
+  font-size: 15px;
+  transition: 0.2s ease;
 }
 
-.login-btn {
-  width: 100%;
+.input-group input:focus {
+  border-color: #1C3554;
+  box-shadow: 0 0 0 3px rgba(28, 53, 84, 0.1);
+}
 
-  padding: 10px;
+/* 5. Fitur Wrapper Password & Tombol Mata */
+.password-wrapper {
+  position: relative;
+}
 
+.password-wrapper input {
+  padding-right: 55px;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
   border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 18px;
+  color: #64748b;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-  background-color: #007bff;
+.toggle-password:hover {
+  color: #1C3554;
+}
 
-  color: white;
+/* 6. Baris Opsi Bawah (Remember Me & Register) */
+.login-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  margin-bottom: 32px;
+}
 
-  border-radius: 5px;
-
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #475569;
   cursor: pointer;
 }
 
-.login-btn:hover {
-  background-color: #0056b3;
+.remember-me input {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
 }
 
-.navbar {
-  background-color: #007bff;
+.signup-text {
+  font-size: 14px;
+  color: #1C3554;
+  text-decoration: none;
+  font-weight: 600;
+}
 
+.signup-text:hover {
+  text-decoration: underline;
+}
+
+/* 7. Tombol Login Utama (Premium Navy) */
+.login-btn {
+  width: 100%;
+  height: 54px;
+  border: none;
+  border-radius: 12px;
+  background: #1C3554;
   color: white;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
 
+.login-btn:hover {
+  background: #15283f;
+  transform: translateY(-1px);
+}
+
+.login-btn:disabled {
+  background-color: #cbd5e1;
+  color: #94a3b8;
+  cursor: not-allowed;
+  transform: none;
+}
+
+
+/* ==========================================================================
+   HALAMAN DASHBOARD & HOME UTAMA (FUNGSI ASLI KELOMPOKMU)
+   ========================================================================== */
+.navbar {
+  background-color: #1C3554; /* Diubah ke Navy agar serasi dengan tema baru */
+  color: white;
   padding: 15px;
-
   display: flex;
-
   justify-content: space-between;
-
   align-items: center;
 }
 
 .navbar button {
   padding: 8px 15px;
-
   border: none;
-
+  border-radius: 6px;
   cursor: pointer;
+  background-color: white;
+  color: #1C3554;
+  font-weight: 600;
 }
 
 .home-container {
@@ -98,29 +223,46 @@ body {
 
 .tailor-list {
   display: grid;
-
-  grid-template-columns:
-    repeat(auto-fit, minmax(250px, 1fr));
-
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 20px;
-
   margin-top: 20px;
 }
 
 .tailor-card {
   background-color: white;
-
   padding: 20px;
-
   border-radius: 10px;
-
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+  border: 1px solid #eef0f3;
 }
 
 .tailor-card button {
   margin-top: 10px;
-
   padding: 10px;
-
   width: 100%;
+  border: none;
+  border-radius: 6px;
+  background-color: #1C3554;
+  color: white;
+  cursor: pointer;
+}
+
+
+/* ==========================================================================
+   RESPONSIVE MOBILE (LAYAR KECIL / HP)
+   ========================================================================== */
+@media screen and (max-width: 600px) {
+  .login-card {
+    padding: 36px 24px;
+  }
+
+  .login-logo {
+    max-width: 100px;
+  }
+
+  .login-options {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
 }

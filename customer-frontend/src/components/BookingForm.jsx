@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import toast from "react-hot-toast"; // 💡 TAMBAHAN: Import toast untuk error handling modern jika diperlukan
 import "./BookingForm.css";
 
 const BookingForm = ({
@@ -20,6 +21,16 @@ const BookingForm = ({
 
   const [selectedSize, setSelectedSize] =
     useState("");
+
+  // 💡 TAMBAHAN: Dapatkan string tanggal hari ini dengan format YYYY-MM-DD
+  // Ini digunakan untuk mengunci batas minimum input tanggal HTML
+  const getTodayDateString = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
 
   useEffect(() => {
 
@@ -65,6 +76,14 @@ Catatan Tambahan Kain/Model:`
   ) => {
 
     e.preventDefault();
+
+    // 💡 VALIDASI TANGGAL: Proteksi lapis kedua jika user membobol lewat ketik manual
+    const todayStr = getTodayDateString();
+    if (bookingDate < todayStr) {
+      toast.dismiss();
+      toast.error("Tanggal pertemuan tidak boleh kurang dari hari ini!");
+      return;
+    }
 
     const finalNote =
       sizeType === "custom"
@@ -123,6 +142,7 @@ Metode Ukuran: Ukuran Standar Katalog (${selectedSize})`;
             <input
               type="date"
               value={bookingDate}
+              min={getTodayDateString()} // 💡 KUNCI KALENDER: Mengunci tanggal kemarin agar tidak bisa dipilih
               onChange={(e) =>
                 setBookingDate(
                   e.target.value

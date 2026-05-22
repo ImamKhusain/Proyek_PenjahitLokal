@@ -10,6 +10,7 @@ import {
 } from "react-router-dom";
 
 import axios from "axios";
+import toast from "react-hot-toast"; // 💡 TAMBAHAN: Import toast untuk notifikasi modern
 
 import {
   AuthContext,
@@ -87,11 +88,9 @@ const Pembayaran = () => {
       try {
 
         if (!paymentProof) {
-
-          alert(
-            "Upload bukti pembayaran dulu"
-          );
-
+          // 💡 GANTI KE TOAST: Menghapus antrean lama dan memunculkan toast error
+          toast.dismiss();
+          toast.error("Silakan unggah bukti pembayaran Anda terlebih dahulu!");
           return;
 
         }
@@ -143,9 +142,9 @@ const Pembayaran = () => {
 
         );
 
-        alert(
-          "Pembayaran berhasil diupload"
-        );
+        // 💡 GANTI KE TOAST: Sukses unggah bukti transfer pembayaran
+        toast.dismiss();
+        toast.success("Bukti pembayaran Anda berhasil diunggah!");
 
         navigate("/pesanan");
 
@@ -153,9 +152,11 @@ const Pembayaran = () => {
 
         console.log(error);
 
-        alert(
+        // 💡 GANTI KE TOAST: Menangkap pesan gagal dari server
+        toast.dismiss();
+        toast.error(
           error.response?.data?.message ||
-          "Upload payment gagal"
+          "Gagal mengunggah bukti pembayaran, silakan coba lagi nanti."
         );
 
       } finally {

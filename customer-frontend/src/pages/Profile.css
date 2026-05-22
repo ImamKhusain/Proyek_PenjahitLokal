@@ -1,0 +1,248 @@
+/* ==========================================================================
+   CONTAINER UTAMA HALAMAN PROFIL
+   ========================================================================== */
+
+.profile-page-container {
+  font-family: sans-serif;
+  background-color: #fafafa;
+  min-height: 100vh;
+  /* Atas diberi 120px agar aman di bawah navbar kamu yang berwarna kuning */
+  padding: 120px 24px 60px 24px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  box-sizing: border-box;
+}
+
+/* Kotak Utama Kartu Profil */
+.profile-card {
+  background-color: #ffffff;
+  width: 100%;
+  max-width: 500px; /* Membatasi lebar agar tetap proporsional di tengah layar */
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f0f0f0;
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   HEADER KARTU PROFIL (AVATAR BESAR)
+   ========================================================================== */
+
+.profile-card-header {
+  background: linear-gradient(135deg, #fdfdd0 0%, #f7f7b5 100%); /* Warna senada navbar kuningmu */
+  padding: 40px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border-bottom: 4px solid #a51c1c; /* Garis marun penyeimbang tema */
+}
+
+/* Avatar Bundar Besar */
+.profile-avatar-large {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background-color: #a51c1c;
+  color: #ffffff;
+  font-size: 36px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 14px rgba(165, 28, 28, 0.3);
+}
+
+.profile-card-header h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  color: #111827;
+  letter-spacing: 0.5px;
+}
+
+.profile-tagline {
+  margin: 6px 0 0 0;
+  font-size: 13px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   STYLING AREA STATISTIK RINGKASAN PESANAN (BARU - SINKRON DENGAN PROFILE CARD)
+   ========================================================================== */
+
+.profile-stats-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Membagi dua kolom sama rata kanan-kiri */
+  gap: 16px;
+  padding: 24px 24px 0 24px; /* Memberi jarak pas di bawah header kuning */
+  box-sizing: border-box;
+}
+
+/* Base Style Box Statistik */
+.stat-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid #f0f0f0;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-box:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.04);
+}
+
+/* Detail teks di dalam box */
+.stat-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-count {
+  font-size: 20px;
+  font-weight: 800;
+  color: #111827;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+/* Variasi 1: Box Pesanan Diproses (Warna Kuning/Oranye Lembut) */
+.stat-box.accepted {
+  background-color: #fffbeb;
+  border-color: #fde68a;
+}
+
+.stat-box.accepted .stat-icon-wrapper {
+  background-color: #fef3c7;
+  color: #d97706;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Variasi 2: Box Pesanan Selesai (Warna Hijau Lembut) */
+.stat-box.completed {
+  background-color: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.stat-box.completed .stat-icon-wrapper {
+  background-color: #dcfce7;
+  color: #16a34a;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ==========================================================================
+   BODY KARTU PROFIL (DETAIL DATA)
+   ========================================================================== */
+
+.profile-card-body {
+  padding: 32px 24px;
+}
+
+.section-title {
+  margin: 0 0 20px 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #a51c1c; /* Warna utama tulisan sub-judul */
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Struktur Baris Informasi */
+.profile-info-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.profile-info-row:last-child {
+  border-bottom: none; /* Baris terakhir tidak memakai garis bawah */
+}
+
+/* Lingkaran Kecil Wadah Ikon */
+.info-icon-wrapper {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background-color: #fef2f2;
+  color: #a51c1c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.info-text-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-text-wrapper label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+.info-text-wrapper p {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #111827;
+}
+
+/* Badge Status Verifikasi */
+.status-badge {
+  display: inline-block;
+  color: #16a34a !important; /* Warna hijau sukses */
+  font-size: 14px !important;
+}
+
+/* ==========================================================================
+   FOOTER KARTU PROFIL & LOADING
+   ========================================================================== */
+
+.profile-card-footer {
+  padding: 16px 24px;
+  background-color: #fafafa;
+  border-top: 1px solid #f3f4f6;
+  text-align: center;
+}
+
+.profile-card-footer p {
+  margin: 0;
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.profile-loading {
+  text-align: center;
+  padding-top: 200px;
+  font-size: 16px;
+  color: #6b7280;
+}

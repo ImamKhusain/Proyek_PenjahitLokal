@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import toast from "react-hot-toast"; // 💡 TAMBAHAN: Mengimpor toast untuk notifikasi modern
 import BookingForm from "./BookingForm";
-import "./PortfolioCard.css"; // 💡 Import file CSS baru
+import "./PortfolioCard.css"; 
 
 const PortfolioCard = () => {
   const { id } = useParams();
@@ -37,13 +38,14 @@ const PortfolioCard = () => {
     setIsModalOpen(true);
   };
 
-  // 🚀 PERUBAHAN DI SINI: Menambahkan productDetail bawaan modal ke dalam destructuring parameter
   const handleBookingSubmit = async ({ bookingDate, finalNote, productDetail }) => {
     setIsSubmitting(true);
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        alert("Anda harus login terlebih dahulu untuk membuat pesanan!");
+        // 💡 GANTI KE TOAST: Mengarahkan user yang belum login dengan pesan error modern
+        toast.dismiss();
+        toast.error("Anda harus login terlebih dahulu untuk membuat pesanan!");
         navigate("/login");
         return;
       }
@@ -70,18 +72,19 @@ const PortfolioCard = () => {
       }
 
       if (!customerId) {
-        alert("Sesi login tidak valid. Silakan login kembali.");
+        // 💡 GANTI KE TOAST: Menangani kondisi token kadaluarsa atau tidak valid
+        toast.dismiss();
+        toast.error("Sesi login tidak valid. Silakan login kembali.");
         navigate("/login");
         return;
       }
 
-      // 🚀 PERUBAHAN DI SINI: Menyisipkan portfolio_id ke payload agar tidak masuk NULL ke database
       const payload = {
         customer_id: parseInt(customerId, 10), 
         tailor_id: parseInt(id, 10),
         booking_date: bookingDate,
         body_size_note: finalNote,
-        portfolio_id: productDetail ? parseInt(productDetail.id, 10) : null // Ambil ID portofolio produk katalog
+        portfolio_id: productDetail ? parseInt(productDetail.id, 10) : null 
       };
 
       const response = await axios.post(
@@ -90,12 +93,17 @@ const PortfolioCard = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      alert(response.data.message || "Booking pakaian berhasil diajukan!");
+      // 💡 GANTI KE TOAST: Notifikasi berhasil membuat booking pakaian
+      toast.dismiss();
+      toast.success(response.data.message || "Booking pakaian berhasil diajukan!");
+      
       setIsModalOpen(false);
       setSelectedProduct(null);
     } catch (error) {
       console.error("Error booking:", error);
-      alert(error.response?.data?.message || "Gagal mengirim pengajuan booking.");
+      // 💡 GANTI KE TOAST: Menangkap pesan error kiriman dari server backend
+      toast.dismiss();
+      toast.error(error.response?.data?.message || "Gagal mengirim pengajuan booking.");
     } finally {
       setIsSubmitting(false);
     }

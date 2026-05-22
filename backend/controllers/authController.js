@@ -193,20 +193,13 @@ const login = async (req, res) => {
     // =========================
 
     res.status(200).json({
-
-      message:
-        "Login success",
-
-      token,
-
-      role: user.role,
-
-      // ✅ TAMBAHAN INI
-      id: user.id,
-
-      name: user.name,
-
-    });
+  message: "Login success",
+  token: token,
+  role: user.role,
+  id: user.id,
+  name: user.name,
+  email: user.email // 
+});
 
   } catch (error) {
 
