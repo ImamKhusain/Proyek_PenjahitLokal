@@ -720,7 +720,7 @@ const Booking = () => {
 
                           <h3>
                             {pesanan.service_type ||
-                              "ARKI -"}
+                              "ARKI"}
                           </h3>
 
                           <span className="booking-id-tag">
