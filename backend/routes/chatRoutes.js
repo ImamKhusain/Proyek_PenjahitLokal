@@ -10,6 +10,7 @@ const authMiddleware = require("../middleware/authMiddleware");
 // ============================
 // SEND MESSAGE
 // ============================
+//send
 
 router.post(
   "/send",
