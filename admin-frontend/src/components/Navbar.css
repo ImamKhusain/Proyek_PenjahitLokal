@@ -1,15 +1,21 @@
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-/* SIDEBAR */
+
+/* =========================
+   SIDEBAR
+========================= */
+
 .sidebar {
 
   width: 78px;
 
   min-height: 100vh;
 
-  background: white;
+  background: #ffffff;
 
   border-right: 1px solid #e5e7eb;
 
@@ -19,7 +25,7 @@
 
   justify-content: space-between;
 
-  padding: 18px 14px;
+  padding: 24px 14px;
 
   transition: 0.3s ease;
 
@@ -29,39 +35,52 @@
 
 .sidebar.open {
 
-  width: 240px;
+  width: 250px;
 
 }
 
 
-/* TITLE */
+/* =========================
+   TOP AREA
+========================= */
+
 .sidebar-title {
 
-  margin: 0 0 34px;
+  margin-bottom: 40px;
 
-  font-size: 18px;
+  font-size: 24px;
 
-  font-weight: 700;
+  font-weight: 800;
 
   color: #111827;
 
+  line-height: 1.3;
+
 }
 
 
-/* MENU */
+/* =========================
+   MENU
+========================= */
+
 .sidebar-menu {
 
   display: flex;
 
   flex-direction: column;
 
-  gap: 18px;
+  gap: 10px;
 
 }
 
 
-/* MENU BUTTON */
+/* =========================
+   MENU BUTTON
+========================= */
+
 .menu-btn {
+
+  width: 100%;
 
   border: none;
 
@@ -71,36 +90,62 @@
 
   cursor: pointer;
 
-  font-size: 13px;
+  font-size: 15px;
 
   font-weight: 600;
 
   color: #111827;
 
-  padding: 0;
+  padding: 14px 16px;
+
+  border-radius: 12px;
 
   display: flex;
 
   align-items: center;
 
-  gap: 8px;
+  gap: 12px;
+
+  transition: all 0.2s ease;
 
 }
 
 
-/* CHAT BUTTON */
+/* HOVER */
+
+.menu-btn:hover {
+
+  background: #eff6ff;
+
+  color: #2563eb;
+
+}
+
+
+/* ACTIVE FEEL */
+
+.menu-btn:active {
+
+  transform: scale(0.98);
+
+}
+
+
+/* =========================
+   CHAT BUTTON
+========================= */
+
 .chat-btn {
 
-  display: flex;
-
-  align-items: center;
-
-  gap: 8px;
+  position: relative;
 
 }
 
 
-/* RED DOT */
+/* =========================
+   RED DOT
+========================= */
+
 .chat-red-dot {
 
   width: 10px;
@@ -111,12 +156,21 @@
 
   background: #ef4444;
 
-  flex-shrink: 0;
+  position: absolute;
+
+  right: 14px;
+
+  top: 50%;
+
+  transform: translateY(-50%);
 
 }
 
 
-/* LOGOUT */
+/* =========================
+   LOGOUT
+========================= */
+
 .logout-btn {
 
   border: none;
@@ -131,10 +185,62 @@
 
   cursor: pointer;
 
-  font-size: 12px;
+  font-size: 15px;
 
-  font-weight: 600;
+  font-weight: 700;
 
-  color: #111827;
+  color: #dc2626;
+
+  padding: 14px 16px;
+
+  border-radius: 12px;
+
+  transition: all 0.2s ease;
+
+  width: 100%;
+
+}
+
+
+/* LOGOUT HOVER */
+
+.logout-btn:hover {
+
+  background: #fef2f2;
+
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 768px) {
+
+  .sidebar {
+
+    width: 78px;
+
+  }
+
+  .sidebar.open {
+
+    width: 220px;
+
+  }
+
+  .sidebar-title {
+
+    font-size: 20px;
+
+  }
+
+  .menu-btn {
+
+    font-size: 14px;
+
+    padding: 12px 14px;
+
+  }
 
 }

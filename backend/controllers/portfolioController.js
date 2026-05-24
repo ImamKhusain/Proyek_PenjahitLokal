@@ -1,34 +1,54 @@
-const portfolioModel = require("../models/Portfolio");
+const portfolioModel =
+  require("../models/Portfolio");
 
+const firebaseService =
+  require("../services/firebaseService");
+
+
+// =====================================
 // GET ALL PORTFOLIOS
-const getAllPortfolios = async (req, res) => {
+// =====================================
 
-  try {
+const getAllPortfolios =
+  async (req, res) => {
 
-    const portfolios =
-      await portfolioModel.findAll();
+    try {
 
-    res.status(200).json({
-      message:
-        "Portfolios retrieved successfully",
+      const portfolios =
+        await portfolioModel
+          .findAll();
 
-      data: portfolios,
-    });
+      res.status(200).json({
 
-  } catch (error) {
+        message:
+          "Portfolios retrieved successfully",
 
-    res.status(500).json({
-      message:
-        "Error retrieving portfolios",
+        data:
+          portfolios,
 
-      error: error.message,
-    });
+      });
 
-  }
+    } catch (error) {
+
+      res.status(500).json({
+
+        message:
+          "Error retrieving portfolios",
+
+        error:
+          error.message,
+
+      });
+
+    }
 
 };
 
+
+// =====================================
 // GET PORTFOLIO BY TAILOR ID
+// =====================================
+
 const getPortfolioByTailorId =
   async (req, res) => {
 
@@ -38,85 +58,149 @@ const getPortfolioByTailorId =
         req.params;
 
       const portfolios =
-        await portfolioModel.findByTailorId(
-          tailorId
-        );
+        await portfolioModel
+          .findByTailorId(
+            tailorId
+          );
 
       res.status(200).json({
+
         message:
           "Portfolio retrieved successfully",
 
-        data: portfolios,
+        data:
+          portfolios,
+
       });
 
     } catch (error) {
 
       res.status(500).json({
+
         message:
           "Error retrieving portfolio",
 
-        error: error.message,
+        error:
+          error.message,
+
       });
 
     }
 
 };
 
+
+// =====================================
 // CREATE PORTFOLIO
-const createPortfolio = async (req, res) => {
+// =====================================
 
-  try {
+const createPortfolio =
+  async (req, res) => {
 
-    const {
-      tailor_id,
-      name,
-      description,
-      price,
-      size,
-    } = req.body;
+    try {
 
-    if (!req.file) {
-      return res.status(400).json({
-        message: "Error creating portfolio",
-        error: "Harap unggah file foto portofolio.",
-      });
-    }
-
-    const imageUrl = `http://localhost:8080/uploads/catalog/${req.file.filename}`;
-
-    const newPortfolio =
-      await portfolioModel.create({
+      const {
 
         tailor_id,
         name,
-        image_url: imageUrl,
         description,
-        price: parseInt(price) || 0,
+        price,
         size,
+
+      } = req.body;
+
+      // =====================================
+      // VALIDATION
+      // =====================================
+
+      if (!req.file) {
+
+        return res.status(400).json({
+
+          message:
+            "Error creating portfolio",
+
+          error:
+            "Harap unggah file foto portofolio.",
+
+        });
+
+      }
+
+      // =====================================
+      // FIREBASE UPLOAD
+      // =====================================
+
+      const uploadResult =
+        await firebaseService
+          .uploadPortfolioImage(
+            req.file
+          );
+
+      const imageUrl =
+        uploadResult.imageurl;
+
+      // =====================================
+      // MYSQL
+      // =====================================
+
+      const newPortfolio =
+        await portfolioModel
+          .create({
+
+            tailor_id,
+
+            name,
+
+            image_url:
+              imageUrl,
+
+            description,
+
+            price:
+              parseInt(price) || 0,
+
+            size,
+
+          });
+
+      // =====================================
+      // RESPONSE
+      // =====================================
+
+      res.status(201).json({
+
+        message:
+          "Portfolio created successfully",
+
+        data:
+          newPortfolio,
 
       });
 
-    res.status(201).json({
-      message:
-        "Portfolio created successfully",
+    } catch (error) {
 
-      data: newPortfolio,
-    });
+      console.log(error);
 
-  } catch (error) {
+      res.status(400).json({
 
-    res.status(400).json({
-      message:
-        "Error creating portfolio",
+        message:
+          "Error creating portfolio",
 
-      error: error.message,
-    });
+        error:
+          error.message,
 
-  }
+      });
+
+    }
 
 };
 
+
+// =====================================
 // GET PORTFOLIO BY ID
+// =====================================
+
 const getPortfolioById =
   async (req, res) => {
 
@@ -126,38 +210,51 @@ const getPortfolioById =
         req.params;
 
       const portfolio =
-        await portfolioModel.findById(id);
+        await portfolioModel
+          .findById(id);
 
       if (!portfolio) {
 
         return res.status(404).json({
+
           message:
             "Portfolio not found",
+
         });
 
       }
 
       res.status(200).json({
+
         message:
           "Portfolio retrieved successfully",
 
-        data: portfolio,
+        data:
+          portfolio,
+
       });
 
     } catch (error) {
 
       res.status(500).json({
+
         message:
           "Error retrieving portfolio",
 
-        error: error.message,
+        error:
+          error.message,
+
       });
 
     }
 
 };
 
+
+// =====================================
 // UPDATE PORTFOLIO
+// =====================================
+
 const updatePortfolio =
   async (req, res) => {
 
@@ -167,20 +264,25 @@ const updatePortfolio =
         req.params;
 
       const {
+
         name,
         description,
         price,
         size,
+
       } = req.body;
 
       const portfolio =
-        await portfolioModel.findById(id);
+        await portfolioModel
+          .findById(id);
 
       if (!portfolio) {
 
         return res.status(404).json({
+
           message:
             "Portfolio not found",
+
         });
 
       }
@@ -188,32 +290,56 @@ const updatePortfolio =
       let image_url =
         portfolio.image_url;
 
-      // kalau upload gambar baru
+      // =====================================
+      // UPLOAD GAMBAR BARU
+      // =====================================
+
       if (req.file) {
 
+        const uploadResult =
+          await firebaseService
+            .uploadPortfolioImage(
+              req.file
+            );
+
         image_url =
-          `http://localhost:8080/uploads/catalog/${req.file.filename}`;
+          uploadResult.imageurl;
 
       }
 
-      await portfolioModel.updateById(
-        id,
-        {
-          name,
-          image_url,
-          description,
-          price:
-            price
-              ? parseInt(price)
-              : 0,
+      // =====================================
+      // UPDATE MYSQL
+      // =====================================
 
-          size,
-        }
-      );
+      await portfolioModel
+        .updateById(
+
+          id,
+
+          {
+
+            name,
+
+            image_url,
+
+            description,
+
+            price:
+              price
+                ? parseInt(price)
+                : 0,
+
+            size,
+
+          }
+
+        );
 
       res.status(200).json({
+
         message:
           "Portfolio updated successfully",
+
       });
 
     } catch (error) {
@@ -221,17 +347,24 @@ const updatePortfolio =
       console.log(error);
 
       res.status(500).json({
+
         message:
           "Error updating portfolio",
 
-        error: error.message,
+        error:
+          error.message,
+
       });
 
     }
 
 };
 
+
+// =====================================
 // DELETE PORTFOLIO
+// =====================================
+
 const deletePortfolio =
   async (req, res) => {
 
@@ -241,33 +374,40 @@ const deletePortfolio =
         req.params;
 
       const portfolio =
-        await portfolioModel.findById(id);
+        await portfolioModel
+          .findById(id);
 
       if (!portfolio) {
 
         return res.status(404).json({
+
           message:
             "Portfolio not found",
+
         });
 
       }
 
-      await portfolioModel.deleteById(
-        id
-      );
+      await portfolioModel
+        .deleteById(id);
 
       res.status(200).json({
+
         message:
           "Portfolio deleted successfully",
+
       });
 
     } catch (error) {
 
       res.status(500).json({
+
         message:
           "Error deleting portfolio",
 
-        error: error.message,
+        error:
+          error.message,
+
       });
 
     }
@@ -275,10 +415,17 @@ const deletePortfolio =
 };
 
 module.exports = {
+
   getAllPortfolios,
+
   getPortfolioByTailorId,
+
   createPortfolio,
+
   getPortfolioById,
+
   updatePortfolio,
+
   deletePortfolio,
+
 };

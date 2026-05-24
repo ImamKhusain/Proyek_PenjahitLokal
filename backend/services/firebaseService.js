@@ -19,6 +19,14 @@ const {
 
   serverTimestamp,
 
+  limit,
+
+  doc,
+
+  updateDoc,
+
+  deleteDoc,
+
 } = require(
   "firebase/firestore"
 );
@@ -99,6 +107,10 @@ const sendMessage =
 
 };
 
+
+// =====================================
+// GET MESSAGES
+// =====================================
 
 const getMessages =
   async (bookingId) => {
@@ -275,6 +287,364 @@ const uploadPaymentProof =
 
 
 // =====================================
+// PORTFOLIO IMAGE
+// =====================================
+
+const uploadPortfolioImage =
+  async (file) => {
+
+    try {
+
+      const filename =
+
+        `portfolios/` +
+
+        `${Date.now()}-` +
+
+        `${file.originalname}`;
+
+      // STORAGE REF
+      const storageRef =
+        ref(storage, filename);
+
+      // UPLOAD FILE
+      await uploadBytes(
+        storageRef,
+        file.buffer
+      );
+
+      // GET URL
+      const imageUrl =
+        await getDownloadURL(
+          storageRef
+        );
+
+      return {
+
+        imageurl:
+          imageUrl,
+
+      };
+
+    } catch (error) {
+
+      console.log(error);
+
+      throw error;
+
+    }
+
+};
+
+
+// =====================================
+// TAILOR IMAGE
+// =====================================
+
+const uploadTailorImage =
+  async (file) => {
+
+    try {
+
+      const filename =
+
+        `tailors/` +
+
+        `${Date.now()}-` +
+
+        `${file.originalname}`;
+
+      // STORAGE REF
+      const storageRef =
+        ref(storage, filename);
+
+      // UPLOAD FILE
+      await uploadBytes(
+        storageRef,
+        file.buffer
+      );
+
+      // GET URL
+      const imageUrl =
+        await getDownloadURL(
+          storageRef
+        );
+
+      return {
+
+        imageurl:
+          imageUrl,
+
+      };
+
+    } catch (error) {
+
+      console.log(error);
+
+      throw error;
+
+    }
+
+};
+
+
+// =====================================
+// CREATE RATING
+// =====================================
+
+const createRating =
+  async (ratingData) => {
+
+    try {
+
+      const ratingDoc =
+        await addDoc(
+
+          collection(
+            db,
+            "ratings"
+          ),
+
+          {
+
+            ...ratingData,
+
+            created_at:
+              serverTimestamp(),
+
+          }
+
+        );
+
+      return {
+
+        id:
+          ratingDoc.id,
+
+        ...ratingData,
+
+      };
+
+    } catch (error) {
+
+      console.log(error);
+
+      throw error;
+
+    }
+
+};
+
+
+// =====================================
+// GET ALL RATINGS
+// =====================================
+
+const getAllRatings =
+  async () => {
+
+    try {
+
+      const snapshot =
+        await getDocs(
+
+          collection(
+            db,
+            "ratings"
+          )
+
+        );
+
+      return snapshot.docs.map(
+        (doc) => ({
+
+          id: doc.id,
+
+          ...doc.data(),
+
+        })
+      );
+
+    } catch (error) {
+
+      console.log(error);
+
+      throw error;
+
+    }
+
+};
+
+
+// =====================================
+// GET RATINGS BY TAILOR
+// =====================================
+
+const getRatingsByTailor =
+  async (tailorId) => {
+
+    try {
+
+      const q = query(
+
+        collection(
+          db,
+          "ratings"
+        ),
+
+        where(
+          "tailor_id",
+          "==",
+          tailorId
+        )
+
+      );
+
+      const snapshot =
+        await getDocs(q);
+
+      return snapshot.docs.map(
+        (doc) => ({
+
+          id: doc.id,
+
+          ...doc.data(),
+
+        })
+      );
+
+    } catch (error) {
+
+      console.log(error);
+
+      throw error;
+
+    }
+
+};
+
+
+// =====================================
+// CHECK EXISTING RATING
+// =====================================
+
+const checkExistingRating =
+  async (
+
+    customer_id,
+
+    tailor_id
+
+  ) => {
+
+    try {
+
+      const q = query(
+
+        collection(
+          db,
+          "ratings"
+        ),
+
+        where(
+          "customer_id",
+          "==",
+          Number(customer_id)
+        ),
+
+        where(
+          "tailor_id",
+          "==",
+          Number(tailor_id)
+        ),
+
+        limit(1)
+
+      );
+
+      const snapshot =
+        await getDocs(q);
+
+      return !snapshot.empty;
+
+    } catch (error) {
+
+      console.log(error);
+
+      throw error;
+
+    }
+
+};
+
+
+// =====================================
+// UPDATE RATING
+// =====================================
+
+const updateRating =
+  async (
+    id,
+    ratingData
+  ) => {
+
+    try {
+
+      const ratingRef =
+        doc(
+          db,
+          "ratings",
+          id
+        );
+
+      await updateDoc(
+        ratingRef,
+        ratingData
+      );
+
+    } catch (error) {
+
+      console.log(error);
+
+      throw error;
+
+    }
+
+};
+
+
+// =====================================
+// DELETE RATING
+// =====================================
+
+const deleteRating =
+  async (id) => {
+
+    try {
+
+      const ratingRef =
+        doc(
+          db,
+          "ratings",
+          id
+        );
+
+      await deleteDoc(
+        ratingRef
+      );
+
+    } catch (error) {
+
+      console.log(error);
+
+      throw error;
+
+    }
+
+};
+
+
+// =====================================
 // SAVE PAYMENT TO FIRESTORE
 // =====================================
 
@@ -362,6 +732,22 @@ module.exports = {
   addProgress,
 
   uploadPaymentProof,
+
+  uploadPortfolioImage,
+
+  uploadTailorImage,
+
+  createRating,
+
+  getAllRatings,
+
+  getRatingsByTailor,
+
+  checkExistingRating,
+
+  updateRating,
+
+  deleteRating,
 
   savePaymentToFirestore,
 

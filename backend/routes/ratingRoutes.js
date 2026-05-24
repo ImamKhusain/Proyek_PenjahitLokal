@@ -1,44 +1,92 @@
-const express = require("express");
+const express =
+  require("express");
 
-const router = express.Router();
+const router =
+  express.Router();
 
 const {
+
   getAllRatings,
+
   createRating,
-  getRatingById,
+
+  getRatingsByTailor,
+
   updateRating,
+
   deleteRating,
-} = require("../controllers/ratingController");
 
-const authMiddleware = require("../middleware/authMiddleware");
-const adminMiddleware = require("../middleware/adminMiddleware");
+} = require(
+  "../controllers/ratingController"
+);
 
+const authMiddleware =
+  require("../middleware/authMiddleware");
+
+
+// =====================================
 // GET ALL RATINGS
-router.get("/", getAllRatings);
+// =====================================
 
-// GET RATING BY ID
-router.get("/:id", authMiddleware, getRatingById);
-
-// CREATE RATING
-router.post(
+router.get(
   "/",
+  getAllRatings
+);
+
+
+// =====================================
+// GET BY TAILOR
+// =====================================
+
+router.get(
+  "/tailor/:tailorId",
+  getRatingsByTailor
+);
+
+
+// =====================================
+// CREATE RATING
+// =====================================
+
+router.post(
+
+  "/",
+
   authMiddleware,
+
   createRating
+
 );
 
+
+// =====================================
 // UPDATE RATING
+// =====================================
+
 router.put(
+
   "/:id",
+
   authMiddleware,
+
   updateRating
+
 );
 
+
+// =====================================
 // DELETE RATING
+// =====================================
+
 router.delete(
+
   "/:id",
+
   authMiddleware,
-  adminMiddleware,
+
   deleteRating
+
 );
 
-module.exports = router;
+module.exports =
+  router;

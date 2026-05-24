@@ -254,6 +254,25 @@ const Navbar = ({
           </button>
 
 
+          {/* PEMASUKAN */}
+
+          <button
+            className="menu-btn"
+
+            onClick={() =>
+              navigate(
+                "/income"
+              )
+            }
+          >
+
+            {isSidebarOpen
+              ? "Pemasukan"
+              : "PM"}
+
+          </button>
+
+
           {/* PORTFOLIO */}
 
           <button

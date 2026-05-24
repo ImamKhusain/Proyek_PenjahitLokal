@@ -27,12 +27,11 @@ import {
   query,
   where,
   onSnapshot,
+  getDocs,
 } from "firebase/firestore";
 
 import db from "../services/firebaseService";
 
-const BASE_URL_BACKEND =
-  "http://localhost:8080/uploads/";
 
 const Dashboard = () => {
 
@@ -92,38 +91,115 @@ const Dashboard = () => {
   }, [user]);
 
 
-  const fetchData =
-    async () => {
+const fetchData =
+  async () => {
 
-      try {
+    try {
 
-        const responseData =
-          await getMyTailor();
+      const responseData =
+        await getMyTailor();
 
-        const actualTailorData =
-          responseData.data
-            ? responseData.data
-            : responseData;
+      const actualTailorData =
+        responseData.data
+          ? responseData.data
+          : responseData;
 
-        if (
-          Array.isArray(
-            actualTailorData
+      // =====================================
+      // AMBIL SEMUA RATING FIRESTORE
+      // =====================================
+
+      const ratingSnapshot =
+        await getDocs(
+
+          collection(
+            db,
+            "ratings"
           )
-        ) {
 
-          setTailors(
-            actualTailorData
-          );
+        );
 
-        }
+      const ratings =
+        ratingSnapshot.docs.map(
+          (doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          })
+        );
 
-      } catch (error) {
+      // =====================================
+      // GABUNGKAN RATING KE TAILOR
+      // =====================================
 
-        console.log(error);
+      const tailorWithRatings =
 
-      }
+        actualTailorData.map(
+          (tailor) => {
 
-    };
+            const tailorRatings =
+
+              ratings.filter(
+                (item) =>
+
+                  Number(
+                    item.tailor_id
+                  ) ===
+                  Number(
+                    tailor.id
+                  )
+              );
+
+            const totalReviews =
+              tailorRatings.length;
+
+            const averageRating =
+
+              totalReviews > 0
+
+                ? (
+
+                    tailorRatings.reduce(
+
+                      (acc, item) =>
+
+                        acc +
+                        Number(
+                          item.rating
+                        ),
+
+                      0
+
+                    ) / totalReviews
+
+                  ).toFixed(1)
+
+                : 0;
+
+            return {
+
+              ...tailor,
+
+              rating:
+                averageRating,
+
+              total_reviews:
+                totalReviews,
+
+            };
+
+          }
+        );
+
+      setTailors(
+        tailorWithRatings
+      );
+
+    } catch (error) {
+
+      console.log(error);
+
+    }
+
+  };
 
 
   // =========================
@@ -710,10 +786,19 @@ const Dashboard = () => {
                   index
                 ) => {
 
-                  const imageUrl =
-                    tailor.photo
+                  // =====================================
+                  // FIREBASE IMAGE URL
+                  // =====================================
 
-                      ? `${BASE_URL_BACKEND}${tailor.photo}`
+                  const imageUrl =
+
+                    tailor.photo &&
+
+                    tailor.photo !== "NULL" &&
+
+                    tailor.photo !== ""
+
+                      ? tailor.photo
 
                       : "https://via.placeholder.com/50";
 
@@ -762,10 +847,22 @@ const Dashboard = () => {
                         }}
                       >
 
+                        {/* FOTO */}
+
                         <img
                           src={imageUrl}
 
                           alt="tailor"
+
+                          onError={(e) => {
+
+                            e.target.onerror =
+                              null;
+
+                            e.target.src =
+                              "https://via.placeholder.com/50";
+
+                          }}
 
                           style={{
 
@@ -783,7 +880,11 @@ const Dashboard = () => {
                           }}
                         />
 
+                        {/* INFO */}
+
                         <div>
+
+                          {/* NAMA */}
 
                           <div
                             style={{
@@ -792,10 +893,10 @@ const Dashboard = () => {
                                 "700",
 
                               fontSize:
-                                "14px",
+                                "15px",
 
                               marginBottom:
-                                "4px",
+                                "6px",
 
                               color:
                                 "#111827",
@@ -807,6 +908,74 @@ const Dashboard = () => {
 
                           </div>
 
+
+                          {/* RATING */}
+
+                          <div
+                            style={{
+
+                              display:
+                                "flex",
+
+                              alignItems:
+                                "center",
+
+                              gap: "6px",
+
+                              marginBottom:
+                                "10px",
+
+                              fontSize:
+                                "13px",
+
+                              color:
+                                "#6b7280",
+
+                              fontWeight:
+                                "600",
+
+                            }}
+                          >
+
+                            <span
+                              style={{
+                                color:
+                                  "#f59e0b",
+                              }}
+                            >
+                              ⭐
+                            </span>
+
+                            <span>
+
+                              {parseFloat(
+                                tailor.rating || 0
+                              ).toFixed(1)}
+
+                            </span>
+
+                            <span
+                              style={{
+                                color:
+                                  "#9ca3af",
+                              }}
+                            >
+
+                              (
+                              {" "}
+
+                              {tailor.total_reviews || 0}
+
+                              {" "}
+                              Review
+                              )
+
+                            </span>
+
+                          </div>
+
+
+                          {/* BUTTON */}
 
                           <div
 
@@ -829,7 +998,7 @@ const Dashboard = () => {
                               gap: "6px",
 
                               marginTop:
-                                "6px",
+                                "2px",
 
                               padding:
                                 "6px 12px",

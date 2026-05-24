@@ -42,6 +42,8 @@ import BookingPage from "../pages/BookingPage";
 
 import AdminPayments from "../pages/AdminPayments";
 
+import IncomePage from "../pages/IncomePage";
+
 const AppRoutes = () => {
 
   const {
@@ -103,6 +105,18 @@ const AppRoutes = () => {
             )
           }
         />
+
+        {/* INCOME */}
+<Route
+  path="/income"
+  element={
+    user ? (
+      <IncomePage />
+    ) : (
+      <Login />
+    )
+  }
+/>
 
         {/* NOTIFICATIONS */}
         <Route

@@ -1,197 +1,556 @@
-/* Container Utama Halaman Detail Tailor */
+/* =========================================
+   CONTAINER UTAMA
+========================================= */
+
 .tailor-detail-page {
-  /* 💡 Kunci Utama agar tidak menabrak Navbar: Jarak atas diset 140px */
-  padding: 140px 40px 40px 40px; 
+
+  padding: 140px 40px 40px 40px;
+
   background-color: #ffffff;
+
   min-height: 100vh;
+
   font-family: sans-serif;
+
   box-sizing: border-box;
+
 }
 
-/* Tombol Kembali ke Daftar */
+
+/* =========================================
+   BUTTON BACK
+========================================= */
+
 .back-to-list-btn {
+
   margin-bottom: 30px;
+
   padding: 8px 16px;
+
   background-color: #f0f0f0;
+
   border: none;
+
   border-radius: 6px;
+
   cursor: pointer;
+
   font-weight: bold;
+
   color: #555555;
+
   transition: background-color 0.2s ease;
+
 }
 
 .back-to-list-btn:hover {
+
   background-color: #e2e8f0;
+
 }
 
-/* Struktur Layout Utama (Grid Fleksibel) */
+
+/* =========================================
+   LAYOUT
+========================================= */
+
 .detail-layout-grid {
+
   display: flex;
+
   gap: 50px;
+
   align-items: flex-start;
+
   flex-wrap: wrap;
+
 }
 
-/* Kolom Kiri: Container Foto Utama */
+
+/* =========================================
+   FOTO
+========================================= */
+
 .detail-photo-column {
+
   flex: 1;
+
   min-width: 300px;
+
   max-width: 450px;
+
 }
 
 .detail-main-img {
+
   width: 100%;
+
   height: auto;
+
   max-height: 450px;
+
   object-fit: cover;
+
   border-radius: 16px;
-  box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.05);
+
+  box-shadow:
+    0px 8px 24px
+    rgba(0, 0, 0, 0.05);
+
 }
 
-/* Kolom Kanan: Detail Informasi */
+
+/* =========================================
+   INFO KANAN
+========================================= */
+
 .detail-info-column {
+
   flex: 1.5;
+
   min-width: 350px;
+
   display: flex;
+
   flex-direction: column;
+
   gap: 20px;
+
 }
 
-/* Nama Vendor */
+
+/* =========================================
+   NAMA
+========================================= */
+
 .detail-vendor-name {
+
   margin: 0;
+
   font-size: 32px;
+
   font-weight: 800;
+
   color: #111111;
+
 }
 
-/* Baris Rating & Jumlah Pemesanan */
+
+/* =========================================
+   RATING ROW
+========================================= */
+
 .detail-rating-row {
+
   display: flex;
+
   align-items: center;
+
   gap: 8px;
+
   font-size: 16px;
+
   font-weight: bold;
+
   color: #444444;
+
 }
 
 .detail-star-icon {
+
   color: #f59e0b;
+
   font-size: 20px;
+
 }
 
 .detail-order-count {
+
   color: #888888;
+
   font-weight: normal;
+
   font-size: 14px;
+
   margin-left: 5px;
+
 }
 
-/* Baris Utama Tombol Aksi */
+
+/* =========================================
+   ACTION BUTTONS
+========================================= */
+
 .detail-actions-row {
+
   display: flex;
+
   align-items: center;
+
   gap: 12px;
+
   margin-top: 10px;
+
 }
 
-/* Tombol Favorit / Simpan */
+
+/* =========================================
+   BUTTON FAVORITE / RATING
+========================================= */
+
 .action-fav-btn {
+
   padding: 10px 14px;
-  background-color: #e2e8f0;
-  border: none;
+
+  background-color: #ffffff;
+
+  border: 1px solid #d1d5db;
+
   border-radius: 8px;
+
   cursor: pointer;
+
   font-size: 18px;
-  transition: background-color 0.2s ease;
+
+  transition: all 0.2s ease;
+
 }
 
 .action-fav-btn:hover {
-  background-color: #cbd5e1;
+
+  background-color: #f3f4f6;
+
 }
 
-/* Tombol Chat Kontak WhatsApp */
+
+/* =========================================
+   ACTIVE BUTTON RATING
+========================================= */
+
+.active-rating-btn {
+
+  background-color: #a61c1c !important;
+
+  border-color: #a61c1c !important;
+
+  color: white !important;
+
+}
+
+
+/* =========================================
+   BUTTON CHAT
+========================================= */
+
 .action-chat-btn {
+
   display: flex;
+
   align-items: center;
+
   gap: 8px;
+
   padding: 10px 24px;
+
   background-color: #ffffff;
+
   color: #333333;
+
   border: 1px solid #cccccc;
+
   border-radius: 8px;
+
   cursor: pointer;
+
   font-weight: bold;
+
   font-size: 14px;
+
   transition: background-color 0.2s ease;
+
 }
 
 .action-chat-btn:hover {
+
   background-color: #f8fafc;
+
 }
 
-/* Tombol Akses Katalog Pakaian (Merah Maroon) */
+
+/* =========================================
+   BUTTON KATALOG
+========================================= */
+
 .action-catalog-btn {
+
   padding: 11px 32px;
+
   background-color: #a61c1c;
+
   color: white;
+
   border: none;
+
   border-radius: 8px;
+
   cursor: pointer;
+
   font-weight: bold;
+
   font-size: 14px;
-  box-shadow: 0 4px 12px rgba(166, 28, 28, 0.2);
+
+  box-shadow:
+    0 4px 12px
+    rgba(166, 28, 28, 0.2);
+
   transition: background-color 0.2s ease;
+
 }
 
 .action-catalog-btn:hover {
+
   background-color: #851414;
+
 }
 
-/* Garis Pembatas Horisontal */
+
+/* =========================================
+   DIVIDER
+========================================= */
+
 .detail-divider-line {
+
   border: none;
+
   border-top: 1px solid #eeeeee;
+
   margin: 10px 0;
+
 }
 
-/* Judul Bagian Deskripsi */
+
+/* =========================================
+   SECTION TITLE
+========================================= */
+
 .detail-section-title {
+
   margin: 0 0 10px 0;
+
   font-size: 18px;
+
   font-weight: bold;
+
   color: #222222;
+
 }
 
-/* Teks Deskripsi */
+
+/* =========================================
+   DESCRIPTION
+========================================= */
+
 .detail-description-text {
+
   margin: 0;
+
   color: #555555;
+
   line-height: 1.6;
+
   font-size: 15px;
+
 }
 
-/* Box Informasi Tambahan Database */
+
+/* =========================================
+   DATABASE BOX
+========================================= */
+
 .detail-database-box {
+
   background-color: #f9f9f9;
+
   padding: 20px;
-  /* borderRadius: 12px; */
+
   display: flex;
+
   flex-direction: column;
+
   gap: 10px;
+
   font-size: 14px;
+
   color: #444444;
+
   border-radius: 12px;
+
 }
 
 .detail-database-box p {
+
   margin: 0;
+
 }
 
-/* State Loading & Error */
+
+/* =========================================
+   LOADING
+========================================= */
+
 .tailor-detail-state {
+
   padding: 50px;
+
   text-align: center;
+
   font-family: sans-serif;
+
+}
+
+
+/* =========================================
+   REVIEW SECTION
+========================================= */
+
+.review-section {
+
+  margin-top: 20px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 15px;
+
+}
+
+
+/* =========================================
+   REVIEW CARD
+========================================= */
+
+.review-card {
+
+  background-color: #ffffff;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 12px;
+
+  padding: 16px;
+
+  box-shadow:
+    0 2px 8px
+    rgba(0,0,0,0.04);
+
+}
+
+
+/* =========================================
+   REVIEW NAME
+========================================= */
+
+.review-name {
+
+  font-weight: bold;
+
+  color: #111827;
+
+  margin-bottom: 6px;
+
+}
+
+
+/* =========================================
+   REVIEW TEXT
+========================================= */
+
+.review-text {
+
+  color: #4b5563;
+
+  line-height: 1.5;
+
+}
+
+
+/* =========================================
+   RATING FORM
+========================================= */
+
+.rating-form {
+
+  margin-top: 20px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 12px;
+
+}
+
+
+/* =========================================
+   TEXTAREA
+========================================= */
+
+.rating-textarea {
+
+  width: 100%;
+
+  min-height: 120px;
+
+  border: 1px solid #d1d5db;
+
+  border-radius: 10px;
+
+  padding: 14px;
+
+  font-size: 14px;
+
+  resize: none;
+
+  outline: none;
+
+}
+
+.rating-textarea:focus {
+
+  border-color: #a61c1c;
+
+}
+
+
+/* =========================================
+   SUBMIT BUTTON
+========================================= */
+
+.submit-rating-btn {
+
+  width: fit-content;
+
+  padding: 10px 24px;
+
+  background-color: #a61c1c;
+
+  color: white;
+
+  border: none;
+
+  border-radius: 8px;
+
+  font-weight: bold;
+
+  cursor: pointer;
+
+  transition: background-color 0.2s ease;
+
+}
+
+.submit-rating-btn:hover {
+
+  background-color: #851414;
+
 }

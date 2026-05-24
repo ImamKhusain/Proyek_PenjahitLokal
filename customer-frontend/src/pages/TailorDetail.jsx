@@ -1,48 +1,112 @@
-  import { useEffect, useState, useContext } from "react";
-  import { useParams, useNavigate } from "react-router-dom";
-  import axios from "axios";
+import {
+  useEffect,
+  useState,
+  useContext,
+} from "react";
 
-  import { AuthContext } from "../context/AuthContext";
+import {
+  useParams,
+  useNavigate,
+} from "react-router-dom";
 
-  // 💡 IMPORT FILE CSS BARU
-  import "./TailorDetail.css";
+import axios from "axios";
 
-  // URL Folder Statis Backend Port 8080
-  const BASE_URL_BACKEND = "http://localhost:8080/uploads/";
+import toast, {
+  Toaster,
+} from "react-hot-toast";
 
-  const TailorDetail = () => {
+import {
+  AuthContext,
+} from "../context/AuthContext";
 
-    // AUTH USER
-    const { user } = useContext(AuthContext);
+import "./TailorDetail.css";
 
-    const { id } = useParams();
+const TailorDetail = () => {
 
-    const navigate = useNavigate();
+  // =====================================
+  // AUTH USER
+  // =====================================
 
-    const [tailor, setTailor] = useState(null);
+  const {
+    user,
+  } = useContext(
+    AuthContext
+  );
 
-    const [loading, setLoading] = useState(true);
+  const { id } =
+    useParams();
+
+  const navigate =
+    useNavigate();
+
+  const [tailor, setTailor] =
+    useState(null);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  // =====================================
+  // RATING
+  // =====================================
+
+  const [ratings, setRatings] =
+    useState([]);
+
+  const [ratingValue, setRatingValue] =
+    useState(5);
+
+  const [review, setReview] =
+    useState("");
+
+  const [isSubmitting, setIsSubmitting] =
+    useState(false);
+
+  // =====================================
+  // SHOW / HIDE
+  // =====================================
+
+  const [showRatingForm, setShowRatingForm] =
+    useState(false);
+
+  const [showReviews, setShowReviews] =
+    useState(false);
 
 
-    // =========================
-    // FETCH DETAIL TAILOR
-    // =========================
+  // =====================================
+  // FETCH DETAIL TAILOR
+  // =====================================
 
-    useEffect(() => {
-      fetchTailorDetail();
-    }, [id]);
+  useEffect(() => {
 
-    const fetchTailorDetail = async () => {
+    fetchTailorDetail();
+
+    fetchRatings();
+
+  }, [id]);
+
+
+  // =====================================
+  // FETCH DETAIL
+  // =====================================
+
+  const fetchTailorDetail =
+    async () => {
 
       try {
 
-        const response = await axios.get(
-          `http://localhost:8080/api/tailors/${id}`
-        );
+        const response =
+          await axios.get(
+
+            `http://localhost:8080/api/tailors/${id}`
+
+          );
 
         const actualData =
+
           response.data.data
+
             ? response.data.data
+
             : response.data;
 
         setTailor(actualData);
@@ -59,241 +123,691 @@
         setLoading(false);
 
       }
+
     };
 
 
-    // =========================
-    // HANDLE CHAT
-    // =========================
+  // =====================================
+  // FETCH RATINGS
+  // =====================================
 
-const handleChat = () => {
+  const fetchRatings =
+    async () => {
 
-  const roomId =
-    `room_${user.id}_${tailor.id}`;
+      try {
 
-  navigate(`/chat/${roomId}`, {
-    state: {
-      tailor,
-    },
-  });
+        const response =
+          await axios.get(
 
-};
+            `http://localhost:8080/api/ratings/tailor/${id}`
+
+          );
+
+        const actualData =
+
+          response.data.data
+
+            ? response.data.data
+
+            : response.data;
+
+        setRatings(actualData);
+
+      } catch (error) {
+
+        console.log(error);
+
+      }
+
+    };
 
 
-    // =========================
-    // LOADING
-    // =========================
+  // =====================================
+  // SUBMIT RATING
+  // =====================================
 
-    if (loading) {
+  const handleSubmitRating =
+    async () => {
 
-      return (
-        <div className="tailor-detail-state">
-          Memuat detail penjahit...
-        </div>
+      try {
+
+        setIsSubmitting(true);
+
+        const token =
+          localStorage.getItem(
+            "token"
+          );
+
+        await axios.post(
+
+          "http://localhost:8080/api/ratings",
+
+          {
+
+            tailor_id:
+              Number(id),
+
+            rating:
+              Number(
+                ratingValue
+              ),
+
+            review,
+
+          },
+
+          {
+
+            headers: {
+
+              Authorization:
+                `Bearer ${token}`,
+
+            },
+
+          }
+
+        );
+
+        // RESET FORM
+
+        setReview("");
+
+        setRatingValue(5);
+
+        // REFRESH RATINGS
+
+        fetchRatings();
+
+        // CLOSE FORM
+
+        setShowRatingForm(false);
+
+        // SUCCESS TOAST
+
+        toast.success(
+          "Review berhasil dikirim"
+        );
+
+      } catch (error) {
+
+        console.log(error);
+
+        // =====================================
+        // ERROR TOAST
+        // =====================================
+
+        if (
+
+          error.response &&
+
+          error.response.data &&
+
+          error.response.data.message
+
+        ) {
+
+          toast.error(
+            error.response.data.message
+          );
+
+        } else {
+
+          toast.error(
+            "Gagal memberi review"
+          );
+
+        }
+
+      } finally {
+
+        setIsSubmitting(false);
+
+      }
+
+    };
+
+
+  // =====================================
+  // HANDLE CHAT
+  // =====================================
+
+  const handleChat =
+    () => {
+
+      const roomId =
+        `room_${user.id}_${tailor.id}`;
+
+      navigate(
+
+        `/chat/${roomId}`,
+
+        {
+
+          state: {
+            tailor,
+          },
+
+        }
+
       );
 
-    }
+    };
 
 
-    // =========================
-    // NOT FOUND
-    // =========================
+  // =====================================
+  // LOADING
+  // =====================================
 
-    if (!tailor) {
-
-      return (
-        <div className="tailor-detail-state">
-          Data penjahit tidak ditemukan.
-        </div>
-      );
-
-    }
-
-
-    // =========================
-    // IMAGE PROCESS
-    // =========================
-
-    const hasPhoto =
-      tailor.photo &&
-      tailor.photo !== "NULL" &&
-      tailor.photo !== "";
-
-    const safePhotoName =
-      hasPhoto
-        ? encodeURIComponent(tailor.photo)
-        : "";
-
-    const imageUrl =
-      hasPhoto
-        ? `${BASE_URL_BACKEND}${safePhotoName}`
-        : "https://placehold.co/500x500?text=No+Photo";
-
-
-    // =========================
-    // RENDER
-    // =========================
+  if (loading) {
 
     return (
 
-      <div className="tailor-detail-page">
+      <div className="tailor-detail-state">
 
-        {/* TOMBOL KEMBALI */}
+        Memuat detail penjahit...
 
-        <button
-          onClick={() => navigate("/home")}
-          className="back-to-list-btn"
-        >
-          ← Kembali ke Daftar
-        </button>
+      </div>
+
+    );
+
+  }
 
 
-        {/* GRID LAYOUT */}
+  // =====================================
+  // NOT FOUND
+  // =====================================
 
-        <div className="detail-layout-grid">
+  if (!tailor) {
 
-          {/* FOTO */}
+    return (
 
-          <div className="detail-photo-column">
+      <div className="tailor-detail-state">
 
-            <img
-              src={imageUrl}
-              alt={tailor.name}
-              className="detail-main-img"
-              onError={(e) => {
+        Data penjahit tidak ditemukan.
 
-                e.target.onerror = null;
+      </div>
 
-                e.target.src =
-                  "https://placehold.co/500x500?text=No+Photo";
-              }}
-            />
+    );
+
+  }
+
+
+  // =====================================
+  // FIREBASE IMAGE
+  // =====================================
+
+  const hasPhoto =
+
+    tailor.photo &&
+
+    tailor.photo !== "NULL" &&
+
+    tailor.photo !== "";
+
+  const imageUrl =
+
+    hasPhoto
+
+      ? tailor.photo
+
+      : "https://placehold.co/500x500?text=No+Photo";
+
+
+  // =====================================
+  // AVERAGE RATING
+  // =====================================
+
+  const averageRating =
+
+    ratings.length > 0
+
+      ? (
+
+          ratings.reduce(
+
+            (acc, item) =>
+
+              acc + Number(item.rating),
+
+            0
+
+          ) / ratings.length
+
+        ).toFixed(1)
+
+      : "0.0";
+
+
+  // =====================================
+  // RENDER
+  // =====================================
+
+  return (
+
+    <div className="tailor-detail-page">
+
+      {/* TOASTER */}
+
+      <Toaster
+
+        position="top-center"
+
+        toastOptions={{
+
+          style: {
+
+            background: "#111827",
+
+            color: "#ffffff",
+
+            borderRadius: "12px",
+
+            padding: "14px 18px",
+
+            fontSize: "14px",
+
+            fontWeight: "500",
+
+          },
+
+          success: {
+
+            style: {
+
+              background: "#16a34a",
+
+            },
+
+          },
+
+          error: {
+
+            style: {
+
+              background: "#dc2626",
+
+            },
+
+          },
+
+        }}
+      />
+
+
+      {/* BACK */}
+
+      <button
+
+        onClick={() =>
+          navigate("/home")
+        }
+
+        className="back-to-list-btn"
+      >
+        ← Kembali ke Daftar
+      </button>
+
+
+      {/* GRID */}
+
+      <div className="detail-layout-grid">
+
+        {/* FOTO */}
+
+        <div className="detail-photo-column">
+
+          <img
+
+            src={imageUrl}
+
+            alt={tailor.name}
+
+            className="detail-main-img"
+
+            onError={(e) => {
+
+              e.target.onerror =
+                null;
+
+              e.target.src =
+                "https://placehold.co/500x500?text=No+Photo";
+
+            }}
+
+          />
+
+        </div>
+
+
+        {/* INFO */}
+
+        <div className="detail-info-column">
+
+          {/* NAMA */}
+
+          <h1 className="detail-vendor-name">
+
+            {tailor.name}
+
+          </h1>
+
+
+          {/* RATING */}
+
+          <div className="detail-rating-row">
+
+            <span className="detail-star-icon">
+              ⭐
+            </span>
+
+            <span>
+              {averageRating}
+            </span>
+
+            <span className="detail-order-count">
+
+              • {ratings.length} Review
+
+            </span>
+
+          </div>
+
+
+          {/* ACTION */}
+
+          <div className="detail-actions-row">
+
+            {/* BUTTON RATING */}
+
+            <button
+
+              onClick={() =>
+
+                setShowRatingForm(
+                  !showRatingForm
+                )
+
+              }
+
+              className={
+
+                showRatingForm
+
+                  ? "action-fav-btn active-rating-btn"
+
+                  : "action-fav-btn"
+
+              }
+            >
+              ⭐
+            </button>
+
+            {/* CHAT */}
+
+            <button
+
+              onClick={handleChat}
+
+              className="action-chat-btn"
+            >
+              💬 Chat
+            </button>
+
+            {/* KATALOG */}
+
+            <button
+
+              onClick={() =>
+
+                navigate(
+                  `/portfolio-katalog/${tailor.id}`
+                )
+
+              }
+
+              className="action-catalog-btn"
+            >
+              Katalog
+            </button>
+
+          </div>
+
+
+          <hr className="detail-divider-line" />
+
+
+          {/* DESKRIPSI */}
+
+          <div>
+
+            <h3 className="detail-section-title">
+
+              Produk Detail & Profil
+
+            </h3>
+
+            <p className="detail-description-text">
+
+              {tailor.description ||
+
+                "Belum ada deskripsi profil dari penjahit ini."}
+
+            </p>
 
           </div>
 
 
           {/* INFO */}
 
-          <div className="detail-info-column">
+          <div className="detail-database-box">
 
-            {/* NAMA */}
+            <p>
 
-            <h1 className="detail-vendor-name">
-              {tailor.name}
-            </h1>
+              <strong>
+                ✨ Spesialisasi Jahit:
+              </strong>{" "}
 
+              {tailor.specialization || "-"}
 
-            {/* RATING */}
+            </p>
 
-            <div className="detail-rating-row">
+            <p>
 
-              <span className="detail-star-icon">
-                ⭐
-              </span>
+              <strong>
+                📍 Alamat Workshop:
+              </strong>{" "}
 
-              <span>
-                {parseFloat(
-                  tailor.rating || 0
-                ).toFixed(1)}
-              </span>
+              {tailor.address || "-"}
 
-              <span className="detail-order-count">
-                • 100+ Pemesanan
-              </span>
+            </p>
 
-            </div>
+            <p>
 
+              <strong>
+                📞 No. HP / WhatsApp:
+              </strong>{" "}
 
-            {/* ACTION BUTTON */}
+              {tailor.phone || "-"}
 
-            <div className="detail-actions-row">
-
-              {/* FAVORITE */}
-
-              <button className="action-fav-btn">
-                ⭐
-              </button>
-
-
-              {/* CHAT */}
-
-              <button
-                onClick={handleChat}
-                className="action-chat-btn"
-              >
-                💬 Chat
-              </button>
-
-
-              {/* KATALOG */}
-
-              <button
-                onClick={() =>
-                  navigate(
-                    `/portfolio-katalog/${tailor.id}`
-                  )
-                }
-                className="action-catalog-btn"
-              >
-                Katalog
-              </button>
-
-            </div>
-
-
-            {/* DIVIDER */}
-
-            <hr className="detail-divider-line" />
-
-
-            {/* DESKRIPSI */}
-
-            <div>
-
-              <h3 className="detail-section-title">
-                Produk Detail & Profil
-              </h3>
-
-              <p className="detail-description-text">
-                {tailor.description ||
-                  "Belum ada deskripsi profil dari penjahit ini."}
-              </p>
-
-            </div>
-
-
-            {/* INFO DATABASE */}
-
-            <div className="detail-database-box">
-
-              <p>
-                <strong>
-                  ✨ Spesialisasi Jahit:
-                </strong>{" "}
-                {tailor.specialization || "-"}
-              </p>
-
-              <p>
-                <strong>
-                  📍 Alamat Workshop:
-                </strong>{" "}
-                {tailor.address || "-"}
-              </p>
-
-              <p>
-                <strong>
-                  📞 No. HP / WhatsApp:
-                </strong>{" "}
-                {tailor.phone || "-"}
-              </p>
-
-            </div>
+            </p>
 
           </div>
+
+
+          {/* BUTTON REVIEW */}
+
+          <div
+            style={{
+              marginTop: "30px",
+            }}
+          >
+
+            <button
+
+              onClick={() =>
+
+                setShowReviews(
+                  !showReviews
+                )
+
+              }
+
+              className="action-chat-btn"
+            >
+              💬 Lihat Review
+            </button>
+
+          </div>
+
+
+          {/* FORM RATING */}
+
+          {showRatingForm && (
+
+            <div
+              className="rating-form"
+            >
+
+              <select
+
+                value={ratingValue}
+
+                onChange={(e) =>
+
+                  setRatingValue(
+                    e.target.value
+                  )
+
+                }
+
+              >
+
+                <option value={5}>
+                  ⭐⭐⭐⭐⭐
+                </option>
+
+                <option value={4}>
+                  ⭐⭐⭐⭐
+                </option>
+
+                <option value={3}>
+                  ⭐⭐⭐
+                </option>
+
+                <option value={2}>
+                  ⭐⭐
+                </option>
+
+                <option value={1}>
+                  ⭐
+                </option>
+
+              </select>
+
+              <textarea
+
+                value={review}
+
+                onChange={(e) =>
+
+                  setReview(
+                    e.target.value
+                  )
+
+                }
+
+                placeholder="Tulis review..."
+
+                className="rating-textarea"
+
+              />
+
+              <button
+
+                onClick={
+                  handleSubmitRating
+                }
+
+                disabled={
+                  isSubmitting
+                }
+
+                className="submit-rating-btn"
+
+              >
+
+                {isSubmitting
+                  ? "Mengirim..."
+                  : "Kirim Rating"}
+
+              </button>
+
+            </div>
+
+          )}
+
+
+          {/* REVIEW CUSTOMER */}
+
+          {showReviews && (
+
+            <div
+              className="review-section"
+            >
+
+              <h3>
+                Review Customer
+              </h3>
+
+              {ratings.length > 0 ? (
+
+                ratings.map(
+                  (item) => (
+
+                    <div
+                      key={item.id}
+
+                      className="review-card"
+                    >
+
+                      <div className="review-name">
+
+                        ⭐ {item.rating}
+
+                      </div>
+
+                      <div className="review-text">
+
+                        {item.review}
+
+                      </div>
+
+                    </div>
+
+                  )
+                )
+
+              ) : (
+
+                <p>
+                  Belum ada review.
+                </p>
+
+              )}
+
+            </div>
+
+          )}
+
         </div>
 
       </div>
-    );
-  };
 
-  export default TailorDetail;
+    </div>
+
+  );
+
+};
+
+export default TailorDetail;

@@ -91,7 +91,7 @@ const Home = () => {
 
 
   // =========================
-  // FETCH TAILORS
+  // FETCH TAILORS + RATINGS
   // =========================
 
   const fetchTailors =
@@ -99,10 +99,98 @@ const Home = () => {
 
       try {
 
+        // =========================
+        // GET ALL TAILORS
+        // =========================
+
         const data =
           await getAllTailors();
 
-        setTailors(data);
+        // =========================
+        // GET RATING TIAP TAILOR
+        // =========================
+
+        const tailorWithRatings =
+          await Promise.all(
+
+            data.map(
+              async (tailor) => {
+
+                try {
+
+                  const response =
+                    await fetch(
+
+                      `http://localhost:8080/api/ratings/tailor/${tailor.id}`
+
+                    );
+
+                  const result =
+                    await response.json();
+
+                  const ratings =
+                    result.data || [];
+
+                  // =========================
+                  // AVERAGE RATING
+                  // =========================
+
+                  const averageRating =
+
+                    ratings.length > 0
+
+                      ? (
+
+                          ratings.reduce(
+
+                            (acc, item) =>
+
+                              acc + Number(item.rating),
+
+                            0
+
+                          ) / ratings.length
+
+                        ).toFixed(1)
+
+                      : 0;
+
+                  return {
+
+                    ...tailor,
+
+                    rating:
+                      averageRating,
+
+                    total_reviews:
+                      ratings.length,
+
+                  };
+
+                } catch (error) {
+
+                  console.log(error);
+
+                  return {
+
+                    ...tailor,
+
+                    rating: 0,
+
+                    total_reviews: 0,
+
+                  };
+
+                }
+
+              }
+            )
+
+          );
+
+        setTailors(
+          tailorWithRatings
+        );
 
       } catch (error) {
 

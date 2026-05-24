@@ -1,160 +1,312 @@
-const ratingModel = require("../models/Rating");
+const firebaseService =
+  require("../services/firebaseService");
 
+
+// =====================================
 // GET ALL RATINGS
-const getAllRatings = async (req, res) => {
-  try {
+// =====================================
 
-    const ratings = await ratingModel.findAll();
+const getAllRatings =
+  async (req, res) => {
 
-    res.status(200).json({
-      message: "Ratings retrieved successfully",
-      data: ratings,
-    });
+    try {
 
-  } catch (error) {
+      const ratings =
+        await firebaseService
+          .getAllRatings();
 
-    res.status(500).json({
-      message: "Error retrieving ratings",
-      error: error.message,
-    });
+      res.status(200).json({
 
-  }
+        message:
+          "Ratings retrieved successfully",
+
+        data:
+          ratings,
+
+      });
+
+    } catch (error) {
+
+      console.log(error);
+
+      res.status(500).json({
+
+        message:
+          "Error retrieving ratings",
+
+        error:
+          error.message,
+
+      });
+
+    }
+
 };
 
+
+// =====================================
 // CREATE RATING
-const createRating = async (req, res) => {
-  try {
+// =====================================
 
-    const {
-      customer_id,
-      tailor_id,
-      rating,
-      review,
-    } = req.body;
+const createRating =
+  async (req, res) => {
 
-    const newRating = await ratingModel.create({
-      customer_id,
-      tailor_id,
-      rating,
-      review,
-    });
+    try {
 
-    res.status(201).json({
-      message: "Rating created successfully",
-      data: newRating,
-    });
+      const {
 
-  } catch (error) {
+        tailor_id,
 
-    res.status(400).json({
-      message: "Error creating rating",
-      error: error.message,
-    });
+        rating,
 
-  }
-};
+        review,
 
-// GET RATING BY ID
-const getRatingById = async (req, res) => {
-  try {
+      } = req.body;
 
-    const { id } = req.params;
+      // =====================================
+      // CUSTOMER LOGIN
+      // =====================================
 
-    const rating = await ratingModel.findById(id);
+      const customer_id =
+        req.user.id;
 
-    if (!rating) {
-      return res.status(404).json({
-        message: "Rating not found",
+
+      // =====================================
+      // CHECK DUPLICATE REVIEW
+      // =====================================
+
+      const alreadyReview =
+
+        await firebaseService
+          .checkExistingRating(
+
+            customer_id,
+
+            tailor_id
+
+          );
+
+      if (alreadyReview) {
+
+        return res.status(400).json({
+
+          message:
+            "Anda sudah memberi review untuk penjahit ini",
+
+        });
+
+      }
+
+
+      // =====================================
+      // SAVE FIRESTORE
+      // =====================================
+
+      const newRating =
+        await firebaseService
+          .createRating({
+
+            customer_id,
+
+            tailor_id:
+              Number(tailor_id),
+
+            rating:
+              Number(rating),
+
+            review,
+
+          });
+
+      res.status(201).json({
+
+        message:
+          "Rating created successfully",
+
+        data:
+          newRating,
+
       });
+
+    } catch (error) {
+
+      console.log(error);
+
+      res.status(500).json({
+
+        message:
+          "Error creating rating",
+
+        error:
+          error.message,
+
+      });
+
     }
 
-    res.status(200).json({
-      message: "Rating retrieved successfully",
-      data: rating,
-    });
-
-  } catch (error) {
-
-    res.status(500).json({
-      message: "Error retrieving rating",
-      error: error.message,
-    });
-
-  }
 };
 
+
+// =====================================
+// GET RATINGS BY TAILOR
+// =====================================
+
+const getRatingsByTailor =
+  async (req, res) => {
+
+    try {
+
+      const {
+        tailorId,
+      } = req.params;
+
+      const ratings =
+        await firebaseService
+          .getRatingsByTailor(
+            Number(tailorId)
+          );
+
+      res.status(200).json({
+
+        message:
+          "Ratings retrieved successfully",
+
+        data:
+          ratings,
+
+      });
+
+    } catch (error) {
+
+      console.log(error);
+
+      res.status(500).json({
+
+        message:
+          "Error retrieving ratings",
+
+        error:
+          error.message,
+
+      });
+
+    }
+
+};
+
+
+// =====================================
 // UPDATE RATING
-const updateRating = async (req, res) => {
-  try {
+// =====================================
 
-    const { id } = req.params;
+const updateRating =
+  async (req, res) => {
 
-    const {
-      rating,
-      review,
-    } = req.body;
+    try {
 
-    const ratingData = await ratingModel.findById(id);
+      const { id } =
+        req.params;
 
-    if (!ratingData) {
-      return res.status(404).json({
-        message: "Rating not found",
+      const {
+
+        rating,
+
+        review,
+
+      } = req.body;
+
+      await firebaseService
+        .updateRating(
+
+          id,
+
+          {
+
+            rating:
+              Number(rating),
+
+            review,
+
+          }
+
+        );
+
+      res.status(200).json({
+
+        message:
+          "Rating updated successfully",
+
       });
+
+    } catch (error) {
+
+      console.log(error);
+
+      res.status(500).json({
+
+        message:
+          "Error updating rating",
+
+        error:
+          error.message,
+
+      });
+
     }
 
-    await ratingModel.updateById(id, {
-      rating,
-      review,
-    });
-
-    res.status(200).json({
-      message: "Rating updated successfully",
-    });
-
-  } catch (error) {
-
-    res.status(500).json({
-      message: "Error updating rating",
-      error: error.message,
-    });
-
-  }
 };
 
+
+// =====================================
 // DELETE RATING
-const deleteRating = async (req, res) => {
-  try {
+// =====================================
 
-    const { id } = req.params;
+const deleteRating =
+  async (req, res) => {
 
-    const ratingData = await ratingModel.findById(id);
+    try {
 
-    if (!ratingData) {
-      return res.status(404).json({
-        message: "Rating not found",
+      const { id } =
+        req.params;
+
+      await firebaseService
+        .deleteRating(id);
+
+      res.status(200).json({
+
+        message:
+          "Rating deleted successfully",
+
       });
+
+    } catch (error) {
+
+      console.log(error);
+
+      res.status(500).json({
+
+        message:
+          "Error deleting rating",
+
+        error:
+          error.message,
+
+      });
+
     }
 
-    await ratingModel.deleteById(id);
-
-    res.status(200).json({
-      message: "Rating deleted successfully",
-    });
-
-  } catch (error) {
-
-    res.status(500).json({
-      message: "Error deleting rating",
-      error: error.message,
-    });
-
-  }
 };
 
 module.exports = {
+
   getAllRatings,
+
   createRating,
-  getRatingById,
+
+  getRatingsByTailor,
+
   updateRating,
+
   deleteRating,
+
 };
