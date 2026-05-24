@@ -1,14 +1,18 @@
-import axios from "axios";
+import API from "./api";
 
-const API_URL =
-  "http://localhost:8080/api/tailors";
 
+// =====================================
 // GET ALL TAILORS
-export const getAllTailors = async () => {
+// =====================================
 
-  const response = await axios.get(
-    API_URL
-  );
+export const getAllTailors =
+  async () => {
 
-  return response.data.data;
-};
+    const response =
+      await API.get(
+        "/tailors"
+      );
+
+    return response.data.data;
+
+  };
