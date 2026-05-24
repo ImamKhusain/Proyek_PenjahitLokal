@@ -1,7 +1,8 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:8080/api",
+  baseURL:
+    "https://proyek-penjahitlokal-764024000152.us-central1.run.app/api",
 });
 
 API.interceptors.request.use(

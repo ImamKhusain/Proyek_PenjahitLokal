@@ -27,7 +27,7 @@ import api from "../services/api";
 import "./ManageTailor.css";
 
 const BASE_URL_BACKEND =
-  "http://localhost:8080/uploads/";
+  "https://proyek-penjahitlokal-764024000152.us-central1.run.app/uploads/";
 
 const TailorDetail = () => {
 

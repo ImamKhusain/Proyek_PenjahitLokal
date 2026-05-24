@@ -97,7 +97,7 @@ const TailorDetail = () => {
         const response =
           await axios.get(
 
-            `http://localhost:8080/api/tailors/${id}`
+            `https://proyek-penjahitlokal-764024000152.us-central1.run.app/api/tailors/${id}`
 
           );
 
@@ -139,7 +139,7 @@ const TailorDetail = () => {
         const response =
           await axios.get(
 
-            `http://localhost:8080/api/ratings/tailor/${id}`
+            `https://proyek-penjahitlokal-764024000152.us-central1.run.app/api/ratings/tailor/${id}`
 
           );
 
@@ -180,7 +180,7 @@ const TailorDetail = () => {
 
         await axios.post(
 
-          "http://localhost:8080/api/ratings",
+          "https://proyek-penjahitlokal-764024000152.us-central1.run.app/api/ratings",
 
           {
 

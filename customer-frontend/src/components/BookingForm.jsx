@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import toast from "react-hot-toast"; // 💡 TAMBAHAN: Import toast untuk error handling modern jika diperlukan
+import toast from "react-hot-toast";
 import "./BookingForm.css";
 
 const BookingForm = ({
@@ -9,6 +9,10 @@ const BookingForm = ({
   onSubmit,
   isSubmitting,
 }) => {
+
+  // ==========================================
+  // STATES
+  // ==========================================
 
   const [bookingDate, setBookingDate] =
     useState("");
@@ -22,41 +26,88 @@ const BookingForm = ({
   const [selectedSize, setSelectedSize] =
     useState("");
 
-  // 💡 TAMBAHAN: Dapatkan string tanggal hari ini dengan format YYYY-MM-DD
-  // Ini digunakan untuk mengunci batas minimum input tanggal HTML
+  // ==========================================
+  // GET TODAY DATE
+  // ==========================================
+
   const getTodayDateString = () => {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, "0");
-    const day = String(today.getDate()).padStart(2, "0");
+
+    const today =
+      new Date();
+
+    const year =
+      today.getFullYear();
+
+    const month =
+      String(
+        today.getMonth() + 1
+      ).padStart(2, "0");
+
+    const day =
+      String(
+        today.getDate()
+      ).padStart(2, "0");
+
     return `${year}-${month}-${day}`;
+
   };
+
+  // ==========================================
+  // AUTO SET FORM
+  // ==========================================
 
   useEffect(() => {
 
     if (selectedProduct) {
 
+      // ======================================
+      // SIZE KATALOG
+      // ======================================
+
       if (
+
         selectedProduct.size &&
-        selectedProduct.size !== "NULL" &&
-        selectedProduct.size !== ""
+
+        selectedProduct.size !==
+          "NULL" &&
+
+        selectedProduct.size !==
+          ""
+
       ) {
 
-        setSizeType("katalog");
+        setSizeType(
+          "katalog"
+        );
 
-        // default kosong dulu
-        setSelectedSize("");
-
-      } else {
-
-        setSizeType("custom");
-
-        setSelectedSize("Custom");
+        setSelectedSize(
+          ""
+        );
 
       }
 
+      // ======================================
+      // CUSTOM
+      // ======================================
+
+      else {
+
+        setSizeType(
+          "custom"
+        );
+
+        setSelectedSize(
+          "Custom"
+        );
+
+      }
+
+      // ======================================
+      // DEFAULT NOTE
+      // ======================================
+
       setBodySizeNote(
-        `Detail Ukuran Badan:
+`Detail Ukuran Badan:
 - Lingkar Dada (cm):
 - Panjang Baju (cm):
 - Lebar Bahu (cm):
@@ -64,53 +115,351 @@ const BookingForm = ({
 
 Catatan Tambahan Kain/Model:`
       );
+
     }
 
   }, [selectedProduct]);
 
-  if (!isOpen || !selectedProduct)
-    return null;
+  // ==========================================
+  // CLOSE MODAL
+  // ==========================================
 
-  const handleSubmitInternal = (
-    e
-  ) => {
+  if (
+    !isOpen ||
+    !selectedProduct
+  ) return null;
 
-    e.preventDefault();
+  // ==========================================
+  // SUBMIT FORM
+  // ==========================================
 
-    // 💡 VALIDASI TANGGAL: Proteksi lapis kedua jika user membobol lewat ketik manual
-    const todayStr = getTodayDateString();
-    if (bookingDate < todayStr) {
-      toast.dismiss();
-      toast.error("Tanggal pertemuan tidak boleh kurang dari hari ini!");
-      return;
-    }
+  const handleSubmitInternal =
+    async (e) => {
 
-    const finalNote =
-      sizeType === "custom"
+      e.preventDefault();
 
-        ? `Model Pakaian: ${selectedProduct.name}
+      try {
+
+        // =====================================
+        // VALIDASI TANGGAL KOSONG
+        // =====================================
+
+        if (!bookingDate) {
+
+          toast.dismiss();
+
+          toast.error(
+            "Tanggal booking wajib diisi!"
+          );
+
+          return;
+
+        }
+
+        // =====================================
+        // VALIDASI TANGGAL
+        // =====================================
+
+        const today =
+          new Date();
+
+        today.setHours(
+          0,
+          0,
+          0,
+          0
+        );
+
+        const selectedDate =
+          new Date(
+            bookingDate
+          );
+
+        selectedDate.setHours(
+          0,
+          0,
+          0,
+          0
+        );
+
+        // =====================================
+        // TANGGAL KURANG DARI HARI INI
+        // =====================================
+
+        if (
+          selectedDate < today
+        ) {
+
+          toast.dismiss();
+
+          toast.error(
+            "Tanggal booking tidak boleh kurang dari hari ini!"
+          );
+
+          return;
+
+        }
+
+        // =====================================
+        // VALIDASI UKURAN KATALOG
+        // =====================================
+
+        if (
+          sizeType ===
+            "katalog" &&
+          !selectedSize
+        ) {
+
+          toast.dismiss();
+
+          toast.error(
+            "Pilih ukuran katalog terlebih dahulu!"
+          );
+
+          return;
+
+        }
+
+        // =====================================
+        // VALIDASI CUSTOM NOTE
+        // =====================================
+
+        if (
+          sizeType ===
+            "custom" &&
+          !bodySizeNote.trim()
+        ) {
+
+          toast.dismiss();
+
+          toast.error(
+            "Detail ukuran custom wajib diisi!"
+          );
+
+          return;
+
+        }
+
+        // =====================================
+        // VALIDASI NOTE PENDEK
+        // =====================================
+
+        if (
+
+          sizeType ===
+            "custom" &&
+
+          bodySizeNote.trim()
+            .length < 15
+
+        ) {
+
+          toast.dismiss();
+
+          toast.error(
+            "Detail ukuran terlalu pendek!"
+          );
+
+          return;
+
+        }
+
+        // =====================================
+        // FINAL NOTE
+        // =====================================
+
+        const finalNote =
+          sizeType === "custom"
+
+            ? `Model Pakaian: ${selectedProduct.name}
 Metode Ukuran: Custom Ukuran Baru
 
 ${bodySizeNote}`
 
-        : `Model Pakaian: ${selectedProduct.name}
+            : `Model Pakaian: ${selectedProduct.name}
 Metode Ukuran: Ukuran Standar Katalog (${selectedSize})`;
 
-    // 🚀 DI SINI PERUBAHANNYA: Kita tambahkan object selectedProduct ke dalam parameter onSubmit
-    // agar file parent (Layanan.jsx) tahu id tailor dan bisa melacak ID booking setelah disubmit.
-    onSubmit({
-      bookingDate,
-      finalNote,
-      selectedSize,
-      productDetail: selectedProduct, // Tambahan aman tanpa merusak form
-    });
-  };
+        // =====================================
+        // LOADING TOAST
+        // =====================================
+
+        const loadingToast =
+          toast.loading(
+            "Mengirim booking..."
+          );
+
+        // =====================================
+        // SUBMIT API
+        // =====================================
+
+        await onSubmit({
+
+          bookingDate,
+
+          finalNote,
+
+          selectedSize,
+
+          productDetail:
+            selectedProduct,
+
+        });
+
+        // =====================================
+        // SUCCESS
+        // =====================================
+
+        toast.dismiss(
+          loadingToast
+        );
+
+        toast.success(
+          "Booking berhasil dikirim! Silakan tunggu konfirmasi tailor."
+        );
+
+        // =====================================
+        // RESET FORM
+        // =====================================
+
+        setBookingDate("");
+
+        setSelectedSize("");
+
+        setBodySizeNote("");
+
+        // =====================================
+        // CLOSE MODAL
+        // =====================================
+
+        onClose();
+
+      } catch (error) {
+
+        console.log(error);
+
+        // =====================================
+        // ERROR MESSAGE
+        // =====================================
+
+        const errorMessage =
+
+          error?.response?.data
+            ?.message ||
+
+          error?.response?.data
+            ?.error ||
+
+          error?.message ||
+
+          "Terjadi kesalahan saat mengirim booking.";
+
+        // =====================================
+        // NETWORK ERROR
+        // =====================================
+
+        if (
+
+          errorMessage
+            .toLowerCase()
+            .includes(
+              "network"
+            )
+
+        ) {
+
+          toast.error(
+            "Koneksi internet bermasalah."
+          );
+
+        }
+
+        // =====================================
+        // LOGIN ERROR
+        // =====================================
+
+        else if (
+
+          errorMessage
+            .toLowerCase()
+            .includes(
+              "unauthorized"
+            )
+
+        ) {
+
+          toast.error(
+            "Sesi login berakhir. Silakan login ulang."
+          );
+
+        }
+
+        // =====================================
+        // VALIDATION ERROR
+        // =====================================
+
+        else if (
+
+          errorMessage
+            .toLowerCase()
+            .includes(
+              "validation"
+            )
+
+        ) {
+
+          toast.error(
+            "Data booking tidak valid."
+          );
+
+        }
+
+        // =====================================
+        // DUPLICATE ERROR
+        // =====================================
+
+        else if (
+
+          errorMessage
+            .toLowerCase()
+            .includes(
+              "duplicate"
+            )
+
+        ) {
+
+          toast.error(
+            "Booking sudah pernah dibuat."
+          );
+
+        }
+
+        // =====================================
+        // DEFAULT ERROR
+        // =====================================
+
+        else {
+
+          toast.error(
+            errorMessage
+          );
+
+        }
+
+      }
+
+    };
+
+  // ==========================================
+  // RENDER
+  // ==========================================
 
   return (
 
     <div className="modal-overlay">
 
       <div className="modal-container">
+
+        {/* HEADER */}
 
         <div className="modal-header">
 
@@ -120,19 +469,30 @@ Metode Ukuran: Ukuran Standar Katalog (${selectedSize})`;
 
           <p>
             Model Baju:{" "}
+
             <strong className="product-highlight">
+
               {selectedProduct.name}
+
             </strong>
+
           </p>
 
         </div>
 
+        {/* FORM */}
+
         <form
-          onSubmit={handleSubmitInternal}
+
+          onSubmit={
+            handleSubmitInternal
+          }
+
           className="booking-form-element"
         >
 
-          {/* TANGGAL */}
+          {/* DATE */}
+
           <div className="form-group">
 
             <label>
@@ -140,21 +500,30 @@ Metode Ukuran: Ukuran Standar Katalog (${selectedSize})`;
             </label>
 
             <input
+
               type="date"
+
               value={bookingDate}
-              min={getTodayDateString()} // 💡 KUNCI KALENDER: Mengunci tanggal kemarin agar tidak bisa dipilih
+
+              min={
+                getTodayDateString()
+              }
+
               onChange={(e) =>
+
                 setBookingDate(
                   e.target.value
                 )
+
               }
+
               className="form-input-date"
-              required
             />
 
           </div>
 
-          {/* PILIHAN METODE */}
+          {/* SIZE METHOD */}
+
           <div className="form-group">
 
             <label>
@@ -163,6 +532,8 @@ Metode Ukuran: Ukuran Standar Katalog (${selectedSize})`;
 
             <div className="segmented-control">
 
+              {/* KATALOG */}
+
               {selectedProduct.size &&
                 selectedProduct.size !==
                   "NULL" &&
@@ -170,7 +541,9 @@ Metode Ukuran: Ukuran Standar Katalog (${selectedSize})`;
                   "" && (
 
                   <button
+
                     type="button"
+
                     onClick={() => {
 
                       setSizeType(
@@ -182,6 +555,7 @@ Metode Ukuran: Ukuran Standar Katalog (${selectedSize})`;
                       );
 
                     }}
+
                     className={`segment-btn ${
                       sizeType ===
                       "katalog"
@@ -193,10 +567,15 @@ Metode Ukuran: Ukuran Standar Katalog (${selectedSize})`;
                     Ukuran Katalog
 
                   </button>
+
                 )}
 
+              {/* CUSTOM */}
+
               <button
+
                 type="button"
+
                 onClick={() => {
 
                   setSizeType(
@@ -208,8 +587,10 @@ Metode Ukuran: Ukuran Standar Katalog (${selectedSize})`;
                   );
 
                 }}
+
                 className={`segment-btn ${
-                  sizeType === "custom"
+                  sizeType ===
+                  "custom"
                     ? "active"
                     : ""
                 }`}
@@ -220,10 +601,14 @@ Metode Ukuran: Ukuran Standar Katalog (${selectedSize})`;
               </button>
 
             </div>
+
           </div>
 
-          {/* DROPDOWN UKURAN */}
-          {sizeType === "katalog" &&
+          {/* DROPDOWN */}
+
+          {sizeType ===
+            "katalog" &&
+
             selectedProduct.size && (
 
               <div className="form-group">
@@ -235,14 +620,18 @@ Metode Ukuran: Ukuran Standar Katalog (${selectedSize})`;
                 <div className="select-wrapper">
 
                   <select
+
                     value={selectedSize}
+
                     onChange={(e) =>
+
                       setSelectedSize(
                         e.target.value
                       )
+
                     }
+
                     className="form-select"
-                    required
                   >
 
                     <option value="">
@@ -265,6 +654,7 @@ Metode Ukuran: Ukuran Standar Katalog (${selectedSize})`;
                             {size.trim()}
 
                           </option>
+
                         )
                       )}
 
@@ -275,38 +665,53 @@ Metode Ukuran: Ukuran Standar Katalog (${selectedSize})`;
                   </div>
 
                 </div>
+
               </div>
+
             )}
 
-          {/* CUSTOM SIZE */}
-          {sizeType === "custom" && (
+          {/* CUSTOM */}
 
-            <div className="form-group">
+          {sizeType ===
+            "custom" && (
 
-              <label>
-                Detail Lembar Catatan Ukuran Mandiri:
-              </label>
+              <div className="form-group">
 
-              <textarea
-                value={bodySizeNote}
-                onChange={(e) =>
-                  setBodySizeNote(
-                    e.target.value
-                  )
-                }
-                className="form-textarea"
-                required
-              />
+                <label>
+                  Detail Lembar Catatan Ukuran Mandiri:
+                </label>
 
-            </div>
-          )}
+                <textarea
 
-          {/* BUTTON */}
+                  value={bodySizeNote}
+
+                  onChange={(e) =>
+
+                    setBodySizeNote(
+                      e.target.value
+                    )
+
+                  }
+
+                  className="form-textarea"
+                />
+
+              </div>
+
+            )}
+
+          {/* BUTTONS */}
+
           <div className="modal-actions">
 
+            {/* CANCEL */}
+
             <button
+
               type="button"
+
               onClick={onClose}
+
               className="btn-cancel"
             >
 
@@ -314,9 +719,14 @@ Metode Ukuran: Ukuran Standar Katalog (${selectedSize})`;
 
             </button>
 
+            {/* SUBMIT */}
+
             <button
+
               type="submit"
+
               disabled={isSubmitting}
+
               className="btn-submit"
             >
 
@@ -329,9 +739,13 @@ Metode Ukuran: Ukuran Standar Katalog (${selectedSize})`;
           </div>
 
         </form>
+
       </div>
+
     </div>
+
   );
+
 };
 
-export default BookingForm;
+export default Booking;

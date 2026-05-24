@@ -124,7 +124,7 @@ const Pembayaran = () => {
         // API
         await axios.post(
 
-          "http://localhost:8080/api/payments",
+          "https://proyek-penjahitlokal-764024000152.us-central1.run.app/api/payments",
 
           formData,
 

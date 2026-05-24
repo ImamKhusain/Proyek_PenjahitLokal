@@ -40,12 +40,12 @@ const PortfolioCard = () => {
 
         try {
 
-          const response =
-            await axios.get(
+const response =
+  await axios.get(
 
-              `http://localhost:8080/api/portfolios/tailor/${id}`
+    `https://proyek-penjahitlokal-764024000152.us-central1.run.app/api/portfolios/tailor/${id}`
 
-            );
+  );
 
           const actualData =
             response.data.data
@@ -276,7 +276,7 @@ const PortfolioCard = () => {
         const response =
           await axios.post(
 
-            "http://localhost:8080/api/bookings",
+            "https://proyek-penjahitlokal-764024000152.us-central1.run.app/api/bookings",
 
             payload,
 

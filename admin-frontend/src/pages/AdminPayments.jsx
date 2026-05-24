@@ -65,7 +65,7 @@ const AdminPayments = () => {
 
         const response =
           await axios.get(
-            "http://localhost:8080/api/payments",
+            "https://proyek-penjahitlokal-764024000152.us-central1.run.app/api/payments",
             {
               headers: {
                 Authorization:
@@ -105,7 +105,7 @@ const AdminPayments = () => {
 
         await axios.put(
 
-          `http://localhost:8080/api/payments/${paymentId}`,
+          `https://proyek-penjahitlokal-764024000152.us-central1.run.app/api/payments/${paymentId}`,
 
           {
             payment_status:

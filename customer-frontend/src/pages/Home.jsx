@@ -121,7 +121,7 @@ const Home = () => {
                   const response =
                     await fetch(
 
-                      `http://localhost:8080/api/ratings/tailor/${tailor.id}`
+                      `https://proyek-penjahitlokal-764024000152.us-central1.run.app/api/ratings/tailor/${tailor.id}`
 
                     );
 
