@@ -5,18 +5,18 @@ require("dotenv").config();
 
 
 // =====================================
-// CLOUD SQL SOCKET CHECK
+// CHECK CLOUD SQL
 // =====================================
 
-const isCloudSQL =
+const isCloudRun =
 
-  process.env.DB_HOST?.startsWith(
+  process.env.DB_HOST?.includes(
     "/cloudsql/"
   );
 
 
 // =====================================
-// SEQUELIZE CONFIG
+// SEQUELIZE
 // =====================================
 
 const sequelize =
@@ -36,12 +36,14 @@ const sequelize =
 
 
       // =====================================
-      // LOCALHOST
+      // CLOUD RUN
       // =====================================
 
-      ...(isCloudSQL
+      ...(isCloudRun
 
         ? {
+
+            host: "localhost",
 
             dialectOptions: {
 
