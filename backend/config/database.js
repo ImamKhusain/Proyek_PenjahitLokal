@@ -11,6 +11,18 @@ const sequelize = new Sequelize(
     port: process.env.DB_PORT,
     dialect: "mysql",
     logging: false,
+
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false,
+      },
+
+      authPlugins: {
+        mysql_clear_password: () => () =>
+          Buffer.from(process.env.DB_PASS + "\0"),
+      },
+    },
   }
 );
 
