@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import toast from "react-hot-toast"; // 💡 Sudah terimport dengan baik
+import toast from "react-hot-toast"; 
 import "./BookingForm.css";
 
 const BookingForm = ({
@@ -51,7 +51,6 @@ Catatan Tambahan Kain/Model:`
 
   if (!isOpen || !selectedProduct) return null;
 
-  // 💡 DI SINI PERUBAHANNYA: Mengubah fungsi menjadi async untuk mendukung alur notifikasi yang sinkron
   const handleSubmitInternal = async (e) => {
     e.preventDefault();
 
@@ -73,19 +72,15 @@ ${bodySizeNote}`
 Metode Ukuran: Ukuran Standar Katalog (${selectedSize})`;
 
     try {
-      // Menjalankan fungsi onSubmit dari Layanan.jsx dan menunggu hingga proses API backend selesai
+      // Menjalankan fungsi onSubmit dari PortfolioCard.jsx dan menunggu hingga proses API selesai
       await onSubmit({
         bookingDate,
         finalNote,
         selectedSize,
         productDetail: selectedProduct, 
       });
-
-      // 🎯 TAMBAHAN: Memicu toast sukses hanya ketika await onSubmit berhasil tanpa melempar error
-      toast.success(`Berhasil mengajukan booking untuk ${selectedProduct.name}!`);
       
     } catch (error) {
-      // Antisipasi jika error tidak di-handle di file parent
       console.error("Error form submission:", error);
       toast.error("Gagal mengirim pengajuan, silakan coba lagi.");
     }
@@ -158,7 +153,7 @@ Metode Ukuran: Ukuran Standar Katalog (${selectedSize})`;
                 <select
                   value={selectedSize}
                   onChange={(e) => setSelectedSize(e.target.value)}
-                  className="form-style" // Menyesuaikan class style standard jika diperlukan
+                  className="form-style"
                   required
                 >
                   <option value="">Pilih Ukuran</option>

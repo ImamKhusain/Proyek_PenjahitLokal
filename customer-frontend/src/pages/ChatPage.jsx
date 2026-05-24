@@ -8,6 +8,7 @@ import {
 import {
   useParams,
   useLocation,
+  navigate,
   useNavigate,
 } from "react-router-dom";
 
@@ -179,51 +180,51 @@ const ChatPage = () => {
   // SEND MESSAGE
   // =========================
 
- const sendMessage =
-  async () => {
+  const sendMessage =
+    async () => {
 
-    if (!message.trim())
-      return;
+      if (!message.trim())
+        return;
 
-    try {
+      try {
 
-      await axios.post(
+        await axios.post(
 
-        "https://proyek-penjahitlokal-764024000152.us-central1.run.app/api/chats/send",
+          "https://proyek-penjahitlokal-764024000152.us-central1.run.app/api/chats/send",
 
-        {
+          {
 
-          // FIX FINAL
-          tailor_id:
-            Number(tailorId),
+            // FIX FINAL
+            tailor_id:
+              Number(tailorId),
 
-          message,
-
-        },
-
-        {
-          headers: {
-
-            Authorization:
-              `Bearer ${user.token}`,
+            message,
 
           },
-        }
 
-      );
+          {
+            headers: {
 
-      setMessage("");
+              Authorization:
+                `Bearer ${user.token}`,
 
-    } catch (error) {
+            },
+          }
 
-      console.log(
-        "SEND ERROR:",
-        error
-      );
+        );
 
-    }
+        setMessage("");
 
-  };
+      } catch (error) {
+
+        console.log(
+          "SEND ERROR:",
+          error
+        );
+
+      }
+
+    };
 
 
   return (
@@ -248,21 +249,7 @@ const ChatPage = () => {
 
           <div className="chat-user-info">
 
-            <div className="chat-avatar">
-
-              {
-                (
-                  tailor?.name ||
-                  tailorName ||
-                  "T"
-                )
-
-                  .charAt(0)
-
-                  .toUpperCase()
-              }
-
-            </div>
+            {/* 💡 BAGIAN AVATAR HURUF SUDAH DIHAPUS DARI SINI */}
 
             <div>
 

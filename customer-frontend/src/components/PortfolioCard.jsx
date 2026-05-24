@@ -293,19 +293,19 @@ const response =
 
           );
 
-        toast.dismiss();
-
-        toast.success(
-
-          response.data.message ||
-
-          "Booking pakaian berhasil diajukan!"
-
-        );
-
+        // 1. Tutup modal secara aman terlebih dahulu
         setIsModalOpen(false);
-
         setSelectedProduct(null);
+
+        // 2. Munculkan toast sukses di level parent agar tidak hilang saat modal unmount
+        toast.dismiss();
+        toast.success(
+          response.data.message || "Booking pakaian berhasil diajukan!",
+          {
+            duration: 4000,
+            icon: '🎉'
+          }
+        );
 
       } catch (error) {
 
