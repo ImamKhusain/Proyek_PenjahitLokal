@@ -3,22 +3,6 @@ const { Sequelize } =
 
 require("dotenv").config();
 
-
-// =====================================
-// CHECK CLOUD SQL
-// =====================================
-
-const isCloudRun =
-
-  process.env.DB_HOST?.includes(
-    "/cloudsql/"
-  );
-
-
-// =====================================
-// SEQUELIZE
-// =====================================
-
 const sequelize =
   new Sequelize(
 
@@ -34,35 +18,12 @@ const sequelize =
 
       logging: false,
 
+      dialectOptions: {
 
-      // =====================================
-      // CLOUD RUN
-      // =====================================
+        socketPath:
+          process.env.DB_HOST,
 
-      ...(isCloudRun
-
-        ? {
-
-            host: "localhost",
-
-            dialectOptions: {
-
-              socketPath:
-                process.env.DB_HOST,
-
-            },
-
-          }
-
-        : {
-
-            host:
-              process.env.DB_HOST,
-
-            port:
-              process.env.DB_PORT,
-
-          }),
+      },
 
     }
 
