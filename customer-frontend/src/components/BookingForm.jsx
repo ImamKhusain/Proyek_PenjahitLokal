@@ -1,164 +1,344 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import toast from "react-hot-toast";
+
+import { AuthContext } from "../context/AuthContext";
+
 import "./BookingForm.css";
 
-const BookingForm = ({
-  isOpen,
-  onClose,
-  selectedProduct,
-  onSubmit,
-  isSubmitting,
-}) => {
+const API_URL =
+  "https://proyek-penjahitlokal-764024000152.us-central1.run.app";
+
+const Booking = () => {
+
+  const navigate =
+    useNavigate();
+
+  const {
+    user,
+    loading,
+  } = useContext(
+    AuthContext
+  );
 
   // ==========================================
   // STATES
   // ==========================================
 
-  const [bookingDate, setBookingDate] =
-    useState("");
+  const [
+    pesananList,
+    setPesananList,
+  ] = useState([]);
 
-  const [bodySizeNote, setBodySizeNote] =
-    useState("");
+  const [
+    paidBookingIds,
+    setPaidBookingIds,
+  ] = useState([]);
 
-  const [sizeType, setSizeType] =
-    useState("katalog");
+  const [
+    errorFetch,
+    setErrorFetch,
+  ] = useState(false);
 
-  const [selectedSize, setSelectedSize] =
-    useState("");
+  const [
+    editingBookingId,
+    setEditingBookingId,
+  ] = useState(null);
 
-  // ==========================================
-  // GET TODAY DATE
-  // ==========================================
+  const [
+    selectedBooking,
+    setSelectedBooking,
+  ] = useState(null);
 
-  const getTodayDateString = () => {
-
-    const today =
-      new Date();
-
-    const year =
-      today.getFullYear();
-
-    const month =
-      String(
-        today.getMonth() + 1
-      ).padStart(2, "0");
-
-    const day =
-      String(
-        today.getDate()
-      ).padStart(2, "0");
-
-    return `${year}-${month}-${day}`;
-
-  };
+  const [
+    newBookingDate,
+    setNewBookingDate,
+  ] = useState("");
 
   // ==========================================
-  // AUTO SET FORM
+  // FETCH DATA
   // ==========================================
 
   useEffect(() => {
 
-    if (selectedProduct) {
+    if (loading) return;
 
-      // ======================================
-      // SIZE KATALOG
-      // ======================================
+    if (
+      !user &&
+      !localStorage.getItem("token")
+    ) {
 
-      if (
-
-        selectedProduct.size &&
-
-        selectedProduct.size !==
-          "NULL" &&
-
-        selectedProduct.size !==
-          ""
-
-      ) {
-
-        setSizeType(
-          "katalog"
-        );
-
-        setSelectedSize(
-          ""
-        );
-
-      }
-
-      // ======================================
-      // CUSTOM
-      // ======================================
-
-      else {
-
-        setSizeType(
-          "custom"
-        );
-
-        setSelectedSize(
-          "Custom"
-        );
-
-      }
-
-      // ======================================
-      // DEFAULT NOTE
-      // ======================================
-
-      setBodySizeNote(
-`Detail Ukuran Badan:
-- Lingkar Dada (cm):
-- Panjang Baju (cm):
-- Lebar Bahu (cm):
-- Lingkar Pinggang (cm):
-
-Catatan Tambahan Kain/Model:`
-      );
+      navigate("/");
+      return;
 
     }
 
-  }, [selectedProduct]);
+    fetchMyBookingsAndPayments();
+
+  }, [user, loading]);
 
   // ==========================================
-  // CLOSE MODAL
+  // FETCH BOOKINGS + PAYMENTS
   // ==========================================
 
-  if (
-    !isOpen ||
-    !selectedProduct
-  ) return null;
-
-  // ==========================================
-  // SUBMIT FORM
-  // ==========================================
-
-  const handleSubmitInternal =
-    async (e) => {
-
-      e.preventDefault();
+  const fetchMyBookingsAndPayments =
+    async () => {
 
       try {
 
-        // =====================================
-        // VALIDASI TANGGAL KOSONG
-        // =====================================
+        const tokenAktif =
 
-        if (!bookingDate) {
+          user?.token ||
 
-          toast.dismiss();
+          localStorage.getItem(
+            "token"
+          );
+
+        const idUserAktif =
+
+          user?.id ||
+
+          localStorage.getItem(
+            "id"
+          );
+
+        const cleanToken =
+
+          tokenAktif.replace(
+            /['"]+/g,
+            ""
+          );
+
+        const headers = {
+
+          Authorization:
+            `Bearer ${cleanToken}`,
+
+        };
+
+        // ======================================
+        // REQUEST
+        // ======================================
+
+        const [
+          bookingsResponse,
+          paymentsResponse,
+        ] = await Promise.all([
+
+          axios.get(
+            `${API_URL}/api/bookings`,
+            { headers }
+          ),
+
+          axios.get(
+            `${API_URL}/api/payments`,
+            { headers }
+          ),
+
+        ]);
+
+        // ======================================
+        // BOOKINGS
+        // ======================================
+
+        const allBookings =
+          bookingsResponse.data
+            ?.data || [];
+
+        const myBookings =
+          allBookings.filter(
+            (booking) =>
+              Number(
+                booking.customer_id
+              ) ===
+              Number(
+                idUserAktif
+              )
+          );
+
+        myBookings.sort(
+          (a, b) => b.id - a.id
+        );
+
+        // ======================================
+        // PAYMENTS
+        // ======================================
+
+        const allPayments =
+          paymentsResponse.data
+            ?.data || [];
+
+        const confirmedPaidIds =
+          allPayments
+
+            .filter(
+
+              (payment) =>
+
+                payment.payment_status
+                  ?.toLowerCase()
+                  ?.trim() ===
+                "paid"
+
+            )
+
+            .map(
+              (payment) =>
+                payment.booking_id
+            );
+
+        // ======================================
+        // SAVE STATE
+        // ======================================
+
+        setPesananList(
+          myBookings
+        );
+
+        setPaidBookingIds(
+          confirmedPaidIds
+        );
+
+      } catch (error) {
+
+        console.log(error);
+
+        setErrorFetch(true);
+
+        toast.error(
+          "Gagal mengambil data pesanan."
+        );
+
+      }
+
+    };
+
+  // ==========================================
+  // DELETE BOOKING
+  // ==========================================
+
+  const handleDeleteBooking =
+    async (bookingId) => {
+
+      try {
+
+        const tokenAktif =
+
+          user?.token ||
+
+          localStorage.getItem(
+            "token"
+          );
+
+        const cleanToken =
+
+          tokenAktif.replace(
+            /['"]+/g,
+            ""
+          );
+
+        // ======================================
+        // LOADING
+        // ======================================
+
+        const loadingToast =
+          toast.loading(
+            "Menghapus pesanan..."
+          );
+
+        // ======================================
+        // DELETE API
+        // ======================================
+
+        await axios.delete(
+
+          `${API_URL}/api/bookings/${bookingId}`,
+
+          {
+
+            headers: {
+
+              Authorization:
+                `Bearer ${cleanToken}`,
+
+            },
+
+          }
+
+        );
+
+        // ======================================
+        // SUCCESS
+        // ======================================
+
+        toast.dismiss(
+          loadingToast
+        );
+
+        toast.success(
+          "Pesanan berhasil dihapus."
+        );
+
+        // ======================================
+        // REFRESH
+        // ======================================
+
+        setTimeout(() => {
+
+          fetchMyBookingsAndPayments();
+
+        }, 800);
+
+      } catch (error) {
+
+        console.log(error);
+
+        const errorMessage =
+
+          error?.response?.data
+            ?.message ||
+
+          error?.message ||
+
+          "Gagal menghapus pesanan.";
+
+        toast.dismiss();
+
+        toast.error(
+          errorMessage
+        );
+
+      }
+
+    };
+
+  // ==========================================
+  // UPDATE BOOKING DATE
+  // ==========================================
+
+  const handleUpdateBooking =
+    async () => {
+
+      try {
+
+        // ======================================
+        // VALIDASI KOSONG
+        // ======================================
+
+        if (!newBookingDate) {
 
           toast.error(
-            "Tanggal booking wajib diisi!"
+            "Tanggal booking wajib diisi."
           );
 
           return;
 
         }
 
-        // =====================================
+        // ======================================
         // VALIDASI TANGGAL
-        // =====================================
+        // ======================================
 
         const today =
           new Date();
@@ -172,7 +352,7 @@ Catatan Tambahan Kain/Model:`
 
         const selectedDate =
           new Date(
-            bookingDate
+            newBookingDate
           );
 
         selectedDate.setHours(
@@ -182,272 +362,337 @@ Catatan Tambahan Kain/Model:`
           0
         );
 
-        // =====================================
-        // TANGGAL KURANG DARI HARI INI
-        // =====================================
+        // ======================================
+        // TIDAK BOLEH < HARI INI
+        // ======================================
 
         if (
           selectedDate < today
         ) {
 
-          toast.dismiss();
-
           toast.error(
-            "Tanggal booking tidak boleh kurang dari hari ini!"
+            "Tanggal booking tidak boleh kurang dari hari ini."
           );
 
           return;
 
         }
 
-        // =====================================
-        // VALIDASI UKURAN KATALOG
-        // =====================================
+        // ======================================
+        // TOKEN
+        // ======================================
 
-        if (
-          sizeType ===
-            "katalog" &&
-          !selectedSize
-        ) {
+        const tokenAktif =
 
-          toast.dismiss();
+          user?.token ||
 
-          toast.error(
-            "Pilih ukuran katalog terlebih dahulu!"
+          localStorage.getItem(
+            "token"
           );
 
-          return;
+        const cleanToken =
 
-        }
-
-        // =====================================
-        // VALIDASI CUSTOM NOTE
-        // =====================================
-
-        if (
-          sizeType ===
-            "custom" &&
-          !bodySizeNote.trim()
-        ) {
-
-          toast.dismiss();
-
-          toast.error(
-            "Detail ukuran custom wajib diisi!"
+          tokenAktif.replace(
+            /['"]+/g,
+            ""
           );
 
-          return;
-
-        }
-
-        // =====================================
-        // VALIDASI NOTE PENDEK
-        // =====================================
-
-        if (
-
-          sizeType ===
-            "custom" &&
-
-          bodySizeNote.trim()
-            .length < 15
-
-        ) {
-
-          toast.dismiss();
-
-          toast.error(
-            "Detail ukuran terlalu pendek!"
-          );
-
-          return;
-
-        }
-
-        // =====================================
-        // FINAL NOTE
-        // =====================================
-
-        const finalNote =
-          sizeType === "custom"
-
-            ? `Model Pakaian: ${selectedProduct.name}
-Metode Ukuran: Custom Ukuran Baru
-
-${bodySizeNote}`
-
-            : `Model Pakaian: ${selectedProduct.name}
-Metode Ukuran: Ukuran Standar Katalog (${selectedSize})`;
-
-        // =====================================
-        // LOADING TOAST
-        // =====================================
+        // ======================================
+        // LOADING
+        // ======================================
 
         const loadingToast =
           toast.loading(
-            "Mengirim booking..."
+            "Memperbarui booking..."
           );
 
-        // =====================================
-        // SUBMIT API
-        // =====================================
+        // ======================================
+        // UPDATE API
+        // ======================================
 
-        await onSubmit({
+        await axios.put(
 
-          bookingDate,
+          `${API_URL}/api/bookings/${selectedBooking.id}`,
 
-          finalNote,
+          {
 
-          selectedSize,
+            booking_date:
+              newBookingDate,
 
-          productDetail:
-            selectedProduct,
+            body_size_note:
+              selectedBooking.body_size_note,
 
-        });
+            status:
+              "PENDING",
 
-        // =====================================
+          },
+
+          {
+
+            headers: {
+
+              Authorization:
+                `Bearer ${cleanToken}`,
+
+            },
+
+          }
+
+        );
+
+        // ======================================
         // SUCCESS
-        // =====================================
+        // ======================================
 
         toast.dismiss(
           loadingToast
         );
 
         toast.success(
-          "Booking berhasil dikirim! Silakan tunggu konfirmasi tailor."
+          "Tanggal booking berhasil diperbarui."
         );
 
-        // =====================================
-        // RESET FORM
-        // =====================================
+        // ======================================
+        // RESET
+        // ======================================
 
-        setBookingDate("");
+        setEditingBookingId(
+          null
+        );
 
-        setSelectedSize("");
+        setSelectedBooking(
+          null
+        );
 
-        setBodySizeNote("");
+        // ======================================
+        // REFRESH
+        // ======================================
 
-        // =====================================
-        // CLOSE MODAL
-        // =====================================
+        setTimeout(() => {
 
-        onClose();
+          fetchMyBookingsAndPayments();
+
+        }, 800);
 
       } catch (error) {
 
         console.log(error);
-
-        // =====================================
-        // ERROR MESSAGE
-        // =====================================
 
         const errorMessage =
 
           error?.response?.data
             ?.message ||
 
-          error?.response?.data
-            ?.error ||
-
           error?.message ||
 
-          "Terjadi kesalahan saat mengirim booking.";
+          "Gagal memperbarui booking.";
 
-        // =====================================
-        // NETWORK ERROR
-        // =====================================
+        toast.dismiss();
 
-        if (
-
+        toast.error(
           errorMessage
-            .toLowerCase()
-            .includes(
-              "network"
-            )
-
-        ) {
-
-          toast.error(
-            "Koneksi internet bermasalah."
-          );
-
-        }
-
-        // =====================================
-        // LOGIN ERROR
-        // =====================================
-
-        else if (
-
-          errorMessage
-            .toLowerCase()
-            .includes(
-              "unauthorized"
-            )
-
-        ) {
-
-          toast.error(
-            "Sesi login berakhir. Silakan login ulang."
-          );
-
-        }
-
-        // =====================================
-        // VALIDATION ERROR
-        // =====================================
-
-        else if (
-
-          errorMessage
-            .toLowerCase()
-            .includes(
-              "validation"
-            )
-
-        ) {
-
-          toast.error(
-            "Data booking tidak valid."
-          );
-
-        }
-
-        // =====================================
-        // DUPLICATE ERROR
-        // =====================================
-
-        else if (
-
-          errorMessage
-            .toLowerCase()
-            .includes(
-              "duplicate"
-            )
-
-        ) {
-
-          toast.error(
-            "Booking sudah pernah dibuat."
-          );
-
-        }
-
-        // =====================================
-        // DEFAULT ERROR
-        // =====================================
-
-        else {
-
-          toast.error(
-            errorMessage
-          );
-
-        }
+        );
 
       }
 
     };
+
+  // ==========================================
+  // PAYMENT
+  // ==========================================
+
+  const handlePaymentRedirect =
+    async (pesanan) => {
+
+      try {
+
+        const tokenAktif =
+
+          user?.token ||
+
+          localStorage.getItem(
+            "token"
+          );
+
+        const cleanToken =
+
+          tokenAktif.replace(
+            /['"]+/g,
+            ""
+          );
+
+        const paymentResponse =
+          await axios.get(
+
+            `${API_URL}/api/payments`,
+
+            {
+
+              headers: {
+
+                Authorization:
+                  `Bearer ${cleanToken}`,
+
+              },
+
+            }
+
+          );
+
+        const allPayments =
+          paymentResponse.data
+            ?.data || [];
+
+        // ======================================
+        // SUDAH PAID
+        // ======================================
+
+        const existingPaid =
+          allPayments.find(
+
+            (payment) =>
+
+              Number(
+                payment.booking_id
+              ) ===
+                Number(
+                  pesanan.id
+                ) &&
+
+              payment.payment_status
+                ?.toLowerCase()
+                ?.trim() ===
+                "paid"
+
+          );
+
+        if (existingPaid) {
+
+          toast.success(
+            "Pembayaran sudah diverifikasi admin."
+          );
+
+          return;
+
+        }
+
+        // ======================================
+        // HARUS ACCEPTED
+        // ======================================
+
+        if (
+          pesanan.status
+            ?.toLowerCase() !==
+          "accepted"
+        ) {
+
+          toast.error(
+            "Pesanan belum bisa dibayar."
+          );
+
+          return;
+
+        }
+
+        navigate(
+          `/pembayaran/${pesanan.id}`,
+          {
+            state: {
+              booking: pesanan,
+            },
+          }
+        );
+
+      } catch (error) {
+
+        console.log(error);
+
+        toast.error(
+          "Gagal memvalidasi pembayaran."
+        );
+
+      }
+
+    };
+
+  // ==========================================
+  // FORMAT RUPIAH
+  // ==========================================
+
+  const formatRupiah =
+    (angka) => {
+
+      if (
+        !angka ||
+        isNaN(angka)
+      ) {
+
+        return "Belum ditentukan";
+
+      }
+
+      return new Intl.NumberFormat(
+        "id-ID",
+        {
+
+          style: "currency",
+
+          currency: "IDR",
+
+          maximumFractionDigits: 0,
+
+        }
+
+      ).format(angka);
+
+    };
+
+  // ==========================================
+  // FORMAT TANGGAL
+  // ==========================================
+
+  const formatTanggal =
+    (dateString) => {
+
+      if (!dateString)
+        return "-";
+
+      return new Date(
+        dateString
+      ).toLocaleDateString(
+        "id-ID",
+        {
+
+          year: "numeric",
+
+          month: "long",
+
+          day: "numeric",
+
+        }
+      );
+
+    };
+
+  // ==========================================
+  // LOADING
+  // ==========================================
+
+  if (loading) {
+
+    return (
+
+      <div className="booking-loading-screen">
+
+        <h3>
+          Memuat Data Pesanan...
+        </h3>
+
+      </div>
+
+    );
+
+  }
 
   // ==========================================
   // RENDER
@@ -455,290 +700,406 @@ Metode Ukuran: Ukuran Standar Katalog (${selectedSize})`;
 
   return (
 
-    <div className="modal-overlay">
+    <div className="booking-page-container">
 
-      <div className="modal-container">
+      <div className="booking-content-wrapper">
 
-        {/* HEADER */}
+        <div className="booking-header">
 
-        <div className="modal-header">
-
-          <h3>
-            Formulir Pengajuan Booking
-          </h3>
+          <h1>
+            Pesanan Saya
+          </h1>
 
           <p>
-            Model Baju:{" "}
-
-            <strong className="product-highlight">
-
-              {selectedProduct.name}
-
-            </strong>
-
+            Pantau proses pengerjaan
+            busana Anda secara
+            real-time
           </p>
 
         </div>
 
-        {/* FORM */}
+        {errorFetch && (
 
-        <form
+          <div className="booking-error-message">
 
-          onSubmit={
-            handleSubmitInternal
-          }
-
-          className="booking-form-element"
-        >
-
-          {/* DATE */}
-
-          <div className="form-group">
-
-            <label>
-              Rencana Tanggal Pertemuan:
-            </label>
-
-            <input
-
-              type="date"
-
-              value={bookingDate}
-
-              min={
-                getTodayDateString()
-              }
-
-              onChange={(e) =>
-
-                setBookingDate(
-                  e.target.value
-                )
-
-              }
-
-              className="form-input-date"
-            />
+            <p>
+              Gagal mengambil data
+              pesanan.
+            </p>
 
           </div>
 
-          {/* SIZE METHOD */}
+        )}
 
-          <div className="form-group">
+        {pesananList.length === 0 ? (
 
-            <label>
-              Pilihan Metode Ukuran:
-            </label>
+          <div className="booking-empty-state">
 
-            <div className="segmented-control">
-
-              {/* KATALOG */}
-
-              {selectedProduct.size &&
-                selectedProduct.size !==
-                  "NULL" &&
-                selectedProduct.size !==
-                  "" && (
-
-                  <button
-
-                    type="button"
-
-                    onClick={() => {
-
-                      setSizeType(
-                        "katalog"
-                      );
-
-                      setSelectedSize(
-                        ""
-                      );
-
-                    }}
-
-                    className={`segment-btn ${
-                      sizeType ===
-                      "katalog"
-                        ? "active"
-                        : ""
-                    }`}
-                  >
-
-                    Ukuran Katalog
-
-                  </button>
-
-                )}
-
-              {/* CUSTOM */}
-
-              <button
-
-                type="button"
-
-                onClick={() => {
-
-                  setSizeType(
-                    "custom"
-                  );
-
-                  setSelectedSize(
-                    "Custom"
-                  );
-
-                }}
-
-                className={`segment-btn ${
-                  sizeType ===
-                  "custom"
-                    ? "active"
-                    : ""
-                }`}
-              >
-
-                Custom Ukuran Baru
-
-              </button>
-
+            <div className="empty-box-icon">
+              📦
             </div>
 
+            <h3>
+              Belum Ada Pesanan
+            </h3>
+
+            <p>
+              Anda belum memiliki
+              pesanan aktif.
+            </p>
+
+            <button
+              className="btn-order-now"
+              onClick={() =>
+                navigate("/home")
+              }
+            >
+              Pesan Sekarang
+            </button>
+
           </div>
 
-          {/* DROPDOWN */}
+        ) : (
 
-          {sizeType ===
-            "katalog" &&
+          <div className="booking-list">
 
-            selectedProduct.size && (
+            {pesananList.map(
+              (pesanan) => {
 
-              <div className="form-group">
+                const isPaid =
+                  paidBookingIds.includes(
+                    pesanan.id
+                  );
 
-                <label>
-                  Pilih Ukuran Tersedia:
-                </label>
+                const bookingStatus =
+                  pesanan.status
+                    ?.toLowerCase();
 
-                <div className="select-wrapper">
+                return (
 
-                  <select
-
-                    value={selectedSize}
-
-                    onChange={(e) =>
-
-                      setSelectedSize(
-                        e.target.value
-                      )
-
-                    }
-
-                    className="form-select"
+                  <div
+                    key={pesanan.id}
+                    className={`booking-card status-border-${bookingStatus}`}
                   >
 
-                    <option value="">
-                      Pilih Ukuran
-                    </option>
+                    <div className="booking-card-main">
 
-                    {selectedProduct.size
-                      .split(",")
-                      .map(
-                        (
-                          size,
-                          index
-                        ) => (
+                      <div className="booking-details">
 
-                          <option
-                            key={index}
-                            value={size.trim()}
+                        <div className="booking-card-header">
+
+                          <h3>
+                            {pesanan.service_type ||
+                              "Jasa Jahit"}
+                          </h3>
+
+                          <span className="booking-id-tag">
+                            #{pesanan.id}
+                          </span>
+
+                        </div>
+
+                        <div className="note-text-box-premium">
+
+                          <h4 className="note-category-title">
+                            INFORMASI BOOKING
+                          </h4>
+
+                          <p className="note-line-item">
+
+                            <strong>
+                              Tanggal Booking:
+                            </strong>{" "}
+
+                            {formatTanggal(
+                              pesanan.booking_date
+                            )}
+
+                          </p>
+
+                          <p className="note-line-item">
+
+                            <strong>
+                              Total Harga:
+                            </strong>{" "}
+
+                            {formatRupiah(
+                              pesanan.portfolio?.price
+                            )}
+
+                          </p>
+
+                          <p className="note-line-item">
+
+                            <strong>
+                              Status Pembayaran:
+                            </strong>{" "}
+
+                            {isPaid
+                              ? "Pembayaran Terverifikasi"
+                              : "Belum Dibayar"}
+
+                          </p>
+
+                          <h4 className="note-category-title">
+                            DETAIL UKURAN
+                          </h4>
+
+                          <p className="note-line-item">
+                            {pesanan.body_size_note}
+                          </p>
+
+                        </div>
+
+                      </div>
+
+                      <div className="booking-status-wrapper">
+
+                        <span
+                          className={`status-badge-premium badge-${bookingStatus}`}
+                        >
+                          {pesanan.status}
+                        </span>
+
+                      </div>
+
+                    </div>
+
+                    <div className="booking-action-bar">
+
+                      <div className="action-message">
+
+                        <div className="info-dot"></div>
+
+                        {bookingStatus ===
+                          "pending" &&
+                          "Pesanan sedang menunggu konfirmasi tailor."}
+
+                        {bookingStatus ===
+                          "accepted" &&
+                          !isPaid &&
+                          "Pesanan diterima. Silakan lakukan pembayaran."}
+
+                        {isPaid &&
+                          "Pembayaran telah diverifikasi admin."}
+
+                        {bookingStatus ===
+                          "completed" &&
+                          "Pesanan telah selesai 🎉"}
+
+                        {bookingStatus ===
+                          "cancelled" &&
+                          "Pesanan dibatalkan. Silakan pilih ulang tanggal booking atau hapus pesanan."}
+
+                      </div>
+
+                      <div className="action-buttons-group">
+
+                        {bookingStatus ===
+                          "accepted" &&
+                          !isPaid && (
+
+                            <button
+
+                              onClick={() =>
+                                handlePaymentRedirect(
+                                  pesanan
+                                )
+                              }
+
+                              className="btn-action-primary"
+                            >
+                              Bayar Sekarang
+                            </button>
+
+                          )}
+
+                        {bookingStatus ===
+                          "cancelled" && (
+
+                            <>
+
+                              <button
+
+                                onClick={() => {
+
+                                  setEditingBookingId(
+                                    pesanan.id
+                                  );
+
+                                  setSelectedBooking(
+                                    pesanan
+                                  );
+
+                                  setNewBookingDate(
+
+                                    pesanan.booking_date
+                                      ?.split(
+                                        "T"
+                                      )[0]
+
+                                  );
+
+                                }}
+
+                                className="btn-action-primary"
+                              >
+                                Pilih Tanggal Baru
+                              </button>
+
+                              <button
+
+                                onClick={() =>
+                                  handleDeleteBooking(
+                                    pesanan.id
+                                  )
+                                }
+
+                                className="btn-action-secondary"
+                              >
+                                Hapus Pesanan
+                              </button>
+
+                            </>
+
+                          )}
+
+                      </div>
+
+                    </div>
+
+                    {editingBookingId ===
+                      pesanan.id && (
+
+                      <div
+                        style={{
+                          padding:
+                            "20px 24px",
+                          borderTop:
+                            "1px solid #f0ede4",
+                          background:
+                            "#fffdf9",
+                        }}
+                      >
+
+                        <div
+                          style={{
+                            display:
+                              "flex",
+                            flexDirection:
+                              "column",
+                            gap: "14px",
+                          }}
+                        >
+
+                          <label
+                            style={{
+                              fontSize:
+                                "14px",
+                              fontWeight:
+                                "600",
+                              color:
+                                "#333",
+                            }}
+                          >
+                            Pilih tanggal booking baru
+                          </label>
+
+                          <input
+
+                            type="date"
+
+                            min={
+                              new Date()
+                                .toISOString()
+                                .split("T")[0]
+                            }
+
+                            value={
+                              newBookingDate
+                            }
+
+                            onChange={(
+                              e
+                            ) =>
+
+                              setNewBookingDate(
+                                e.target
+                                  .value
+                              )
+
+                            }
+
+                            style={{
+                              padding:
+                                "12px 14px",
+                              borderRadius:
+                                "10px",
+                              border:
+                                "1px solid #ddd",
+                              fontSize:
+                                "14px",
+                              outline:
+                                "none",
+                            }}
+                          />
+
+                          <div
+                            style={{
+                              display:
+                                "flex",
+                              gap: "10px",
+                            }}
                           >
 
-                            {size.trim()}
+                            <button
 
-                          </option>
+                              onClick={
+                                handleUpdateBooking
+                              }
 
-                        )
-                      )}
+                              className="btn-action-primary"
+                            >
+                              Simpan Perubahan
+                            </button>
 
-                  </select>
+                            <button
 
-                  <div className="select-arrow">
-                    ▼
+                              onClick={() => {
+
+                                setEditingBookingId(
+                                  null
+                                );
+
+                                setSelectedBooking(
+                                  null
+                                );
+
+                              }}
+
+                              className="btn-action-secondary"
+                            >
+                              Batal
+                            </button>
+
+                          </div>
+
+                        </div>
+
+                      </div>
+
+                    )}
+
                   </div>
 
-                </div>
+                );
 
-              </div>
-
+              }
             )}
-
-          {/* CUSTOM */}
-
-          {sizeType ===
-            "custom" && (
-
-              <div className="form-group">
-
-                <label>
-                  Detail Lembar Catatan Ukuran Mandiri:
-                </label>
-
-                <textarea
-
-                  value={bodySizeNote}
-
-                  onChange={(e) =>
-
-                    setBodySizeNote(
-                      e.target.value
-                    )
-
-                  }
-
-                  className="form-textarea"
-                />
-
-              </div>
-
-            )}
-
-          {/* BUTTONS */}
-
-          <div className="modal-actions">
-
-            {/* CANCEL */}
-
-            <button
-
-              type="button"
-
-              onClick={onClose}
-
-              className="btn-cancel"
-            >
-
-              Batal
-
-            </button>
-
-            {/* SUBMIT */}
-
-            <button
-
-              type="submit"
-
-              disabled={isSubmitting}
-
-              className="btn-submit"
-            >
-
-              {isSubmitting
-                ? "Mengirim..."
-                : "Kirim Pengajuan"}
-
-            </button>
 
           </div>
 
-        </form>
+        )}
 
       </div>
 
