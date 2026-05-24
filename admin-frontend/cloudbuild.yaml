@@ -1,0 +1,27 @@
+steps:
+  # install dependency
+  - name: 'node:22'
+    dir: 'admin-frontend'
+    entrypoint: npm
+    args: ['install']
+
+  # build vite production
+  - name: 'node:22'
+    dir: 'admin-frontend'
+    entrypoint: npm
+    args: ['run', 'build']
+
+  # deploy app engine
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    dir: 'admin-frontend'
+    entrypoint: gcloud
+    args:
+      - app
+      - deploy
+      - app.yaml
+      - '--quiet'
+
+timeout: '1600s'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
