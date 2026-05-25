@@ -1,6 +1,6 @@
 runtime: nodejs22
 
-service: admin-frontend
+service: arki-admin
 
 automatic_scaling:
   max_instances: 2
