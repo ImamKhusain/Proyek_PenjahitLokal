@@ -1,4 +1,6 @@
-/* Modal Overlay */
+/* ==========================================================================
+   MODAL OVERLAY & LAYOUT DASAR
+   ========================================================================== */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -80,7 +82,9 @@
   font-family: inherit;
 }
 
-/* Segmented Control / Tab Switcher */
+/* ==========================================================================
+   SEGMENTED CONTROL (TAB SWITCHER)
+   ========================================================================== */
 .segmented-control {
   display: flex;
   background-color: #fdfdd0;
@@ -107,13 +111,17 @@
   color: #ffffff;
 }
 
-/* Dropdown Wrapper & Element */
+/* ==========================================================================
+   DROPDOWN FIX (PILIH UKURAN)
+   ========================================================================== */
 .select-wrapper {
   position: relative;
+  width: 100%;
 }
 
-.form-select {
-  padding: 11px;
+/* Mengatur element <select> utama */
+.form-style {
+  padding: 11px 40px 11px 12px; /* Diberi padding kanan agar teks tidak menabrak panah */
   border: 1px solid #cbd5e1;
   border-radius: 6px;
   font-size: 14px;
@@ -123,21 +131,35 @@
   width: 100%;
   outline: none;
   font-weight: 600;
+  
+  /* 🌟 HILANGKAN PANAH BAWAAN BROWSER AGAR TIDAK DOUBLE */
   appearance: none;
   -webkit-appearance: none;
+  -moz-appearance: none;
 }
 
+/* Hilangkan panah tambahan bawaan di browser Internet Explorer / Edge Lama */
+.form-style::-ms-expand {
+  display: none;
+}
+
+/* Mengatur icon panah merah buatan sendiri */
 .select-arrow {
   position: absolute;
   top: 50%;
-  right: 12px;
+  right: 15px;
   transform: translateY(-50%);
-  pointer-events: none;
   color: #a51c1c;
   font-weight: bold;
+  font-size: 12px;
+  
+  /* 🌟 SOLUSI FIX: Klik mouse menembus objek ini langsung ke select di bawahnya */
+  pointer-events: none; 
 }
 
-/* Textarea Note */
+/* ==========================================================================
+   TEXTAREA & ACTION BUTTONS
+   ========================================================================== */
 .form-textarea {
   padding: 12px;
   border: 1px solid #cbd5e1;
