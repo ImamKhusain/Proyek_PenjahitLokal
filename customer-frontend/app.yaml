@@ -1,6 +1,6 @@
 runtime: nodejs22
 
-service: customer-frontend
+service: arki-tailor
 
 handlers:
   - url: /(.*\..+)$
