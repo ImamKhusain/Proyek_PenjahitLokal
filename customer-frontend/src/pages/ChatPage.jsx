@@ -8,7 +8,6 @@ import {
 import {
   useParams,
   useLocation,
-  navigate,
   useNavigate,
 } from "react-router-dom";
 
