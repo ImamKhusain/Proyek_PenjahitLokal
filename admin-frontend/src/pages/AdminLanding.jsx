@@ -146,7 +146,7 @@ const AdminLanding = () => {
                   <div className="admin-stat-box">
 
                     <h3>
-                      120+
+                      100+
                     </h3>
 
                     <span>
