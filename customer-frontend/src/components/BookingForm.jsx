@@ -54,7 +54,6 @@ Catatan Tambahan Kain/Model:`
   const handleSubmitInternal = async (e) => {
     e.preventDefault();
 
-    // VALIDASI TANGGAL
     const todayStr = getTodayDateString();
     if (bookingDate < todayStr) {
       toast.dismiss();
@@ -72,7 +71,7 @@ ${bodySizeNote}`
 Metode Ukuran: Ukuran Standar Katalog (${selectedSize})`;
 
     try {
-      // Menjalankan fungsi onSubmit dari PortfolioCard.jsx dan menunggu hingga proses API selesai
+      // Menjalankan fungsi submit yang ada di PortfolioCard.jsx
       await onSubmit({
         bookingDate,
         finalNote,

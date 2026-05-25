@@ -9,14 +9,20 @@ const Booking = () => {
   const navigate = useNavigate();
   const { user, loading } = useContext(AuthContext);
   const [pesananList, setPesananList] = useState([]);
-  // 💡 TAMBAHAN: State untuk menyimpan daftar booking_id yang sudah lunas dibayar
   const [paidBookingIds, setPaidBookingIds] = useState([]);
   const [errorFetch, setErrorFetch] = useState(false);
 
-  // State untuk menyimpan tanggal baru pilihan user berdasarkan ID booking
   const [selectedNewDates, setSelectedNewDates] = useState({});
-  // State indikator loading saat proses update/delete sedang dikirim ke backend
   const [isUpdating, setIsUpdating] = useState(false);
+
+  // 💡 MENDAPATKAN TANGGAL HARI INI (Format: YYYY-MM-DD) untk mengunci kalender
+  const getTodayDateString = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
 
   useEffect(() => {
     if (loading) return;
@@ -30,7 +36,7 @@ const Booking = () => {
   }, [user, loading]);
 
   // ==========================================
-  // 1. AMBIL DATA PESANAN & STATUS FINANSIAL (FORK-JOIN)
+  // 1. AMBIL DATA PESANAN & STATUS FINANSIAL
   // ==========================================
   const fetchMyBookingsAndPayments = async () => {
     try {
@@ -49,7 +55,6 @@ const Booking = () => {
         "Accept": "application/json"
       };
 
-      // 💡 PERBAIKAN: Memanggil endpoint bookings dan payments secara paralel menggunakan URL Production
       const [bookingsResponse, paymentsResponse] = await Promise.all([
         axios({
           method: "get",
@@ -63,21 +68,19 @@ const Booking = () => {
         })
       ]);
       
-      // Proses data booking
       const allBookings = bookingsResponse.data?.data || [];
       const myBookings = allBookings.filter(
         (booking) => booking && Number(booking.customer_id) === Number(idUserAktif)
       );
       myBookings.sort((a, b) => b.id - a.id);
 
-      // Proses data payment untuk mendapatkan ID booking yang berstatus "paid"
       const allPayments = paymentsResponse.data?.data || [];
       const confirmedPaidIds = allPayments
         .filter(p => p && p.payment_status && p.payment_status.toLowerCase().trim() === "paid")
         .map(p => p.booking_id);
       
       setPesananList(myBookings);
-      setPaidBookingIds(confirmedPaidIds); // Simpan semua ID booking yang sudah lunas
+      setPaidBookingIds(confirmedPaidIds);
       setErrorFetch(false);
     } catch (error) {
       console.error("Gagal memuat data gabungan booking dan payment:", error);
@@ -86,13 +89,21 @@ const Booking = () => {
   };
 
   // ==========================================
-  // 2. AJUKAN TANGGAL BARU (PUT)
+  // 2. AJUKAN TANGGAL BARU (PUT) + VALIDASI KETAT
   // ==========================================
   const handleRescheduleBooking = async (bookingId, currentBookingData) => {
     const newDate = selectedNewDates[bookingId];
     if (!newDate) {
       toast.dismiss();
       toast.error("Silakan pilih tanggal rencana pertemuan yang baru terlebih dahulu.");
+      return;
+    }
+
+    // 🛡️ VALIDASI JAVASCRIPT: Menolak jika user memaksa input tanggal lewat inspect element
+    const todayStr = getTodayDateString();
+    if (newDate < todayStr) {
+      toast.dismiss();
+      toast.error("Tanggal pertemuan baru tidak boleh kurang dari hari ini!");
       return;
     }
 
@@ -293,7 +304,6 @@ const Booking = () => {
               const isAccepted = currentStatusClean === "accepted";
               const isCompleted = currentStatusClean === "completed";
               
-              // 💡 KUNCI UTAMA: Cek apakah ID booking ini ada di dalam array paidBookingIds
               const isAlreadyPaid = paidBookingIds.includes(pesanan.id);
 
               let statusLabel = "Menunggu";
@@ -301,7 +311,6 @@ const Booking = () => {
               if (isCompleted || (isAccepted && isAlreadyPaid)) statusLabel = "Selesai"; 
               if (isCanceled) statusLabel = "Dibatalkan";
 
-              // Penentuan class style berdasarkan status bayar / status booking
               const badgeClass = isCanceled ? "badge-canceled" : (isCompleted || isAlreadyPaid) ? "badge-completed" : isAccepted ? "badge-accepted" : "badge-pending";
               const borderClass = isCanceled ? "status-border-canceled" : (isCompleted || isAlreadyPaid) ? "status-border-completed" : isAccepted ? "status-border-accepted" : "status-border-pending";
 
@@ -335,7 +344,6 @@ const Booking = () => {
                         </p>
                       </div>
 
-                      {/* 💡 KONDISIONAL TOMBOL: Jika di-acc DAN belum dibayar, tampilkan tombol bayar */}
                       {isAccepted && !isAlreadyPaid && (
                         <div className="payment-action-box" style={{ margin: '16px 0 8px 0' }}>
                           <button
@@ -358,12 +366,11 @@ const Booking = () => {
                             onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#059669'}
                             onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#10b981'}
                           >
-                            bitte 💳 Lanjut Ke Pembayaran
+                            💳 Lanjut Ke Pembayaran
                           </button>
                         </div>
                       )}
 
-                      {/* 💡 KONDISIONAL INFORMASI: Jika sudah sukses dibayar, tampilkan informasi Lunas */}
                       {isAccepted && isAlreadyPaid && (
                         <div className="payment-success-info-box" style={{ 
                           margin: '16px 0 8px 0', 
@@ -407,6 +414,8 @@ const Booking = () => {
                             type="date" 
                             id={`new-date-${pesanan.id}`}
                             className="form-input-date"
+                            /* 💡 KUNCI UTAMA: Mengunci kalender HTML (mengarsir abu-abu tanggal kemarin) */
+                            min={getTodayDateString()}
                             value={selectedNewDates[pesanan.id] || ""}
                             onChange={(e) => handleDateChange(pesanan.id, e.target.value)}
                             disabled={isUpdating}
@@ -415,6 +424,7 @@ const Booking = () => {
 
                         <div className="action-buttons-group">
                           <button 
+                            type="button"
                             className="btn-action-secondary"
                             onClick={() => handleDeleteBooking(pesanan.id)}
                             disabled={isUpdating}
@@ -422,6 +432,7 @@ const Booking = () => {
                             {isUpdating ? "Menghapus..." : "Singkirkan"}
                           </button>
                           <button 
+                            type="button"
                             className="btn-action-primary"
                             onClick={() => handleRescheduleBooking(pesanan.id, pesanan)}
                             disabled={isUpdating}
