@@ -48,6 +48,12 @@ const BookingPage = () => {
     setLoading,
   ] = useState(true);
 
+  // SEARCH
+  const [
+    search,
+    setSearch,
+  ] = useState("");
+
 
   // ======================
   // CHECK LOGIN
@@ -106,6 +112,39 @@ const BookingPage = () => {
       }
 
     };
+
+
+  // ======================
+  // FILTER SEARCH
+  // ======================
+
+  const filteredBookings =
+    bookings.filter((item) => {
+
+      const keyword =
+        search.toLowerCase();
+
+      return (
+
+        item.id
+          ?.toString()
+          .includes(keyword)
+
+        ||
+
+        item.customer?.name
+          ?.toLowerCase()
+          .includes(keyword)
+
+        ||
+
+        item.tailor?.name
+          ?.toLowerCase()
+          .includes(keyword)
+
+      );
+
+    });
 
 
   // ======================
@@ -311,6 +350,53 @@ const BookingPage = () => {
           </div>
 
 
+          {/* SEARCH */}
+
+          <div
+            style={{
+              marginBottom: "20px",
+            }}
+          >
+
+            <input
+              type="text"
+
+              placeholder="Cari ID, customer, atau tailor..."
+
+              value={search}
+
+              onChange={(e) =>
+                setSearch(
+                  e.target.value
+                )
+              }
+
+              style={{
+
+                width: "100%",
+
+                padding: "14px 18px",
+
+                borderRadius: "14px",
+
+                border:
+                  "1px solid #d1d5db",
+
+                outline: "none",
+
+                fontSize: "14px",
+
+                background: "#ffffff",
+
+                boxSizing:
+                  "border-box",
+
+              }}
+            />
+
+          </div>
+
+
           {/* TABLE */}
 
           <div
@@ -398,10 +484,10 @@ const BookingPage = () => {
 
                   </tr>
 
-                ) : bookings.length >
+                ) : filteredBookings.length >
                   0 ? (
 
-                  bookings.map(
+                  filteredBookings.map(
                     (item) => (
 
                       <tr
@@ -609,7 +695,7 @@ const BookingPage = () => {
                           "#6b7280",
                       }}
                     >
-                      Belum ada pesanan
+                      Data tidak ditemukan
                     </td>
 
                   </tr>

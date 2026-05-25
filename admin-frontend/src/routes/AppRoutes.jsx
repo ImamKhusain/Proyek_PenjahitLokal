@@ -44,6 +44,9 @@ import AdminPayments from "../pages/AdminPayments";
 
 import IncomePage from "../pages/IncomePage";
 
+/* IMPORT LANDING PAGE */
+import AdminLanding from "../pages/AdminLanding";
+
 const AppRoutes = () => {
 
   const {
@@ -64,13 +67,31 @@ const AppRoutes = () => {
 
       <Routes>
 
-        {/* LOGIN */}
+        {/* =========================================
+            LANDING PAGE
+        ========================================= */}
         <Route
           path="/"
-          element={<Login />}
+          element={<AdminLanding />}
         />
 
-        {/* DASHBOARD */}
+        {/* =========================================
+            LOGIN
+        ========================================= */}
+        <Route
+          path="/login"
+          element={
+            user ? (
+              <Dashboard />
+            ) : (
+              <Login />
+            )
+          }
+        />
+
+        {/* =========================================
+            DASHBOARD
+        ========================================= */}
         <Route
           path="/dashboard"
           element={
@@ -82,7 +103,9 @@ const AppRoutes = () => {
           }
         />
 
-        {/* BOOKINGS */}
+        {/* =========================================
+            BOOKINGS
+        ========================================= */}
         <Route
           path="/bookings"
           element={
@@ -94,7 +117,9 @@ const AppRoutes = () => {
           }
         />
 
-        {/* PAYMENTS */}
+        {/* =========================================
+            PAYMENTS
+        ========================================= */}
         <Route
           path="/payments"
           element={
@@ -106,19 +131,23 @@ const AppRoutes = () => {
           }
         />
 
-        {/* INCOME */}
-<Route
-  path="/income"
-  element={
-    user ? (
-      <IncomePage />
-    ) : (
-      <Login />
-    )
-  }
-/>
+        {/* =========================================
+            INCOME
+        ========================================= */}
+        <Route
+          path="/income"
+          element={
+            user ? (
+              <IncomePage />
+            ) : (
+              <Login />
+            )
+          }
+        />
 
-        {/* NOTIFICATIONS */}
+        {/* =========================================
+            NOTIFICATIONS
+        ========================================= */}
         <Route
           path="/notifications"
           element={
@@ -130,7 +159,9 @@ const AppRoutes = () => {
           }
         />
 
-        {/* PORTFOLIO */}
+        {/* =========================================
+            PORTFOLIO
+        ========================================= */}
         <Route
           path="/portfolio"
           element={
@@ -142,7 +173,9 @@ const AppRoutes = () => {
           }
         />
 
-        {/* DETAIL PENJAHIT */}
+        {/* =========================================
+            DETAIL PENJAHIT
+        ========================================= */}
         <Route
           path="/tailor-detail/:id"
           element={
@@ -154,7 +187,9 @@ const AppRoutes = () => {
           }
         />
 
-        {/* ADMIN CHAT */}
+        {/* =========================================
+            ADMIN CHAT
+        ========================================= */}
         <Route
           path="/admin-chat"
           element={
@@ -166,7 +201,9 @@ const AppRoutes = () => {
           }
         />
 
-        {/* ADMIN CHAT ROOM */}
+        {/* =========================================
+            ADMIN CHAT ROOM
+        ========================================= */}
         <Route
           path="/admin-chat/:roomId"
           element={
@@ -178,7 +215,9 @@ const AppRoutes = () => {
           }
         />
 
-        {/* MANAGE PORTFOLIO */}
+        {/* =========================================
+            MANAGE PORTFOLIO
+        ========================================= */}
         <Route
           path="/manage-portfolio/:id"
           element={
@@ -191,7 +230,9 @@ const AppRoutes = () => {
           }
         />
 
-        {/* DETAIL PORTFOLIO */}
+        {/* =========================================
+            DETAIL PORTFOLIO
+        ========================================= */}
         <Route
           path="/portfolio-detail/:id"
           element={
@@ -204,7 +245,9 @@ const AppRoutes = () => {
           }
         />
 
-        {/* ADD PORTFOLIO */}
+        {/* =========================================
+            ADD PORTFOLIO
+        ========================================= */}
         <Route
           path="/manage-portfolio/:id/add"
           element={
@@ -217,7 +260,9 @@ const AppRoutes = () => {
           }
         />
 
-        {/* MANAGE TAILOR */}
+        {/* =========================================
+            MANAGE TAILOR
+        ========================================= */}
         <Route
           path="/manage-tailor"
           element={
