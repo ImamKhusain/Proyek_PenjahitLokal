@@ -71,9 +71,9 @@ ${bodySizeNote}`
 Metode Ukuran: Ukuran Standar Katalog (${selectedSize})`;
 
     try {
-      // Menjalankan fungsi submit yang ada di PortfolioCard.jsx
+      // Menjalankan fungsi submit dengan property 'booking_date'
       await onSubmit({
-        bookingDate,
+        booking_date: bookingDate, // Menggunakan properti snake_case
         finalNote,
         selectedSize,
         productDetail: selectedProduct, 
@@ -81,7 +81,6 @@ Metode Ukuran: Ukuran Standar Katalog (${selectedSize})`;
       
     } catch (error) {
       console.error("Error form submission:", error);
-      toast.error("Gagal mengirim pengajuan, silakan coba lagi.");
     }
   };
 

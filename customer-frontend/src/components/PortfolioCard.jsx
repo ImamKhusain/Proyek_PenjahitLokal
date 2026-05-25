@@ -7,26 +7,14 @@ import "./PortfolioCard.css";
 
 const PortfolioCard = () => {
 
-  const { id } =
-    useParams();
+  const { id } = useParams();
+  const navigate = useNavigate();
 
-  const navigate =
-    useNavigate();
-
-  const [portfolios, setPortfolios] =
-    useState([]);
-
-  const [loading, setLoading] =
-    useState(true);
-
-  const [isModalOpen, setIsModalOpen] =
-    useState(false);
-
-  const [selectedProduct, setSelectedProduct] =
-    useState(null);
-
-  const [isSubmitting, setIsSubmitting] =
-    useState(false);
+  const [portfolios, setPortfolios] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
 
   // =====================================
@@ -40,12 +28,9 @@ const PortfolioCard = () => {
 
         try {
 
-const response =
-  await axios.get(
-
-    `https://proyek-penjahitlokal-764024000152.us-central1.run.app/api/portfolios/tailor/${id}`
-
-  );
+          const response = await axios.get(
+            `https://proyek-penjahitlokal-764024000152.us-central1.run.app/api/portfolios/tailor/${id}`
+          );
 
           const actualData =
             response.data.data
@@ -53,11 +38,9 @@ const response =
               : response.data;
 
           setPortfolios(
-
             Array.isArray(actualData)
               ? actualData
               : []
-
           );
 
           setLoading(false);
@@ -65,10 +48,8 @@ const response =
         } catch (error) {
 
           console.error(
-
             "Gagal mengambil data portfolio penjahit:",
             error
-
           );
 
           setLoading(false);
@@ -92,7 +73,6 @@ const response =
     (product) => {
 
       setSelectedProduct(product);
-
       setIsModalOpen(true);
 
     };
@@ -104,23 +84,16 @@ const response =
 
   const handleBookingSubmit =
     async ({
-
-      bookingDate,
-
+      booking_date, // Menerima key booking_date dari BookingForm
       finalNote,
-
       productDetail,
-
     }) => {
 
       setIsSubmitting(true);
 
       try {
 
-        const token =
-          localStorage.getItem(
-            "token"
-          );
+        const token = localStorage.getItem("token");
 
         // =====================================
         // VALIDASI LOGIN
@@ -129,58 +102,33 @@ const response =
         if (!token) {
 
           toast.dismiss();
-
           toast.error(
             "Anda harus login terlebih dahulu untuk membuat pesanan!"
           );
 
           navigate("/login");
-
           return;
 
         }
 
-        let customerId =
-          null;
+        let customerId = null;
 
         try {
 
-          const base64Url =
-            token.split('.')[1];
+          const base64Url = token.split('.')[1];
+          const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+          const jsonPayload = decodeURIComponent(
+            atob(base64)
+              .split('')
+              .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+              .join('')
+          );
 
-          const base64 =
-            base64Url
-              .replace(/-/g, '+')
-              .replace(/_/g, '/');
-
-          const jsonPayload =
-            decodeURIComponent(
-
-              atob(base64)
-                .split('')
-                .map(
-
-                  (c) =>
-
-                    '%' +
-                    ('00' + c.charCodeAt(0).toString(16)).slice(-2)
-
-                )
-                .join('')
-
-            );
-
-          const decoded =
-            JSON.parse(
-              jsonPayload
-            );
+          const decoded = JSON.parse(jsonPayload);
 
           customerId =
-
             decoded.id ||
-
             decoded.userId ||
-
             decoded.customer_id;
 
         } catch (err) {
@@ -198,20 +146,12 @@ const response =
 
         if (!customerId) {
 
-          const storedUser =
-            localStorage.getItem(
-              "user"
-            );
+          const storedUser = localStorage.getItem("user");
 
           if (storedUser) {
 
-            const parsedUser =
-              JSON.parse(
-                storedUser
-              );
-
-            customerId =
-              parsedUser.id;
+            const parsedUser = JSON.parse(storedUser);
+            customerId = parsedUser.id;
 
           }
 
@@ -224,74 +164,41 @@ const response =
         if (!customerId) {
 
           toast.dismiss();
-
           toast.error(
             "Sesi login tidak valid. Silakan login kembali."
           );
 
           navigate("/login");
-
           return;
 
         }
 
         // =====================================
-        // PAYLOAD
+        // PAYLOAD (SESUAI NOTASI DATABASE)
         // =====================================
 
         const payload = {
-
-          customer_id:
-            parseInt(
-              customerId,
-              10
-            ),
-
-          tailor_id:
-            parseInt(
-              id,
-              10
-            ),
-
-          booking_date:
-            bookingDate,
-
-          body_size_note:
-            finalNote,
-
-          portfolio_id:
-            productDetail
-              ? parseInt(
-                  productDetail.id,
-                  10
-                )
-              : null,
-
+          customer_id: parseInt(customerId, 10),
+          tailor_id: parseInt(id, 10),
+          booking_date: booking_date, // Cocok dengan nama kolom phpMyAdmin kamu
+          body_size_note: finalNote,
+          portfolio_id: productDetail ? parseInt(productDetail.id, 10) : null,
         };
 
         // =====================================
         // API BOOKING
         // =====================================
 
-        const response =
-          await axios.post(
-
-            "https://proyek-penjahitlokal-764024000152.us-central1.run.app/api/bookings",
-
-            payload,
-
-            {
-
-              headers: {
-
-                Authorization:
-                  `Bearer ${token}`,
-
-              },
-
-            }
-
-          );
+        const response = await axios.post(
+          "https://proyek-penjahitlokal-764024000152.us-central1.run.app/api/bookings",
+          payload,
+          {
+            headers: {
+              Authorization:
+                `Bearer ${token}`,
+            },
+          }
+        );
 
         // 1. Tutup modal secara aman terlebih dahulu
         setIsModalOpen(false);
@@ -315,13 +222,9 @@ const response =
         );
 
         toast.dismiss();
-
         toast.error(
-
           error.response?.data?.message ||
-
           "Gagal mengirim pengajuan booking."
-
         );
 
       } finally {
@@ -340,13 +243,9 @@ const response =
   if (loading) {
 
     return (
-
       <div className="portfolio-loading">
-
         Memuat katalog eksklusif...
-
       </div>
-
     );
 
   }
@@ -361,36 +260,23 @@ const response =
     <div className="portfolio-page">
 
       <button
-
-        onClick={() =>
-          navigate(`/detail/${id}`)
-        }
-
+        onClick={() => navigate(`/detail/${id}`)}
         className="back-profile-btn"
       >
         ← Kembali ke Profil Tailor
       </button>
 
       <div className="portfolio-header">
-
-        <h1>
-          KATALOG PAKAIAN
-        </h1>
-
+        <h1>KATALOG PAKAIAN</h1>
         <p>
           Daftar karya premium dan masterpice jahitan terbaik untuk Anda.
         </p>
-
       </div>
 
       {portfolios.length === 0 ? (
 
         <div className="portfolio-empty">
-
-          <p>
-            Belum ada produk katalog yang dipublikasikan.
-          </p>
-
+          <p>Belum ada produk katalog yang dipublikasikan.</p>
         </div>
 
       ) : (
@@ -404,19 +290,13 @@ const response =
             // =====================================
 
             const hasImage =
-
               item.image_url &&
-
               item.image_url !== "NULL" &&
-
               item.image_url !== "";
 
             const imageSrc =
-
               hasImage
-
                 ? item.image_url
-
                 : "https://placehold.co/600x450?text=No+Image+Available";
 
 
@@ -432,31 +312,18 @@ const response =
                 <div className="card-image-wrap">
 
                   <img
-
                     src={imageSrc}
-
                     alt={item.name}
-
                     onError={(e) => {
-
-                      e.target.onerror =
-                        null;
-
-                      e.target.src =
-                        "https://placehold.co/600x450?text=Gambar+Tidak+Tersedia";
-
+                      e.target.onerror = null;
+                      e.target.src = "https://placehold.co/600x450?text=Gambar+Tidak+Tersedia";
                     }}
-
                   />
 
                   {item.size && (
-
                     <div className="card-size-badge">
-
                       SIZE: {item.size}
-
                     </div>
-
                   )}
 
                 </div>
@@ -465,39 +332,22 @@ const response =
 
                 <div className="card-content-body">
 
-                  <h3>
-                    {item.name}
-                  </h3>
+                  <h3>{item.name}</h3>
 
                   <p>
-
-                    {item.description ||
-
-                      "Tidak ada deskripsi detail pengerjaan."}
-
+                    {item.description || "Tidak ada deskripsi detail pengerjaan."}
                   </p>
 
                   <div className="card-content-footer">
 
                     <p className="card-price">
-
                       Rp {
-
-                        parseInt(
-                          item.price || 0,
-                          10
-                        ).toLocaleString("id-ID")
-
+                        parseInt(item.price || 0, 10).toLocaleString("id-ID")
                       }
-
                     </p>
 
                     <button
-
-                      onClick={() =>
-                        openBookingModal(item)
-                      }
-
+                      onClick={() => openBookingModal(item)}
                       className="booking-trigger-btn"
                     >
                       Booking Ini
@@ -520,23 +370,14 @@ const response =
       {/* MODAL */}
 
       <BookingForm
-
         isOpen={isModalOpen}
-
         onClose={() => {
-
           setIsModalOpen(false);
-
           setSelectedProduct(null);
-
         }}
-
         selectedProduct={selectedProduct}
-
         onSubmit={handleBookingSubmit}
-
         isSubmitting={isSubmitting}
-
       />
 
     </div>
