@@ -361,7 +361,6 @@ const PortofolioForm = () => {
               styles.topbarRight
             }
           >
-            🔔
             <span>ARKI</span>
           </div>
         </div>
